@@ -1,0 +1,17 @@
+blank:
+  - title: 'Blank Issue'
+    labels: ['bug']
+    assignees: []
+  - title: 'Feature Request'
+    labels: ['enhancement']
+    assignees: []
+
+bug:
+  - title: 'Bug Report'
+    labels: ['bug']
+    assignees: []
+
+feature:
+  - title: 'Feature Request'
+    labels: ['feature']
+    assignees: []
