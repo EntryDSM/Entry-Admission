@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@entry/design-token": ["libs/design-token/src/index.ts"],
+      "@entry/ui": ["libs/ui/src/index.ts"],
+      "@entry/untils": ["libs/untils/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
