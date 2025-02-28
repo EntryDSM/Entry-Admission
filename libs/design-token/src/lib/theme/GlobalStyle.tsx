@@ -31,6 +31,7 @@ const style = css`
   button {
     outline: none;
     border: none;
+    cursor: pointer;
     &:active {
       outline: none;
       border: none;
