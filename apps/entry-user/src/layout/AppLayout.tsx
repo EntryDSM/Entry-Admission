@@ -6,7 +6,7 @@ import { GlobalStyle } from '@entry/design-token';
 export const AppLayout = () => {
   return (
     <>
-      <CommonHeader isAdmin={false} />
+      <CommonHeader />
       <MainContainer>
         <Outlet />
       </MainContainer>

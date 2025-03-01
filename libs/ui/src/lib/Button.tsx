@@ -3,10 +3,10 @@ import { colors } from '@entry/design-token';
 
 interface IButtonType {
   children: string;
-  width: string;
-  backgroundColor: string;
-  color: string;
-  backgroundHoverColor: string;
+  width?: string;
+  backgroundColor?: string;
+  color?: string;
+  backgroundHoverColor?: string;
 }
 
 export const Button = ({

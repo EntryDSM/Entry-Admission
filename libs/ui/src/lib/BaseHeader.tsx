@@ -3,18 +3,23 @@ import { colors } from '@entry/design-token';
 import { EntryLogo } from './icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+interface IHeaderType {
+  isAdmin?: boolean;
+}
+
 type INavType = {
   children?: string;
   isPath?: boolean;
   onClick?: () => void;
+  isAdmin?: boolean;
 };
 
-const Nav = ({ children, isPath, onClick }: INavType) => {
+const Nav = ({ children, isPath, isAdmin, onClick }: INavType) => {
   return (
     <>
       <NavContentContainer onClick={onClick}>
         <NavContent isPath={isPath}>{children}</NavContent>
-        <NavLine isPath={isPath} />
+        <NavLine isPath={isPath} isAdmin={isAdmin} />
       </NavContentContainer>
     </>
   );
@@ -56,6 +61,7 @@ export const AdmissionHeader = () => {
               key={data.path}
               isPath={pathname === data.path}
               onClick={() => navClick(data.path)}
+              isAdmin={true}
             >
               {data.name}
             </Nav>
@@ -76,6 +82,75 @@ export const AdmissionHeader = () => {
           backgroundHoverColor={colors.gray[100]}
         >
           메인으로{' '}
+        </Button>
+      </ButtonContainer>
+    </HeaderContainer>
+  );
+};
+
+export const CommonHeader = ({ isAdmin }: IHeaderType) => {
+  const navigate = useNavigate();
+  const navData = [
+    {
+      name: '전형요강',
+      path: '/admission/guidelines',
+    },
+    {
+      name: '공지사항',
+      path: '/notices',
+    },
+    {
+      name: '자주 묻는 질문',
+      path: '/faq',
+    },
+    {
+      name: '성적산출',
+      path: '/admission/score',
+    },
+  ];
+
+  const { pathname } = useLocation();
+
+  const navClick = (path: string) => {
+    navigate(path);
+  };
+
+  return (
+    <HeaderContainer>
+      <NavAllContainer>
+        <LogoContainer>
+          <EntryLogo isAdmin={isAdmin} />
+          <HeaderLogoTitle>EntryDSM</HeaderLogoTitle>
+        </LogoContainer>
+        <NavContainer>
+          {navData.map((data) => (
+            <Nav
+              key={data.path}
+              isPath={pathname === data.path}
+              onClick={() => navClick(data.path)}
+              isAdmin={isAdmin}
+            >
+              {data.name}
+            </Nav>
+          ))}
+        </NavContainer>
+      </NavAllContainer>
+      <ButtonContainer>
+        <Button
+          color={colors.gray[50]}
+          backgroundColor={isAdmin ? colors.green[500] : colors.orange[500]}
+          backgroundHoverColor={
+            isAdmin ? colors.green[700] : colors.orange[700]
+          }
+        >
+          로그인
+        </Button>
+        <Button
+          color={colors.gray[900]}
+          backgroundColor={'transparent'}
+          backgroundHoverColor={colors.gray[100]}
+        >
+          회원가입
         </Button>
       </ButtonContainer>
     </HeaderContainer>
@@ -134,12 +209,14 @@ const NavContent = styled.nav<{ isPath: boolean }>`
   }
 `;
 
-const NavLine = styled.div<{ isPath: boolean }>`
+const NavLine = styled.div<{ isPath: boolean; isAdmin: boolean }>`
   width: 100%;
   height: 2px;
   border-radius: 1px;
-  background-color: ${({ isPath }) =>
-    isPath ? colors.green[500] : 'transparent'};
+  background-color: ${({ isPath, isAdmin }) => {
+    if (!isPath) return 'transparent';
+    return isAdmin ? colors.green[500] : colors.orange[500];
+  }};
 `;
 
 const NavContentContainer = styled.nav`
