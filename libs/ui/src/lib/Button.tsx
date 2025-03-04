@@ -30,7 +30,7 @@ export const Button = ({
 
 const BtnContainer = styled.button<Omit<IButtonType, 'children'>>`
   width: ${({ width }) => width};
-  height: 48px;
+  height: 54px;
   border-radius: 8px;
   background-color: ${({ backgroundColor }) => backgroundColor};
   display: flex;

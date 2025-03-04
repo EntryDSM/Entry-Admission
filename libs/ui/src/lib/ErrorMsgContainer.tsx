@@ -68,4 +68,7 @@ const HomeBtn = styled.button<{ isAdmin: boolean }>`
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  outline: none;
+  border: none;
+  cursor: pointer;
 `;
