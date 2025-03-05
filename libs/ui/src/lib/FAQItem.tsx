@@ -8,9 +8,10 @@ interface IFAQType {
   title: string;
   content: string;
   isAdmin?: boolean;
+  key?: number;
 }
 
-export const FAQItem = ({ number, title, content, isAdmin }: IFAQType) => {
+export const FAQItem = ({ number, title, content, isAdmin, key }: IFAQType) => {
   const [isClick, setIsClick] = useState<boolean>(false);
 
   const itemClick = () => {
@@ -18,7 +19,12 @@ export const FAQItem = ({ number, title, content, isAdmin }: IFAQType) => {
   };
 
   return (
-    <ItemContainer isClick={isClick} onClick={itemClick} isAdmin={isAdmin}>
+    <ItemContainer
+      isClick={isClick}
+      onClick={itemClick}
+      isAdmin={isAdmin}
+      key={key}
+    >
       <Number isClick={isClick} isAdmin={isAdmin}>
         {number}
       </Number>
@@ -87,7 +93,7 @@ const ItemContainer = styled.div<{ isClick: boolean; isAdmin: boolean }>`
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.05);
   padding: 24px 32px;
   width: 100%;
-  height: ${({ isClick }) => (isClick ? 157 : 81)}px;
+  height: ${({ isClick }) => (isClick ? 'auto' : 81)}px;
   border-radius: 12px;
   background-color: ${({ isClick, isAdmin }) => {
     if (!isClick) return colors.gray[50];

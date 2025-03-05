@@ -1,3 +1,5 @@
+export { default as videoIcon } from './videoIcon.svg';
+export { default as chatIcon } from './chatIcon.svg';
 export * from './EntryLogo';
 export * from './BookIcon';
 export * from './ChallengeIcon';

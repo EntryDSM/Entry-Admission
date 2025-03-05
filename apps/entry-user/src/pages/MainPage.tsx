@@ -4,6 +4,7 @@ import { colors } from '@entry/design-token';
 import {
   BackgroundGradient,
   Button,
+  ChatButtonContainer,
   FAQItem,
   ProcessContainer,
 } from '@entry/ui';
@@ -43,73 +44,32 @@ export const MainPage = () => {
       },
     ],
   });
+
+  const videoClick = () => {
+    window.location.href = 'https://www.youtube.com/watch?v=d70Snj2wTmY';
+  };
   return (
     <MainContainer>
       <BannerContainer imgUrl={banner}>
         <BannerContentContainer>
           <BannerTitleContainer>
             <BannerTitle>
-              대덕소프트웨어마이스터고는 지금, IT 업계를 선도할
-              <BannerMainTitle>미래 인재</BannerMainTitle>를 모집하고 있어요!
+              대덕소프트웨어마이스터고는 지금, <br /> IT 업계를 선도할
+              <BannerMainTitle> 미래 인재</BannerMainTitle>를 모집하고 있어요!
             </BannerTitle>
             <Date>{datas.date}</Date>
           </BannerTitleContainer>
           <Button width="269px">아직 지원 기간이 아닙니다</Button>
         </BannerContentContainer>
+        <ChatButtonContainer chatClick={'ㅇ'} videoClick={videoClick} />
       </BannerContainer>
       <ProcessContentContainer>
         <BackgroundGradient top="-1400px" left="10px" />
-        <ProcessLine src={processLine} />
-        <ProcessContainer
-          title="원서 접수"
-          time="17:00"
-          date="24.10.14 (월) ~ 10.17 (목)"
-          iconType="application"
-          top="200px"
-          left="280px"
-        />
-        <ProcessContainer
-          title="1차 합격자 발표"
-          time="15:00"
-          date="24.10.21 (월)"
-          iconType="firstStageResults"
-          top="200px"
-          left="800px"
-        />
-        <ProcessContainer
-          title="적성검사, 심층 면접"
-          date="24.10.25 (금)"
-          iconType="interview"
-          top="530px"
-          left="1100px"
-        />
-        <ProcessContainer
-          title="최종 합격자 발표"
-          time="10:00"
-          date="24.10.31 (목)"
-          iconType="finalResults"
-          top="530px"
-          left="600px"
-        />
-        <ProcessContainer
-          title="합격자 등록"
-          time="17:00"
-          date="24.11.1 (금) ~ 11.8 (금)"
-          iconType="registration"
-          top="830px"
-          left="900px"
-        />
-        <ProcessContainer
-          title="건강검진 결과 제출"
-          date="24.11.1 (금) ~ 11.16 (토)"
-          iconType="healthCheck"
-          top="830px"
-          left="400px"
-        />
         <Title>
           대덕소프트웨어마이스터고등학교
           <MainTitle>2026 신입생 모집 절차</MainTitle>
         </Title>
+        <ProcessImg src={processLine} />
       </ProcessContentContainer>
       <FAQContainer>
         <Title>
@@ -119,7 +79,8 @@ export const MainPage = () => {
         <FAQItemContainer>
           {datas.faq.map((data, index) => (
             <FAQItem
-              number={'0' + (index + 1)}
+              key={index}
+              number={(index + 1).toString().padStart(2, '0')}
               title={data.title}
               content={data.content}
             />
@@ -137,10 +98,18 @@ export const MainPage = () => {
   );
 };
 
+const ProcessImg = styled.img`
+  width: 100%;
+`;
+
 const MainContainer = styled.div`
   width: 100%;
   height: auto;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 125px;
 `;
 
 const ViewMoreContainer = styled.div`
@@ -161,33 +130,29 @@ const FAQItemContainer = styled.div`
 `;
 
 const FAQContainer = styled.div`
-  margin-top: 300px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: start;
   gap: 52px;
 `;
 
-const ProcessLine = styled.img`
-  position: absolute;
-  z-index: 1;
-  top: 300px;
-`;
-
 const BannerContainer = styled.div<{ imgUrl: string }>`
   width: 100%;
-  height: 794px;
+  height: 920px;
   background-image: url(${({ imgUrl }) => imgUrl});
-  margin-bottom: 125px;
 `;
 
 const ProcessContentContainer = styled.div`
   width: 100%;
   height: 841px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  align-items: start;
 `;
 
-const BannerTitle = styled.div`
+const BannerTitle = styled.span`
   font-size: 54px;
   font-weight: 700;
   color: ${colors.gray[50]};
@@ -217,24 +182,23 @@ const BannerContentContainer = styled.div`
   gap: 24px;
   position: absolute;
   top: 176px;
-  left: 240px;
+  left: 140px;
 `;
 
 const Title = styled.div<{ isSpan: boolean }>`
   display: flex;
-  flex-direction: ${({ isSpan }) => !isSpan && 'column'};
-  margin-left: 120px;
+  flex-direction: ${({ isSpan }) => (isSpan ? 'row' : 'column')};
   font-size: 36px;
   font-weight: 600;
   color: ${colors.gray[900]};
+  padding: 0 100px;
 `;
 
 const MainTitle = styled(Title)`
   color: ${colors.orange[600]};
-  margin-left: 0;
+  padding: 0;
 `;
 
 const SubMainTitle = styled(MainTitle)`
   font-size: 24px;
-  margin-bottom: 8px;
 `;
