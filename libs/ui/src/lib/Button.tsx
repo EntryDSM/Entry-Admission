@@ -14,7 +14,7 @@ export const Button = ({
   width = '100%',
   backgroundColor = colors.orange[500],
   color = colors.gray[50],
-  backgroundHoverColor = colors.orange[600],
+  backgroundHoverColor = colors.orange[700],
 }: IButtonType) => {
   return (
     <BtnContainer
@@ -29,8 +29,9 @@ export const Button = ({
 };
 
 const BtnContainer = styled.button<Omit<IButtonType, 'children'>>`
+  transition: 0.3s ease-in;
   width: ${({ width }) => width};
-  height: 48px;
+  height: 54px;
   border-radius: 8px;
   background-color: ${({ backgroundColor }) => backgroundColor};
   display: flex;

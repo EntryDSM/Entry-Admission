@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
-import { EntryLogo } from './icons';
+import { EntryLogo } from './assets';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IHeaderType {
@@ -92,8 +92,8 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
   const navigate = useNavigate();
   const navData = [
     {
-      name: '전형요강',
-      path: '/admission/guidelines',
+      name: '학교 설명',
+      path: '/school',
     },
     {
       name: '공지사항',
@@ -106,6 +106,14 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
     {
       name: '성적산출',
       path: '/admission/score',
+    },
+    {
+      name: '전형요강',
+      path: '/admission/guidelines',
+    },
+    {
+      name: '팀소개',
+      path: '/team',
     },
   ];
 
@@ -163,6 +171,11 @@ const HeaderContainer = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-around;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background-color: ${colors.extra.white};
 `;
 
 const NavAllContainer = styled.div`
