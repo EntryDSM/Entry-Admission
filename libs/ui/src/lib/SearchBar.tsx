@@ -11,9 +11,9 @@ export const SearchBar = ({ width = '384px', ...props }: ISearchBar) => {
     <SearchBarContainer width={width}>
       <Search {...props} />
       <SearchIcon
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
+        width="19"
+        height="19"
+        viewBox="0 0 19 19"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
