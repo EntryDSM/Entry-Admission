@@ -1,27 +1,22 @@
-import { useState, ChangeEvent, InputHTMLAttributes } from 'react';
+import { useState, InputHTMLAttributes } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { EyesIcon } from './assets/icons/EyesIcon';
+import { keyframes } from '@emotion/react';
 
-interface IInputType extends InputHTMLAttributes<HTMLInputElement> {
-  placeholder: string;
-  type: 'text' | 'password' | 'tel';
+interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
   width?: string;
-  value?: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isError?: boolean;
   errorMessage?: string;
 }
 
 export const Input = ({
-  placeholder,
-  type = 'text',
   width = '100%',
-  value,
-  onChange,
   isError = false,
   errorMessage = '비밀번호가 일치하지 않습니다.',
-}: IInputType) => {
+  type = 'text',
+  ...props
+}: IInputProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const inputType =
@@ -36,30 +31,28 @@ export const Input = ({
 
   return (
     <InputContainer>
-      <RelativeWrapper>
-        <InputWrapper width={width}>
-          <InputField
-            type={inputType}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            isError={isError}
-          />
-          {type === 'password' && (
-            <IconWrapper>
-              <EyesIcon isOpen={showPassword} onClick={clickPassword} />
-            </IconWrapper>
-          )}
-        </InputWrapper>
-        {isError && <ErrorMessage>{errorMessage}</ErrorMessage>}
-      </RelativeWrapper>
+      <InputWrapper width={width}>
+        <InputField {...props} type={inputType} isError={isError} />
+        {type === 'password' && (
+          <IconWrapper>
+            <EyesIcon isOpen={showPassword} onClick={clickPassword} />
+          </IconWrapper>
+        )}
+      </InputWrapper>
+      {isError && <ErrorMessage>{errorMessage}</ErrorMessage>}
     </InputContainer>
   );
 };
 
-const RelativeWrapper = styled.div`
-  position: relative;
-  width: 100%;
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 const InputContainer = styled.div`
@@ -72,8 +65,9 @@ const ErrorMessage = styled.p`
   color: red;
   position: absolute;
   font-size: 15px;
-  margin-top: 4px;
+  margin-top: 55px;
   margin-left: 190px;
+  animation: ${fadeInUp} 0.5s ease-out forwards;
 `;
 
 const InputWrapper = styled.div<{ width: string }>`
