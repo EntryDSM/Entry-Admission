@@ -1,9 +1,9 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, InputHTMLAttributes } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { EyesIcon } from './assets/icons/EyesIcon';
 
-interface IInputType {
+interface IInputType extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;
   type: 'text' | 'password' | 'tel';
   width?: string;
