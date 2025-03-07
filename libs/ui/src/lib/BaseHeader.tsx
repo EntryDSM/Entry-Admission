@@ -2,6 +2,8 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { EntryLogo } from './assets';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { SideBarBtnIcon } from './assets/icons/SideBarBtnIcon';
+import { useState } from 'react';
 
 interface IHeaderType {
   isAdmin?: boolean;
@@ -93,11 +95,11 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
   const navData = [
     {
       name: '학교 설명',
-      path: '/school',
+      path: '/school-description',
     },
     {
       name: '공지사항',
-      path: '/notices',
+      path: '/notification',
     },
     {
       name: '자주 묻는 질문',
@@ -121,11 +123,31 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
 
   const navClick = (path: string) => {
     navigate(path);
+    if (isSideClick === true) sideClick(!isSideClick);
+  };
+
+  const [isSideClick, setIsSideClick] = useState<boolean>(false);
+  const sideClick = () => {
+    setIsSideClick(!isSideClick);
   };
 
   return (
     <HeaderContainer>
       <NavAllContainer>
+        <SideBarBtnIcon onClick={sideClick} />
+        {isSideClick && (
+          <SideNavContainer>
+            {navData.map((data) => (
+              <SideNavContent
+                key={data.path}
+                isPath={pathname.includes(data.path)}
+                onClick={() => navClick(data.path)}
+              >
+                {data.name}
+              </SideNavContent>
+            ))}
+          </SideNavContainer>
+        )}
         <LogoContainer>
           <EntryLogo isAdmin={isAdmin} />
           <HeaderLogoTitle>EntryDSM</HeaderLogoTitle>
@@ -134,7 +156,7 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
           {navData.map((data) => (
             <Nav
               key={data.path}
-              isPath={pathname === data.path}
+              isPath={pathname.includes(data.path)}
               onClick={() => navClick(data.path)}
               isAdmin={isAdmin}
             >
@@ -142,28 +164,50 @@ export const CommonHeader = ({ isAdmin }: IHeaderType) => {
             </Nav>
           ))}
         </NavContainer>
+        <ButtonContainer>
+          <Button
+            color={colors.gray[50]}
+            backgroundColor={isAdmin ? colors.green[500] : colors.orange[500]}
+            backgroundHoverColor={
+              isAdmin ? colors.green[700] : colors.orange[700]
+            }
+          >
+            로그인
+          </Button>
+          <Button
+            color={colors.gray[900]}
+            backgroundColor={'transparent'}
+            backgroundHoverColor={colors.gray[100]}
+          >
+            회원가입
+          </Button>
+        </ButtonContainer>
       </NavAllContainer>
-      <ButtonContainer>
-        <Button
-          color={colors.gray[50]}
-          backgroundColor={isAdmin ? colors.green[500] : colors.orange[500]}
-          backgroundHoverColor={
-            isAdmin ? colors.green[700] : colors.orange[700]
-          }
-        >
-          로그인
-        </Button>
-        <Button
-          color={colors.gray[900]}
-          backgroundColor={'transparent'}
-          backgroundHoverColor={colors.gray[100]}
-        >
-          회원가입
-        </Button>
-      </ButtonContainer>
     </HeaderContainer>
   );
 };
+
+const SideNavContainer = styled.nav`
+  transition: 0.6s ease-in;
+  width: 100vw;
+  height: auto;
+  position: absolute;
+  top: 64px;
+  left: 0;
+`;
+
+const SideNavContent = styled.nav`
+  transition: 0.6s ease-in;
+  width: 100%;
+  height: 52px;
+  background-color: ${colors.extra.white};
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  &:hover {
+    background-color: ${colors.gray[50]};
+  }
+`;
 
 const HeaderContainer = styled.header`
   width: 100vw;
@@ -179,9 +223,10 @@ const HeaderContainer = styled.header`
 `;
 
 const NavAllContainer = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 100px;
+  justify-content: space-around;
 `;
 
 const ButtonContainer = styled.div`
@@ -196,6 +241,7 @@ const Button = styled.button<{
   backgroundHoverColor: string;
 }>`
   outline: none;
+  transition: 0.3s ease-in;
   border: none;
   padding: 8px 12px;
   border-radius: 8px;
@@ -212,6 +258,7 @@ const Button = styled.button<{
 `;
 
 const NavContent = styled.nav<{ isPath: boolean }>`
+  transition: 0.2s ease-in;
   font-size: 16px;
   font-weight: 600;
   color: ${({ isPath }) => (isPath ? colors.gray[600] : colors.gray[400])};
@@ -230,6 +277,7 @@ const NavLine = styled.div<{ isPath: boolean; isAdmin: boolean }>`
     if (!isPath) return 'transparent';
     return isAdmin ? colors.green[500] : colors.orange[500];
   }};
+  transition: 0.2s ease-in;
 `;
 
 const NavContentContainer = styled.nav`
@@ -241,9 +289,12 @@ const NavContentContainer = styled.nav`
 `;
 
 const NavContainer = styled.nav`
-  display: flex;
-  align-items: center;
-  gap: 32px;
+  display: none;
+  @media (min-width: 1062px) {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
 `;
 
 const HeaderLogoTitle = styled.div`

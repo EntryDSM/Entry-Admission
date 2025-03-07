@@ -11,3 +11,8 @@ export * from './EducationalGoal';
 export * from './Department';
 export * from './ModalContainer';
 export * from './ChatButtonContainer';
+export * from './AdmissionsGuidePdf';
+export * from './PDFDownloader';
+export * from './MainModal';
+export * from './MouLogoImgs';
+export * from './AnimationBox';

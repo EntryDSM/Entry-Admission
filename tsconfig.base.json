@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@entry/design-token": ["libs/design-token/src/index.ts"],
+      "@entry/hooks": ["libs/hooks/src/index.ts"],
       "@entry/ui": ["libs/ui/src/index.ts"],
       "@entry/untils": ["libs/untils/src/index.ts"]
     }
