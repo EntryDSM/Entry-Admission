@@ -9,12 +9,12 @@ interface IBottomNavType {
   onPageChange: (page: number) => void;
 }
 
-export const BottomNav: React.FC<IBottomNavType> = ({
+export const BottomNav = ({
   totalItems,
   itemsPerPage,
   currentPage,
   onPageChange,
-}) => {
+}: IBottomNavType) => {
   const [pages, setPages] = useState<number[]>([]);
 
   // 전체 페이지 수 계산
@@ -121,8 +121,7 @@ const NavButton = styled.button<{ disabled?: boolean }>`
   border: none;
   cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
-  padding: 0;
-  margin: 0 5px;
+  margin: 0 18px;
 `;
 
 const PageNumberButton = styled.button<{ active: boolean }>`
@@ -133,12 +132,13 @@ const PageNumberButton = styled.button<{ active: boolean }>`
   height: 30px;
   border-radius: 50%;
   border: none;
-  margin: 0 5px;
-  font-size: 14px;
+  margin: 0 8px;
+  font-size: 15px;
   cursor: pointer;
   background-color: ${(props) =>
     props.active ? `${colors.orange[500]}` : 'transparent'};
-  color: ${(props) => (props.active ? 'white' : 'black')};
+  color: ${(props) =>
+    props.active ? `${colors.extra.white}` : `${colors.gray[300]}`};
 
   &:hover {
     background-color: ${(props) =>
