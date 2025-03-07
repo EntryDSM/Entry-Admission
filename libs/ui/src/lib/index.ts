@@ -12,3 +12,4 @@ export * from './Department';
 export * from './ModalContainer';
 export * from './ChatButtonContainer';
 export * from './Input';
+export * from './SearchBar';
