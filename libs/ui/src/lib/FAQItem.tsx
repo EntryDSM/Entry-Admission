@@ -30,12 +30,12 @@ export const FAQItem = ({ number, title, content, isAdmin, key }: IFAQType) => {
       </Number>
       <ContentContainer>
         <TitleContainer>
-          <Title>{title}</Title>
+          <Title>Q. {title}</Title>
           <DropDownArrow isClick={isClick} isAdmin={isAdmin} />
         </TitleContainer>
         {isClick && (
           <>
-            <Line isAdmin={isAdmin} /> <Content>{content}</Content>
+            <Line isAdmin={isAdmin} /> <Content>A. {content}</Content>
           </>
         )}
       </ContentContainer>
@@ -51,7 +51,7 @@ const TitleContainer = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: ${colors.gray[900]};
 `;
