@@ -16,3 +16,4 @@ export * from './PDFDownloader';
 export * from './MainModal';
 export * from './MouLogoImgs';
 export * from './AnimationBox';
+export * from './SearchBar';
