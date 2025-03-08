@@ -1,0 +1,39 @@
+import slide1 from './slide1.png';
+import slide2 from './slide2.png';
+import slide3 from './slide3.png';
+import slide4 from './slide4.png';
+import slide5 from './slide5.png';
+import slide6 from './slide6.png';
+import slide7 from './slide7.png';
+import slide8 from './slide8.png';
+import slide9 from './slide9.png';
+import slide10 from './slide10.png';
+import slide11 from './slide11.png';
+import slide12 from './slide12.png';
+import slide13 from './slide13.png';
+import slide14 from './slide14.png';
+import slide15 from './slide15.png';
+import slide16 from './slide16.png';
+import slide17 from './slide17.png';
+import slide18 from './slide18.png';
+
+export const SlideImg = [
+  <img src={slide1} alt="1" />,
+  <img src={slide2} alt="2" />,
+  <img src={slide3} alt="3" />,
+  <img src={slide4} alt="4" />,
+  <img src={slide5} alt="5" />,
+  <img src={slide6} alt="6" />,
+  <img src={slide7} alt="7" />,
+  <img src={slide8} alt="8" />,
+  <img src={slide9} alt="9" />,
+  <img src={slide10} alt="10" />,
+  <img src={slide11} alt="11" />,
+  <img src={slide12} alt="12" />,
+  <img src={slide13} alt="13" />,
+  <img src={slide14} alt="14" />,
+  <img src={slide15} alt="15" />,
+  <img src={slide16} alt="16" />,
+  <img src={slide17} alt="17" />,
+  <img src={slide18} alt="18" />,
+];

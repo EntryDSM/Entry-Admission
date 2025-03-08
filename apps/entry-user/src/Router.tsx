@@ -1,7 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
 import { Page404 } from '@entry/ui';
-import { MainPage } from './pages';
+import {
+  MainPage,
+  SchoolDescription,
+  Notification,
+  FAQ,
+  NotificationView,
+  Mypage,
+} from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -11,6 +18,26 @@ export const Router = createBrowserRouter([
       {
         path: '/',
         element: <MainPage />,
+      },
+      {
+        path: '/school-description',
+        element: <SchoolDescription />,
+      },
+      {
+        path: '/notification',
+        element: <Notification />,
+      },
+      {
+        path: '/notification/:id',
+        element: <NotificationView />,
+      },
+      {
+        path: '/faq',
+        element: <FAQ />,
+      },
+      {
+        path: '/mypage',
+        element: <Mypage />,
       },
     ],
   },

@@ -33,7 +33,7 @@ export const EducationalGoal = ({
 };
 
 const Container = styled.div`
-  width: 560px;
+  min-width: 560px;
   padding: 24px 55px;
   border-radius: 20px;
   background-color: ${colors.extra.white};

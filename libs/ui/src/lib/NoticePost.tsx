@@ -6,15 +6,16 @@ interface IPostType {
   title: string;
   date: string;
   isAdmin: boolean;
+  isNew?: boolean;
 }
 
-export const NoticePost = ({ title, date, isAdmin }: IPostType) => {
+export const NoticePost = ({ title, isNew, date, isAdmin }: IPostType) => {
   return (
     <PostContainer>
       <ContentContainer>
         <TitleContainer>
           <Title>{title}</Title>
-          <KeyWord isAdmin={isAdmin}>New</KeyWord>
+          {isNew && <KeyWord isAdmin={isAdmin}>New</KeyWord>}
         </TitleContainer>
         <Date>{date}</Date>
       </ContentContainer>
