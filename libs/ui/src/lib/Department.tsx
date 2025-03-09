@@ -33,7 +33,7 @@ export const Department = ({
 };
 
 const DepartmentContainer = styled.div<Pick<IDepartmentType, 'isSide'>>`
-  width: ${({ isSide }) => (isSide ? 960 : 464)}px;
+  width: ${({ isSide }) => (isSide ? 960 : 400)}px;
   display: flex;
   flex-direction: ${({ isSide }) => !isSide && 'column'};
   gap: 32px;
@@ -46,8 +46,8 @@ const Image = styled.img`
 `;
 
 const ImgContainer = styled.div`
-  width: 464px;
-  height: 320px;
+  width: 400px;
+  height: 300px;
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -57,13 +57,13 @@ const ImgContainer = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 600;
   color: ${colors.orange[500]};
 `;
 
 const Grade = styled.div`
-  font-size: 24px;
+  font-size: 20px;
   color: ${colors.gray[600]};
 `;
 
@@ -81,7 +81,7 @@ const TitleContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  width: 464px;
+  width: 400px;
   display: flex;
   flex-direction: column;
   align-items: start;

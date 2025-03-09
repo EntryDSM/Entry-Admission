@@ -7,10 +7,12 @@ interface IButtonType {
   backgroundColor?: string;
   color?: string;
   backgroundHoverColor?: string;
+  onClick?: () => void;
 }
 
 export const Button = ({
   children,
+  onClick,
   width = '100%',
   backgroundColor = colors.orange[500],
   color = colors.gray[50],
@@ -22,6 +24,7 @@ export const Button = ({
       backgroundColor={backgroundColor}
       color={color}
       backgroundHoverColor={backgroundHoverColor}
+      onClick={onClick}
     >
       {children}
     </BtnContainer>
