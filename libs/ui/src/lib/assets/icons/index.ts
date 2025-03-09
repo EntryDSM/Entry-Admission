@@ -14,6 +14,7 @@ export * from './BrainIcon';
 export * from './DropDownArrow';
 export * from './PostArrow';
 export * from './CancelIcon';
+export * from './BottomNav';
 export * from './EyesIcon';
 export * from './NotificationIcon';
 export * from './Download';
