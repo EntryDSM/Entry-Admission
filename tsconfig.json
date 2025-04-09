@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/entry-user"
+    },
+    {
+      "path": "./apps/entry-admin"
+    },
+    {
+      "path": "./apps/entry-auth"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/design-token"
+    },
+    {
+      "path": "./libs/hooks"
+    }
+  ]
+}
