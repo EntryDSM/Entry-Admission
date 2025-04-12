@@ -35,6 +35,11 @@ const style = css`
     list-style: none;
     font-style: normal;
     font-family: 'Pretendard', sans-serif;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
   label {
     cursor: pointer;
