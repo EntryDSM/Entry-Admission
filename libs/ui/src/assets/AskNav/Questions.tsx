@@ -51,6 +51,7 @@ const AnswerWrapper = styled.div<{ $clicked: boolean }>`
   background-color: ${colors.gray[50]};
   transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
   overflow: hidden;
+  width: 100%;
 `;
 
 const AnswerContainer = styled.div<{ $clicked: boolean }>`

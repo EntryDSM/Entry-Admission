@@ -39,7 +39,7 @@ export const AskNav = ({ tabs, questions, isQuestion }: IAskNavProps) => {
 
   return (
     <Flex height="auto" width="100%" gap={10} isColumn={true}>
-      <Flex width="100%" height="auto" alignItems="center">
+      <Flex width="100%" height="auto" alignItems="center" gap={15}>
         {/* 탭 네비게이션 */}
         {tabs.map((tab) => (
           <Tab
@@ -93,6 +93,7 @@ const Sortation = styled.div`
 const TitleElement = styled.div`
   border-block: 1px solid ${colors.gray[400]};
   display: flex;
+  width: 100%;
 `;
 
 const Tab = styled.div<{ $isActive: boolean }>`
@@ -104,6 +105,10 @@ const Tab = styled.div<{ $isActive: boolean }>`
   background-color: ${({ $isActive }) =>
     $isActive ? colors.orange[300] : colors.extra.realWhite};
   transition: background-color 0.5s, color 0.5s;
+
+  @media (max-width: 500px) {
+    width: 80px;
+  }
 
   &:hover {
     background-color: ${colors.orange[300]};
