@@ -35,18 +35,16 @@ export const AskNav = ({ tabs, questions, isQuestion }: IAskNavProps) => {
         questions.filter((question) => question.tabTitle === activeTitle)
       );
     }
-  }, [activeTitle]);
+  }, [activeTitle, questions]);
 
   return (
-    <Flex height="45px" gap={10} isColumn={true}>
-      <Flex>
+    <Flex height="auto" width="100%" gap={10} isColumn={true}>
+      <Flex width="100%" height="auto" alignItems="center">
         {/* 탭 네비게이션 */}
         {tabs.map((tab) => (
           <Tab
-            $clicked={activeTitle === tab.tabTitle}
-            onClick={() => {
-              setActiveTitle(tab.tabTitle);
-            }}
+            $isActive={activeTitle === tab.tabTitle}
+            onClick={() => setActiveTitle(tab.tabTitle)}
             key={tab.tabTitle}
           >
             {tab.tabTitle}
@@ -56,20 +54,28 @@ export const AskNav = ({ tabs, questions, isQuestion }: IAskNavProps) => {
 
       {/* 질문s */}
       {isQuestion && (
-        <QuestionContainer>
+        <Flex
+          width="80%"
+          height="auto"
+          isColumn={true}
+          paddingTop="30px"
+          style={{ minWidth: '500px' }}
+        >
           <TitleElement>
             <Sortation>구분</Sortation>
             <Sortation>제목</Sortation>
           </TitleElement>
-          {filteredQuestions.map((question) => (
-            <Question
-              key={question.tabTitle}
-              tabTitle={question.tabTitle}
-              content={question.content}
-              answer={question.answer}
-            />
-          ))}
-        </QuestionContainer>
+          <Flex width="100%" height="auto" isColumn={true}>
+            {filteredQuestions.map((question, index) => (
+              <Question
+                key={`${question.tabTitle}-${index}`}
+                tabTitle={question.tabTitle}
+                content={question.content}
+                answer={question.answer}
+              />
+            ))}
+          </Flex>
+        </Flex>
       )}
     </Flex>
   );
@@ -89,25 +95,18 @@ const TitleElement = styled.div`
   display: flex;
 `;
 
-const QuestionContainer = styled.div`
-  margin-top: 30px;
-  width: 80%;
-  min-width: 500px;
-`;
-
-const Tab = styled.div<{ $clicked: boolean }>`
+const Tab = styled.div<{ $isActive: boolean }>`
   padding: 8px 16px;
   font-size: 18px;
-  color: ${colors.gray[400]};
+  color: ${({ $isActive }) =>
+    $isActive ? colors.orange[800] : colors.gray[300]};
   border-radius: 12px;
-  background-color: ${({ $clicked }) =>
-    $clicked ? colors.orange[300] : colors.extra.realWhite};
-  color: ${({ $clicked }) =>
-    $clicked ? colors.orange[800] : colors.gray[300]};
+  background-color: ${({ $isActive }) =>
+    $isActive ? colors.orange[300] : colors.extra.realWhite};
+  transition: background-color 0.5s, color 0.5s;
 
   &:hover {
     background-color: ${colors.orange[300]};
     color: ${colors.orange[800]};
-    transition-duration: 0.5s;
   }
 `;
