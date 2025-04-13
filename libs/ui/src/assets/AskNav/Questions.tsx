@@ -32,8 +32,8 @@ export const Question = ({ tabTitle, content, answer }: IQuestion) => {
 };
 
 const QuestionWrapper = styled.div`
-  padding: 1.2%;
-  margin-left: 45px;
+  padding: 1.2% 0;
+  margin-left: 15px;
 `;
 
 const AnswerTitle = styled.div`
