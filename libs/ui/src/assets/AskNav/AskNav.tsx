@@ -100,7 +100,7 @@ const Tab = styled.div<{ $isActive: boolean }>`
   padding: 8px 16px;
   font-size: 18px;
   color: ${({ $isActive }) =>
-    $isActive ? colors.orange[800] : colors.gray[300]};
+    $isActive ? colors.orange[800] : colors.gray[400]};
   border-radius: 12px;
   background-color: ${({ $isActive }) =>
     $isActive ? colors.orange[300] : colors.extra.realWhite};
