@@ -12,7 +12,7 @@ interface IFlexType {
   paddingBottom?: string;
   className?: string;
   style?: React.CSSProperties;
-}
+} 
 
 export const Flex = ({
   height = '100vh',

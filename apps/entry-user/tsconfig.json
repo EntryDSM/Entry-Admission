@@ -3,6 +3,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/ui"
+    },
+    {
+      "path": "../../libs/design-token"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ],
