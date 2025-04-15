@@ -33,9 +33,6 @@
   "references": [
     {
       "path": "../../libs/ui/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/design-token/tsconfig.lib.json"
     }
   ]
 }
