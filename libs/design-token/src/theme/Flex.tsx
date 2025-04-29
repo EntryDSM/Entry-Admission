@@ -12,7 +12,9 @@ interface IFlexType {
   paddingBottom?: string;
   className?: string;
   style?: React.CSSProperties;
-} 
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  key?: string | number;
+}
 
 export const Flex = ({
   height = '100vh',
@@ -28,6 +30,8 @@ export const Flex = ({
   paddingRight = '0',
   className,
   style = {},
+  onClick,
+  key,
 }: IFlexType) => {
   const inlineStyle: React.CSSProperties = {
     display: 'flex',
@@ -42,7 +46,7 @@ export const Flex = ({
   };
 
   return (
-    <div className={className} style={inlineStyle}>
+    <div key={key} onClick={onClick} className={className} style={inlineStyle}>
       {children}
     </div>
   );

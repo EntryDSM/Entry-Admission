@@ -13,6 +13,7 @@ interface ITextType {
   left?: string;
   bottom?: string;
   right?: string;
+  isSpan?: boolean;
 }
 
 export const Text = ({
@@ -28,6 +29,7 @@ export const Text = ({
   left,
   right,
   bottom,
+  isSpan = false,
 }: ITextType) => {
   const style: React.CSSProperties = {
     width,
@@ -42,6 +44,7 @@ export const Text = ({
     textOverflow: isOverFlow ? 'ellipsis' : 'clip',
     overflow: isOverFlow ? 'hidden' : undefined,
     whiteSpace: isOverFlow ? 'nowrap' : undefined,
+    display: isSpan ? 'inline' : 'block',
   };
 
   return (
