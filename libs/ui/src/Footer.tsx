@@ -54,7 +54,6 @@ export const Footer = () => {
 const FooterContainer = styled.footer`
   width: 100%;
   background-color: ${colors.extra.realWhite};
-  border-top: 1px solid ${colors.gray[200]};
   padding: 24px 0;
 `;
 
