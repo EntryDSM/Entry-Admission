@@ -13,4 +13,8 @@ export const Router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: '*',
+    element: <div>404</div>,
+  },
 ]);
