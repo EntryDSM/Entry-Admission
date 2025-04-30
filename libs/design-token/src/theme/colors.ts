@@ -8,6 +8,7 @@ export const colors = {
     600: '#FFA16B',
     700: '#FF8B48',
     800: '#FF7C33',
+    850: '#FF6D1B',
     900: '#CC6329',
   },
   gray: {
