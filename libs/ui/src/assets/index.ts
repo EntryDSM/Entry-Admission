@@ -3,3 +3,4 @@ export * from './icons';
 export * from './main';
 export * from './askNav';
 export * from './scheduleTable';
+export * from './subject';
