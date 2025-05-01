@@ -1,7 +1,3 @@
 export const Main = () => {
-  return (
-    <>
-      <></>
-    </>
-  );
+  return <div></div>;
 };
