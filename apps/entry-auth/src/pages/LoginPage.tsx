@@ -81,8 +81,8 @@ const LoginKindContainer = styled.div`
 const LoginButton = styled.button<{ $disabled: boolean }>`
   width: 360px;
   height: 48px;
-  background-color: ${(props) =>
-    props.$disabled ? colors.gray[300] : colors.orange[800]};
+  background-color: ${colors.orange[800]};
+  opacity: ${(props) => (props.$disabled ? '0.4' : '1')};
   color: ${colors.extra.realWhite};
   margin-top: 20%;
   border-radius: 12px;
@@ -92,8 +92,7 @@ const LoginButton = styled.button<{ $disabled: boolean }>`
   transition: all 0.4s ease;
 
   &:hover {
-    background-color: ${(props) =>
-      props.$disabled ? colors.gray[300] : colors.orange[850]};
+    background-color: ${colors.orange[850]};
     color: ${colors.gray[100]};
   }
 `;
