@@ -108,17 +108,17 @@ const InputWrapper = styled.div`
 
 const BackGroundWrapper = styled.div`
   background-color: ${colors.gray[50]};
-  padding-top: 55px;
-  padding-bottom: 55px;
+  padding-top: 35px;
+  padding-bottom: 10px;
   display: flex;
   justify-content: center;
   overflow-x: hidden;
 `;
 
 const LoginPageContainer = styled.div`
-  width: 45%;
+  width: 40%;
   min-width: 400px;
-  height: 650px;
+  height: 620px;
   background-color: ${colors.extra.realWhite};
   border-radius: 32px;
   display: flex;
