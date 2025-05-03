@@ -7,3 +7,4 @@ export * from './Check';
 export * from './Cancel';
 export * from './SideBarBtnIcon';
 export * from './ArrowNav';
+export * from './Eye';
