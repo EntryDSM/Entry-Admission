@@ -20,6 +20,9 @@
     },
     {
       "path": "./libs/hooks"
+    },
+    {
+      "path": "./apps/Admission-LTS"
     }
   ]
 }
