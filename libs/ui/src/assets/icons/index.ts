@@ -7,3 +7,8 @@ export * from './Check';
 export * from './Cancel';
 export * from './SideBarBtnIcon';
 export * from './ArrowNav';
+export * from './Photo';
+export * from './Caution';
+export * from './ImageChange';
+export * from './Search';
+export { default as dropdownArrow } from './dropdownArrow.svg';
