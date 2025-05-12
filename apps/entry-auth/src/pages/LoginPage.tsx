@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { AuthInput } from '@entry/ui';
@@ -8,6 +9,24 @@ export const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [phoneError, setPhoneError] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhoneNumber(value);
+
+    const onlyNumber = value.replace(/[^\d]/g, '');
+    setPhoneError(onlyNumber.length < 10);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    setPasswordError(value.length < 8 || !/[!@#$%^&*(),.?":{}|<>]/.test(value));
+  };
 
   useEffect(() => {
     const isPhoneValid = phoneNumber.replace(/[^\d]/g, '').length >= 10;
@@ -33,22 +52,31 @@ export const LoginPage = () => {
           <AuthInput
             type="phone"
             label="전화번호"
-            placeholder="010-xxxx-xxxx"
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="010-XXXX-XXXX"
+            onChange={handlePhoneChange}
+            isError={!!phoneError}
+            errorMessage="올바른 형식이 아닙니다."
           />
           <AuthInput
             label="비밀번호"
             placeholder="8자 이상, 숫자, 특수문자를 포함해 비밀번호를 입력해 주세요."
             type="password"
             isEye={true}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
+            isError={!!passwordError}
+            errorMessage="비밀번호 형식이 올바르지 않습니다."
           />
         </InputWrapper>
         <LoginButton onClick={handleLogin} $disabled={!isFormValid}>
           로그인
         </LoginButton>
         <LoginKindContainer>
-          <div style={{ cursor: 'pointer' }}>회원가입</div>
+          <div
+            onClick={() => navigate('/signup')}
+            style={{ cursor: 'pointer' }}
+          >
+            회원가입
+          </div>
           <AuthLink>비밀번호 찾기</AuthLink>
           <div style={{ cursor: 'pointer' }}>관리자 로그인</div>
         </LoginKindContainer>

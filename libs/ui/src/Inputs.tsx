@@ -10,6 +10,8 @@ interface IAuthInputType {
   type?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   maxLength?: number;
+  isError: boolean;
+  errorMessage?: string;
 }
 
 export const AuthInput = ({
@@ -19,6 +21,8 @@ export const AuthInput = ({
   type = 'text',
   onChange,
   maxLength,
+  isError,
+  errorMessage,
 }: IAuthInputType) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [isClose, setIsClose] = useState<boolean>(true);
@@ -78,6 +82,7 @@ export const AuthInput = ({
       <Label>{label}</Label>
       <InputWrapper>
         <Input
+          $isError={isError}
           value={inputValue}
           type={changeInputType()}
           placeholder={placeholder}
@@ -90,9 +95,16 @@ export const AuthInput = ({
           </EyeWrapper>
         )}
       </InputWrapper>
+      {isError && <ErrorMsg>{errorMessage}</ErrorMsg>}
     </AuthInputContainer>
   );
 };
+
+const ErrorMsg = styled.div`
+  margin-top: 6px;
+  font-size: 11px;
+  color: ${colors.extra.error};
+`;
 
 const EyeWrapper = styled.div`
   position: absolute;
@@ -107,14 +119,17 @@ const InputWrapper = styled.div`
   position: relative;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ $isError: boolean }>`
   width: 100%;
-  border: 1px solid ${colors.gray[300]};
+  border: 1px solid
+    ${({ $isError }) => ($isError ? colors.extra.error : colors.gray[300])};
   border-radius: 8px;
   padding: 12px 20px;
+  transition: all 0.3s ease;
 
   ::placeholder {
     color: ${colors.gray[300]};
+    font-weight: 530;
   }
 `;
 
