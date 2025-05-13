@@ -271,15 +271,25 @@ export const CommonHeader = () => {
 };
 
 export const AuthHeader = () => {
+  const navigate = useNavigate();
+
   return (
     <AuthHeaderContainer>
-      <EntryLogo />
-      <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
-        EntryDSM
-      </Text>
+      <LogoContainer onClick={() => navigate('/')}>
+        <EntryLogo />
+        <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
+          EntryDSM
+        </Text>
+      </LogoContainer>
     </AuthHeaderContainer>
   );
 };
+
+const LogoContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+`;
 
 const AuthHeaderContainer = styled.div`
   display: flex;
