@@ -1,6 +1,6 @@
 import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { MainButton, SubButton } from './Button';
+import { SubButton } from './Button';
 
 interface IApplicationNavType {
   totalPages: number;

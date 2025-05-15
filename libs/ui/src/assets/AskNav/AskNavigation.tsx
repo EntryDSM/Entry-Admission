@@ -19,7 +19,7 @@ interface IAskNavProps {
   isQuestion?: boolean;
 }
 
-export const AskNav = ({ tabs, questions, isQuestion }: IAskNavProps) => {
+export const AskNavigation = ({ tabs, questions, isQuestion }: IAskNavProps) => {
   // nav 타이틀에 의해 필터된 질문들
   const [filteredQuestions, setFilteredQuestions] =
     useState<IQuestion[]>(questions);
