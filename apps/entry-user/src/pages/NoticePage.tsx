@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
-import { MainButton, SubButton } from '@entry/ui';
+import { MainButton, SubButton, NoticePinIcon } from '@entry/ui';
+import { useNavigate } from 'react-router-dom';
 
-// 데이터 타입 정의
 interface NoticeItem {
   id: number;
   title: string;
@@ -13,8 +13,12 @@ interface NoticeItem {
 
 export const NoticePage = () => {
   const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>('admission');
+  const navigate = useNavigate();
   
-  // 목업 데이터
+  const handleNoticeClick = (id: number) => {
+    navigate(`/notice/${id}`);
+  };
+  
   const noticeItems: NoticeItem[] = [
     { id: 1, title: '안녕하세요', date: '2024-10-31', isNew: true },
     { id: 2, title: '안녕하세요', date: '2024-10-31', isNew: true },
@@ -62,10 +66,10 @@ export const NoticePage = () => {
           
           <TableBody>
             {noticeItems.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} onClick={() => handleNoticeClick(item.id)}>
                 <ColumnNum>{item.id}</ColumnNum>
                 <ColumnTitle>
-                  {item.isNew && <NewIcon>🔸</NewIcon>}
+                  {item.isNew && <NewIconWrapper><NoticePinIcon /></NewIconWrapper>}
                   {item.title}
                 </ColumnTitle>
                 <ColumnDate>{item.date}</ColumnDate>
@@ -107,30 +111,33 @@ const TabSection = styled.div`
 
 const TabButton = styled.div<{ isActive: boolean }>`
   padding: 12px 24px;
-  background-color: ${({ isActive }) => isActive ? colors.orange[800] : colors.gray[100]};
-  color: ${({ isActive }) => isActive ? colors.extra.realWhite : colors.gray[400]};
-  border-radius: 8px 8px 0 0;
+  background-color: ${({ isActive }) => isActive ? colors.orange[500] : "none"};
+  color: ${({ isActive }) => isActive ? colors.orange[800] : colors.gray[400]};
+  border: 1px solid none;
+  border-bottom: none;
+  border-radius: 8px;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${({ isActive }) => isActive ? colors.orange[850] : colors.gray[200]};
+    background-color: ${({ isActive }) => isActive ? "none" : colors.gray[50]};
   }
 `;
 
 const TableContainer = styled.div`
   width: 100%;
-  border-top: 1px solid ${colors.gray[200]};
+  border-top: 1px solid ${colors.gray[400]};
 `;
 
 const TableHeader = styled.div`
   display: flex;
-  border-bottom: 1px solid ${colors.gray[200]};
+  border-bottom: 1px solid ${colors.gray[400]};
   padding: 16px 0;
   font-weight: 600;
   font-size: 15px;
+  background-color: white;
 `;
 
 const TableBody = styled.div`
@@ -169,10 +176,10 @@ const ColumnDate = styled.div`
   color: ${colors.gray[400]};
 `;
 
-const NewIcon = styled.span`
-  color: ${colors.orange[800]};
+const NewIconWrapper = styled.span`
   margin-right: 8px;
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
 `;
 
 const SubTitle = styled(Text)`
