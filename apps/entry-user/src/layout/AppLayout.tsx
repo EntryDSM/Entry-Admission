@@ -11,11 +11,6 @@ export const AppLayout = () => {
     <>
       <CommonHeader />
       <Main>
-        <ApplicationNav
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
-        />
         <Outlet />
       </Main>
     </>
