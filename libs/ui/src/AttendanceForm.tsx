@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { colors } from '@entry/design-token';
+import { colors, Text } from '@entry/design-token';
 
 interface AttendanceFormProps {
   title: string;
@@ -13,7 +13,6 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
   title,
   value,
   onChange,
-  defaultCount,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -22,29 +21,28 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
     onChange(onlyNums);
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
   return (
     <Container>
       <HeaderRow>
-        {value && <CheckIcon>✓</CheckIcon>}
-        <Title>{title}</Title>
+        <CheckMark visible={!!value}>✓</CheckMark>
+        <Text>
+          {title}
+        </Text>
       </HeaderRow>
-      <InputContainer>
+      <InputWrapper>
         <StyledInput
+          type="text"
           value={value}
           onChange={handleChange}
-          placeholder=""
-          type="tel"
-          onFocus={handleFocus}
+          onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           hasValue={!!value}
           isFocused={isFocused}
         />
-        {value && <CountDisplay>회</CountDisplay>}
-      </InputContainer>
+        <InputSuffix>
+          회
+        </InputSuffix>
+      </InputWrapper>
     </Container>
   );
 };
@@ -58,22 +56,10 @@ const HeaderRow = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+  gap: 8px;
 `;
 
-const CheckIcon = styled.span`
-  color: ${colors.orange[800]};
-  font-size: 18px;
-  font-weight: bold;
-  margin-right: 8px;
-`;
-
-const Title = styled.div`
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const InputContainer = styled.div`
+const InputWrapper = styled.div`
   position: relative;
   width: 100%;
 `;
@@ -82,25 +68,37 @@ const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
   width: 100%;
   height: 48px;
   border: 1px solid
-    ${(props) => (props.hasValue ? colors.orange[800] : colors.gray[300])};
+    ${(props) =>
+      props.isFocused
+        ? props.hasValue
+          ? colors.orange[800]
+          : colors.gray[300]
+        : props.hasValue
+        ? colors.orange[800]
+        : colors.gray[300]};
   border-radius: 12px;
-  padding: 0 16px;
+  padding: 0 40px 0 20px;
   font-size: 16px;
   outline: none;
-
-  &:focus {
-    border-color: ${(props) =>
-      props.hasValue ? colors.orange[800] : colors.gray[300]};
-  }
+  box-sizing: border-box;
+  text-align: right;
 `;
 
-const CountDisplay = styled.div`
+const InputSuffix = styled.span`
   position: absolute;
-  right: 16px;
   top: 50%;
+  right: 16px;
   transform: translateY(-50%);
   font-size: 16px;
-  color: #333;
+  color: ${colors.gray[500]};
+  pointer-events: none;
+`;
+
+const CheckMark = styled.span<{ visible: boolean }>`
+  font-size: 24px;
+  font-weight: 700;
+  color: ${(props) => (props.visible ? colors.orange[800] : colors.gray[300])};
+  transition: color 0.2s;
 `;
 
 export default AttendanceForm;
