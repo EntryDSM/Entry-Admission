@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
+import { Check } from '@entry/ui';
 
-interface AttendanceFormProps {
+interface IAttendanceFormProps {
   title: string;
   value: string;
   onChange: (value: string) => void;
   defaultCount?: number;
+  suffix: string;
 }
 
-export const AttendanceForm: React.FC<AttendanceFormProps> = ({
+export const AttendanceForm: React.FC<IAttendanceFormProps> = ({
   title,
   value,
   onChange,
+  suffix
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -24,7 +27,9 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
   return (
     <Container>
       <HeaderRow>
-        <CheckMark visible={!!value}>✓</CheckMark>
+        <CheckMark hasValue={!!value}>
+          <Check />
+        </CheckMark>
         <Text>
           {title}
         </Text>
@@ -40,7 +45,7 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
           isFocused={isFocused}
         />
         <InputSuffix>
-          회
+          {suffix}
         </InputSuffix>
       </InputWrapper>
     </Container>
@@ -94,11 +99,17 @@ const InputSuffix = styled.span`
   pointer-events: none;
 `;
 
-const CheckMark = styled.span<{ visible: boolean }>`
-  font-size: 24px;
-  font-weight: 700;
-  color: ${(props) => (props.visible ? colors.orange[800] : colors.gray[300])};
+const CheckMark = styled.span<{ hasValue: boolean }>`
+  color: ${(props) => props.hasValue ? colors.orange[800] : colors.gray[300]};
   transition: color 0.2s;
+  
+  svg {
+    fill: currentColor !important;
+    color: inherit !important;
+  }
+  
+  * {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
 `;
-
-export default AttendanceForm;
