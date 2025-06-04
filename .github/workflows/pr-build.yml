@@ -1,0 +1,35 @@
+name: PR Build Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+      
+    - name: Build entry-user
+      run: yarn nx build entry-user
+      
+    - name: Build success notification
+      if: success()
+      run: echo "✅ Build successful!"
+      
+    - name: Build failure notification
+      if: failure()
+      run: echo "❌ Build failed!"
