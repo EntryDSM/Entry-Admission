@@ -1,4 +1,4 @@
-name: PR Build Check
+name: EntryDSM PR Build Check
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
         
     - name: Install dependencies
@@ -26,10 +26,16 @@ jobs:
     - name: Build entry-user
       run: yarn nx build entry-user
       
+    - name: Build entry-admin
+      run: yarn nx build entry-admin
+      
+    - name: Build entry-auth
+      run: yarn nx build entry-auth
+      
     - name: Build success notification
       if: success()
-      run: echo "✅ Build successful!"
+      run: echo "✅ OK"
       
     - name: Build failure notification
       if: failure()
-      run: echo "❌ Build failed!"
+      run: echo "❌ FAILED"
