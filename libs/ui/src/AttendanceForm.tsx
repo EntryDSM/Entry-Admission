@@ -60,8 +60,8 @@ const Container = styled.div`
 const HeaderRow = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  gap: 8px;
+  margin-bottom: 20px;
+  gap: 20px;
 `;
 
 const InputWrapper = styled.div`
@@ -72,7 +72,7 @@ const InputWrapper = styled.div`
 const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
   width: 100%;
   height: 48px;
-  border: 1px solid
+  border: 2px solid
     ${(props) =>
       props.isFocused
         ? props.hasValue
@@ -92,7 +92,7 @@ const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
 const InputSuffix = styled.span`
   position: absolute;
   top: 50%;
-  right: 16px;
+  right: 23px;
   transform: translateY(-50%);
   font-size: 16px;
   color: ${colors.gray[500]};
