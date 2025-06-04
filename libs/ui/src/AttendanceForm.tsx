@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
 import { Check } from '@entry/ui';
 
-interface IAttendanceFormProps {
+interface IAttendanceFormType {
   title: string;
   value: string;
   onChange: (value: string) => void;
@@ -11,7 +11,7 @@ interface IAttendanceFormProps {
   suffix: string;
 }
 
-export const AttendanceForm: React.FC<IAttendanceFormProps> = ({
+export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   title,
   value,
   onChange,
