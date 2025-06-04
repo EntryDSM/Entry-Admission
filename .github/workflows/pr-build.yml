@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_SKIP_NX_CACHE: true
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -38,4 +42,4 @@ jobs:
       
     - name: Build failure notification
       if: failure()
-      run: echo "❌ FAILED"
+      run: echo "❌ FAIL"
