@@ -20,7 +20,7 @@ export const NoPathHeader = () => {
   }, []);
 
   return (
-    <HeaderContainer scrollPosition={scrollPosition}>
+    <NoPathHeaderContainer scrollPosition={scrollPosition}>
       <Flex
         gap={12}
         alignItems="center"
@@ -32,7 +32,7 @@ export const NoPathHeader = () => {
           EntryDSM
         </Text>
       </Flex>
-    </HeaderContainer>
+    </NoPathHeaderContainer>
   );
 };
 
@@ -323,7 +323,7 @@ const HeaderContainer = styled.header<{ scrollPosition: number }>`
   width: 100vw;
   height: 70px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 0 120px;
   align-items: center;
   background-color: ${({ scrollPosition }) =>
@@ -333,6 +333,10 @@ const HeaderContainer = styled.header<{ scrollPosition: number }>`
       scrollPosition ? colors.gray[200] : 'transparent'};
   transition: 0.4s ease-in-out;
   z-index: 10;
+`;
+
+const NoPathHeaderContainer = styled(HeaderContainer)`
+  justify-content: flex-start;
 `;
 
 const NavContent = styled.nav<{ isPath?: boolean }>`
