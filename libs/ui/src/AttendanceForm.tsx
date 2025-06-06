@@ -55,7 +55,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   );
 };
 
-const Container = styled.div<Pick<AttendanceFormProps, 'width'>>`
+const Container = styled.div<Pick<IAttendanceFormType, 'width'>>`
   width: ${({ width }) => width};
   margin-bottom: 16px;
 `;
