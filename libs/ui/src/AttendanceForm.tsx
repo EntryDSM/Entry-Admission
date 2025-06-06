@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { colors } from '@entry/design-token';
+import { colors, Text } from '@entry/design-token';
+import { Check } from '@entry/ui';
 
-interface AttendanceFormProps {
+interface IAttendanceFormType {
   title: string;
   value: string;
   onChange: (value: string) => void;
   defaultCount?: number;
   width?: string;
+  suffix: string;
 }
 
-export const AttendanceForm: React.FC<AttendanceFormProps> = ({
+export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   title,
   value,
   onChange,
   defaultCount,
   width = '100%',
+  suffix
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -24,29 +27,30 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
     onChange(onlyNums);
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
   return (
     <Container width={width}>
       <HeaderRow>
-        {value && <CheckIcon>✓</CheckIcon>}
-        <Title>{title}</Title>
+        <CheckMark hasValue={!!value}>
+          <Check />
+        </CheckMark>
+        <Text>
+          {title}
+        </Text>
       </HeaderRow>
-      <InputContainer>
+      <InputWrapper>
         <StyledInput
+          type="text"
           value={value}
           onChange={handleChange}
-          placeholder=""
-          type="tel"
-          onFocus={handleFocus}
+          onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           hasValue={!!value}
           isFocused={isFocused}
         />
-        {value && <CountDisplay>회</CountDisplay>}
-      </InputContainer>
+        <InputSuffix>
+          {suffix}
+        </InputSuffix>
+      </InputWrapper>
     </Container>
   );
 };
@@ -59,23 +63,11 @@ const Container = styled.div<Pick<AttendanceFormProps, 'width'>>`
 const HeaderRow = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
+  gap: 20px;
 `;
 
-const CheckIcon = styled.span`
-  color: ${colors.orange[800]};
-  font-size: 18px;
-  font-weight: bold;
-  margin-right: 8px;
-`;
-
-const Title = styled.div`
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const InputContainer = styled.div`
+const InputWrapper = styled.div`
   position: relative;
   width: 100%;
 `;
@@ -83,26 +75,44 @@ const InputContainer = styled.div`
 const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
   width: 100%;
   height: 48px;
-  border: 1px solid
-    ${(props) => (props.hasValue ? colors.orange[800] : colors.gray[300])};
+  border: 2px solid
+    ${(props) =>
+      props.isFocused
+        ? props.hasValue
+          ? colors.orange[800]
+          : colors.gray[300]
+        : props.hasValue
+        ? colors.orange[800]
+        : colors.gray[300]};
   border-radius: 12px;
-  padding: 0 16px;
+  padding: 0 40px 0 20px;
   font-size: 16px;
   outline: none;
-
-  &:focus {
-    border-color: ${(props) =>
-      props.hasValue ? colors.orange[800] : colors.gray[300]};
-  }
+  box-sizing: border-box;
+  text-align: right;
 `;
 
-const CountDisplay = styled.div`
+const InputSuffix = styled.span`
   position: absolute;
-  right: 16px;
   top: 50%;
+  right: 23px;
   transform: translateY(-50%);
   font-size: 16px;
-  color: #333;
+  color: ${colors.gray[500]};
+  pointer-events: none;
 `;
 
-export default AttendanceForm;
+const CheckMark = styled.span<{ hasValue: boolean }>`
+  color: ${(props) => props.hasValue ? colors.orange[800] : colors.gray[300]};
+  transition: color 0.2s;
+  
+  svg {
+    fill: currentColor !important;
+    color: inherit !important;
+  }
+  
+  * {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+`;

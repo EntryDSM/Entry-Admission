@@ -4,3 +4,5 @@ export * from './main';
 export * from './askNav';
 export * from './scheduleTable';
 export * from './subject';
+export * from './notice';
+export * from './common';

@@ -1,0 +1,45 @@
+name: EntryDSM PR Build Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_SKIP_NX_CACHE: true
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+        
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+      
+    - name: Build entry-user
+      run: yarn nx build entry-user
+      
+    - name: Build entry-admin
+      run: yarn nx build entry-admin
+      
+    - name: Build entry-auth
+      run: yarn nx build entry-auth
+      
+    - name: Build success notification
+      if: success()
+      run: echo "✅ OK"
+      
+    - name: Build failure notification
+      if: failure()
+      run: echo "❌ FAIL"

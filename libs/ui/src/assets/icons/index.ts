@@ -12,3 +12,4 @@ export * from './Caution';
 export * from './ImageChange';
 export * from './Search';
 export { default as dropdownArrow } from './dropdownArrow.svg';
+export * from './Eye';
