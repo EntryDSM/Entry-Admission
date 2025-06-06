@@ -2,7 +2,7 @@ import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { PreviousButton } from './PreviousButton';
 import { useNavigate } from 'react-router-dom';
-
+        
 interface IApplicationNavType {
   totalPages: number;
   currentPage: number;

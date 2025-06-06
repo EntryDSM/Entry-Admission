@@ -1,9 +1,11 @@
 import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
+import { AuthHeader } from '@entry/ui';
 
 export const AppLayout = () => {
   return (
     <>
+      <AuthHeader />
       <Main>
         <Outlet />
       </Main>
@@ -12,6 +14,6 @@ export const AppLayout = () => {
 };
 
 const Main = styled.main`
-  width: 100vw;
+  width: 100%;
   margin-top: 70px;
 `;

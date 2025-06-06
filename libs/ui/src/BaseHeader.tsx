@@ -292,6 +292,42 @@ export const CommonHeader = () => {
     </HeaderContainer>
   );
 };
+
+export const AuthHeader = () => {
+  const navigate = useNavigate();
+
+  return (
+    <AuthHeaderContainer>
+      <LogoContainer onClick={() => navigate('/')}>
+        <EntryLogo />
+        <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
+          EntryDSM
+        </Text>
+      </LogoContainer>
+    </AuthHeaderContainer>
+  );
+};
+
+const LogoContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+`;
+
+const AuthHeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 70px;
+  z-index: 10;
+  padding-left: 10%;
+  background-color: ${colors.extra.realWhite};
+`;
+
 const SideNavContainer = styled.nav`
   width: 100vw;
   height: auto;
@@ -316,7 +352,7 @@ const SideNavContent = styled.nav`
   }
 `;
 
-const HeaderContainer = styled.header<{ scrollPosition: number }>`
+const HeaderContainer = styled.header<{ scrollPosition?: number }>`
   position: fixed;
   top: 0;
   left: 0;
