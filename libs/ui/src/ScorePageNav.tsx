@@ -1,21 +1,24 @@
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 
 interface IScorePageNav {
-  datas: [{ path: string; name: string }];
+  datas: { path: string; name: string }[];
 }
 
 export const ScorePageNav = ({ datas }: IScorePageNav) => {
   const navigate = useNavigate();
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const location = useLocation();
+
+  const activeIndex = useMemo(() => {
+    return datas.findIndex((data) => location.pathname.endsWith(data.path));
+  }, [location.pathname, datas]);
 
   const navClick = (index: number, path: string) => {
-    setActiveIndex(index);
     navigate(path);
-    console.log('click');
   };
+
   return (
     <Flex width="fit-content" height="fit-content" gap={20} alignItems="center">
       {datas.map((data, index) => (
@@ -26,7 +29,12 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
           alignItems="center"
           key={index}
         >
-          {0 !== index && <Line isActive={index <= activeIndex} />}
+          {index !== 0 && (
+            <Line
+              width={datas.length === 2 ? '928px' : '196px'}
+              isActive={index <= activeIndex}
+            />
+          )}
           <Flex
             onClick={() => navClick(index, data.path)}
             width="fit-content"
@@ -43,16 +51,15 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
     </Flex>
   );
 };
-
 const NavLabel = styled.div<{ isActive: boolean }>`
   font-size: 16px;
   font-weight: 400;
   color: ${({ isActive }) => (isActive ? colors.gray[500] : colors.gray[400])};
 `;
 
-const Line = styled.div<{ isActive: boolean }>`
-  width: 420px;
-  height: 6px;
+const Line = styled.div<{ isActive: boolean; width: string }>`
+  width: ${({ width }) => width};
+  height: 4px;
   background-color: ${({ isActive }) =>
     isActive ? colors.orange[800] : colors.gray[100]};
   border-radius: 100px;
@@ -66,8 +73,8 @@ const Nav = styled.button<{ isActive: boolean }>`
   cursor: pointer;
   outline: none;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   border-radius: 16px;
   background-color: ${({ isActive }) =>
     isActive ? colors.orange[800] : colors.gray[100]};

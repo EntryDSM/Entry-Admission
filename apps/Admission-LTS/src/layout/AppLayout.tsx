@@ -1,140 +1,69 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
-import { CommonHeader, FormElement } from '@entry/ui';
-import { useState, useEffect } from 'react';
+import { ApplicationNav } from '@entry/ui';
+import { Flex } from '@entry/design-token';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 export const AppLayout = () => {
-  // dropDown 데이터 정의 - 컴포넌트 외부에 선언해도 됨
-  const dropData = [
-    {
-      label: '년',
-      content: [2012, 2013, 2014, 2015],
-    },
-    {
-      label: '일',
-      content: [1, 2, 3, 4],
-    },
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { pathname } = location;
+
+  //page 전환 시 스크롤 상단으로
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  const pageRoutes = [
+    '/first',
+    '/second',
+    '/third',
+    '/fourth',
+    '/ged/score',
+    '/first-expected-graduate',
+    '/second-expected-graduate',
+    '/third-expected-graduate',
+    '/activity',
+    '/submit-check',
   ];
 
-  const radioDate = ['옵션1', '옵션2', '옵션3'];
-
-  // 기본값으로 각 드롭다운의 첫 번째 옵션을 설정
-  const initialDropDownValues = dropData.map((item) =>
-    Array.isArray(item.content) ? item.content[0] : item.content
+  const currentPath = location.pathname;
+  const currentIndex = pageRoutes.findIndex((path) =>
+    currentPath.includes(path)
   );
 
-  // 상태 초기화
-  const [formValues, setFormValues] = useState({
-    textArea: '',
-    search: '',
-    input: '',
-    radio: radioDate[0], // 첫 번째 라디오 옵션을 기본값으로 설정
-    dropDown: initialDropDownValues, // 초기화된 드롭다운 값 사용
-    imgUrl: null as string | null,
-  });
+  const [currentPage, setCurrentPage] = useState(currentIndex + 1 || 1);
 
   useEffect(() => {
-    console.log('Form values updated:', formValues);
-  }, [formValues]);
-
-  // 드롭다운 값 변경 핸들러
-  const handleDropDownChange = (values: (string | number)[]) => {
-    setFormValues((prev) => ({ ...prev, dropDown: values }));
-  };
-
-  // 라디오 버튼 선택 핸들러
-  const handleRadioSelect = (value: string) => {
-    setFormValues((prev) => ({ ...prev, radio: value }));
-  };
-
-  // 이미지 업로드 핸들러
-  const handleImageChange = (url: string | null) => {
-    setFormValues((prev) => ({ ...prev, imgUrl: url }));
-  };
-
-  // 파일 변경 핸들러 - 필요한 경우 사용
-  const handleFileChange = (file: File | null) => {
-    if (file) {
-      console.log('File selected:', file.name);
-      // 필요한 경우 파일 처리 로직 추가
+    const path = pageRoutes[currentPage - 1];
+    if (path && !currentPath.includes(path)) {
+      navigate(path);
     }
-  };
+  }, [currentPage]);
 
   return (
-    <>
-      <CommonHeader />
-      <Main>
-        <FormElement
-          explanation="텍스트 영역에 내용을 입력하세요"
-          warning="이 필드는 필수입니다"
-          type="textArea"
-          label="텍스트에어리어"
-          value={formValues.textArea}
-          onChange={(e) =>
-            setFormValues((prev) => ({ ...prev, textArea: e.target.value }))
-          }
-        />
-
-        <FormElement
-          explanation="검색어를 입력하세요"
-          warning="검색 결과는 제한적일 수 있습니다"
-          type="search"
-          label="검색"
-          value={formValues.search}
-          onChange={(e) =>
-            setFormValues((prev) => ({ ...prev, search: e.target.value }))
-          }
-        />
-
-        <FormElement
-          explanation="텍스트를 입력하세요"
-          warning="이 필드는 필수입니다"
-          type="input"
-          label="일반 인풋"
-          placeholder="입력하세요"
-          value={formValues.input}
-          onChange={(e) =>
-            setFormValues((prev) => ({ ...prev, input: e.target.value }))
-          }
-        />
-
-        <FormElement
-          explanation="옵션 중 하나를 선택하세요"
-          warning="반드시 하나를 선택해야 합니다"
-          type="radio"
-          label="라디오 선택"
-          radioDatas={radioDate}
-          selectedRadio={formValues.radio}
-          setSelectedRadio={handleRadioSelect}
-        />
-
-        <FormElement
-          explanation="날짜를 선택하세요"
-          warning="유효한 날짜를 선택해야 합니다"
-          type="dropDown"
-          label="드롭다운"
-          dropDownDatas={dropData}
-          dropDownValues={formValues.dropDown}
-          onDropDownChange={handleDropDownChange}
-        />
-
-        <FormElement
-          imgUrl={formValues.imgUrl}
-          setImgUrl={handleImageChange}
-          onFileChange={handleFileChange}
-          explanation="이미지를 업로드하세요"
-          warning="허용된 파일 형식: JPG, PNG"
-          type="imgSelector"
-          label="이미지 업로드"
-        />
-
-        <Outlet />
-      </Main>
-    </>
+    <Main>
+      <Flex isColumn gap={125} height="calc(100vh - 70px)" width="100%">
+        <Flex
+          isColumn
+          width="100%"
+          alignItems="center"
+          justifyContent="space-between"
+          height="100%"
+        >
+          <Outlet />
+          <ApplicationNav
+            totalPages={pageRoutes.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
+        </Flex>
+      </Flex>
+    </Main>
   );
 };
 
 const Main = styled.main`
   width: 100vw;
-  margin-top: 70px;
+  padding: 40px 160px;
 `;

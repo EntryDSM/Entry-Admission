@@ -6,15 +6,19 @@ import { PreviousButton } from './PreviousButton';
 import { Check, Search } from '@entry/ui';
 
 interface ISchoolSearchModalType {
-  setIsShow: React.Dispatch<React.SetStateAction<boolean>>; //다른 페이지에서 버튼 클릭 시 창 열림 백그라운드 클릭 시 창 닫힘 설정
+  setIsShow: React.Dispatch<React.SetStateAction<boolean>>;
   isShow?: boolean;
+  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수
+  selectedValue?: string | null;
 }
 
 export const SchoolSearchModal = ({
+  setSelectedValue,
+  selectedValue,
   setIsShow,
   isShow,
 }: ISchoolSearchModalType) => {
-  const [datas, setDatas] = useState<string[]>([
+  const [datas] = useState<string[]>([
     '서울고등학교',
     '부산대학교',
     '대구여자고등학교',
@@ -22,13 +26,10 @@ export const SchoolSearchModal = ({
     '인천외국어고등학교',
   ]);
 
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState<string>('');
-
-  //클릭 시에 체크를 위한 함수
-  const contentClick = (value: string) => {
-    setSelectedValue((prev) => (prev === value ? null : value));
-  };
+  const [tempSelectedValue, setTempSelectedValue] = useState<string | null>(
+    selectedValue ?? null
+  );
 
   //초성 검색 단어
   const CHO = [
@@ -68,36 +69,39 @@ export const SchoolSearchModal = ({
     return result;
   };
 
-  //검색 value 변경 함수
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
-  //필터링 기능 함수
   const filterSearch = datas.filter((data) => {
     const lower = searchValue.toLowerCase();
-    const choSearch = getCho(lower); // 검색어 초성
-    const choData = getCho(data); // 대상 데이터 초성
-
-    const isChoSearch = CHO.includes(lower[0]); // 첫 글자가 초성이면 초성 검색
-
-    if (isChoSearch) {
-      return choData.startsWith(choSearch);
-    } else {
-      return data.includes(searchValue);
-    }
+    const choSearch = getCho(lower);
+    const choData = getCho(data);
+    const isChoSearch = CHO.includes(lower[0]);
+    return isChoSearch
+      ? choData.startsWith(choSearch)
+      : data.includes(searchValue);
   });
 
-  //배경 Ref
-  const backRef = useRef<HTMLDivElement>(null);
-
-  //배경 클릭 함수
-  const backClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (backRef.current === e.target) setIsShow(false);
+  const contentClick = (value: string) => {
+    setTempSelectedValue((prev) => (prev === value ? null : value)); // 선택된 값을 임시 저장에 저장
   };
 
-  //모달 닫기
-  const closeClick = () => {
+  const backRef = useRef<HTMLDivElement>(null);
+  const backClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    if (backRef.current === e.target) {
+      setTempSelectedValue(selectedValue ?? null); // 원래 값으로 변경
+      setIsShow(false);
+    }
+  };
+
+  const handleCancelClick = () => {
+    setTempSelectedValue(selectedValue ?? null); // 원래 값으로 변경
+    setIsShow(false);
+  };
+
+  const handleConfirmClick = () => {
+    setSelectedValue(tempSelectedValue); // 선택
     setIsShow(false);
   };
 
@@ -114,11 +118,11 @@ export const SchoolSearchModal = ({
             value={searchValue}
           />
           <ContentContainer>
-            {datas && filterSearch.length > 0 ? (
-              filterSearch.map((data, index) => (
+            {filterSearch.length > 0 ? (
+              filterSearch.map((data) => (
                 <Content onClick={() => contentClick(data)} key={data}>
                   {data}
-                  {data === selectedValue ? (
+                  {data === tempSelectedValue ? (
                     <Check />
                   ) : (
                     <Check color="transparent" />
@@ -138,6 +142,7 @@ export const SchoolSearchModal = ({
               </Flex>
             )}
           </ContentContainer>
+
           <Flex
             gap={16}
             width="100%"
@@ -149,25 +154,17 @@ export const SchoolSearchModal = ({
               backgroundColor={colors.extra.realWhite}
               color={colors.orange[800]}
               hoverBackgroundColor={colors.extra.realWhite}
-              onClick={closeClick}
+              onClick={handleCancelClick}
             >
               취소
             </PreviousButton>
-            <PreviousButton>선택</PreviousButton>
+            <PreviousButton onClick={handleConfirmClick}>선택</PreviousButton>
           </Flex>
         </Modal>
       </ModalBack>
     )
   );
 };
-
-const ContentContainer = styled.div`
-  width: 100%;
-  height: 160px;
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
-`;
 
 const ModalBack = styled.div`
   padding: 30px;
@@ -180,7 +177,7 @@ const ModalBack = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
 `;
 
 const Modal = styled.div`
@@ -192,6 +189,14 @@ const Modal = styled.div`
   display: flex;
   flex-direction: column;
   gap: 48px;
+`;
+
+const ContentContainer = styled.div`
+  width: 100%;
+  height: 160px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Content = styled.div`

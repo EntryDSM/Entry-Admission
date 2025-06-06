@@ -1,5 +1,3 @@
-import styled from '@emotion/styled';
-
 interface ICheckType {
   color?: string;
 }
@@ -20,9 +18,3 @@ export const Check = ({ color = '#FF7C33' }: ICheckType) => {
     </svg>
   );
 };
-
-const Container = styled.div`
-  position: absolute;
-  top: 2px;
-  left: 2px;
-`;

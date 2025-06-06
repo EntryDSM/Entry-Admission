@@ -3,32 +3,30 @@ import styled from '@emotion/styled';
 import {
   Caution,
   Check,
-  dropdownArrow,
-  ImageChange,
-  Photo,
-  PreviousButton,
+  DropDownContent,
+  ImageContent,
+  InputContent,
+  RadioContent,
+  SearchContent,
+  TextAreaContent,
 } from '@entry/ui';
-import React, { useEffect, useRef, useState } from 'react';
-import { SchoolSearchModal } from './SchoolSearchModal';
+import React, { useEffect, useState } from 'react';
 
-interface IFormElementType extends Partial<IInputType>, Partial<IImgType> {
+interface IFormElementType
+  extends Partial<IInputType>,
+    Partial<IImgType>,
+    Partial<ISearchType> {
   label?: string;
   explanation?: string;
   warning?: string;
   type?: 'radio' | 'dropDown' | 'imgSelector' | 'input' | 'textArea' | 'search';
   radioDatas?: string[];
-  dropDownDatas?: { label: string; content: string | number[] }[];
+  dropDownDatas?: { label: string; content: (string | number)[] }[];
   selectedRadio?: string;
   setSelectedRadio?: React.Dispatch<React.SetStateAction<string>>;
   dropDownValues?: (string | number)[];
   onDropDownChange?: (values: (string | number)[]) => void;
 }
-
-type IRadioType = {
-  label: string;
-  isSelected: boolean;
-  onSelect: () => void;
-};
 
 type IInputType = ITextAreaType & {
   width?: string;
@@ -37,7 +35,7 @@ type IInputType = ITextAreaType & {
 
 type ITextAreaType = {
   placeholder?: string;
-  value?: string;
+  value?: string | null | number;
   onChange?: (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
@@ -49,168 +47,9 @@ type IImgType = {
   onFileChange?: (file: File | null) => void;
 };
 
-type IDropDownType = {
-  datas: (string | number)[];
-  label?: string;
-  value?: string | number;
-  onChange?: (value: string | number) => void;
-};
-
-const RadioContent = ({ label, isSelected, onSelect }: IRadioType) => (
-  <Flex width="fit-content" height="fit-content" gap={8} alignItems="center">
-    <Radio isClick={isSelected} onClick={onSelect}>
-      <Check color={isSelected ? colors.gray[50] : 'transparent'} />
-    </Radio>
-    <Text fontSize={20}>{label}</Text>
-  </Flex>
-);
-
-const DropDownContent = ({ datas, label, value, onChange }: IDropDownType) => {
-  const [content, setContent] = useState<string | number>(value || datas[0]);
-  const headRef = useRef<HTMLDivElement>(null);
-  const [headWidth, setHeadWidth] = useState<number | null>(null);
-  const [isClick, setIsClick] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (headRef.current) setHeadWidth(headRef.current.offsetWidth);
-  }, [content]);
-
-  useEffect(() => {
-    if (value !== undefined) setContent(value);
-  }, [value]);
-
-  const handleOptionClick = (data: string | number) => {
-    setContent(data);
-    setIsClick(false);
-    if (onChange) {
-      onChange(data);
-    }
-  };
-
-  return (
-    <Flex width="fit-content" height="fit-content" gap={12} alignItems="center">
-      <DropAllContainer>
-        <Flex isColumn={true} width="fit-content" height="fit-content">
-          <DropHead ref={headRef} onClick={() => setIsClick(!isClick)}>
-            {content}
-            <DropDownImg isClick={isClick} src={dropdownArrow} alt="arrow" />
-          </DropHead>
-          {isClick && (
-            <DropContainer width={headWidth}>
-              {datas.map((data) => (
-                <DropOption key={data} onClick={() => handleOptionClick(data)}>
-                  {data}
-                </DropOption>
-              ))}
-            </DropContainer>
-          )}
-        </Flex>
-      </DropAllContainer>
-      <Text fontSize={20}>{label}</Text>
-    </Flex>
-  );
-};
-
-const InputContent = ({ width, value, placeholder, onChange }: IInputType) => (
-  <InputContainer
-    width={width}
-    value={value}
-    onChange={onChange}
-    placeholder={placeholder}
-  />
-);
-
-const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
-  const imgRef = useRef<HTMLInputElement>(null);
-  const [isHover, setIsHover] = useState(false);
-
-  const handleChange = () => {
-    const file = imgRef.current?.files?.[0];
-    if (file) {
-      const newUrl = URL.createObjectURL(file);
-      setImgUrl(newUrl);
-      onFileChange?.(file);
-    }
-  };
-
-  return (
-    <ImgSelector
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
-      onClick={() => imgRef.current?.click()}
-      imgUrl={imgUrl}
-    >
-      {isHover && imgUrl && (
-        <HoverSelector>
-          <ImageChange />
-          <Text fontSize={12} color={colors.gray[200]}>
-            눌러서 사진을 변경
-          </Text>
-        </HoverSelector>
-      )}
-      <FileInput type="file" ref={imgRef} onChange={handleChange} />
-      {imgUrl ? (
-        <ImgContent src={imgUrl} alt="img" />
-      ) : (
-        <Flex
-          isColumn={true}
-          width="100%"
-          height="fit-content"
-          gap={16}
-          alignItems="center"
-        >
-          <Photo />
-          <Text fontSize={12} color={colors.gray[300]}>
-            눌러서 사진을 업로드
-          </Text>
-        </Flex>
-      )}
-    </ImgSelector>
-  );
-};
-
-const TextAreaContent = ({ onChange, placeholder, value }: ITextAreaType) => {
-  const [inputCount, setInputCount] = useState<number>(0);
-
-  const onInputHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputCount(e.target.value.length);
-    onChange?.(e); //전달받은 onChange도 실행
-  };
-
-  return (
-    <Flex
-      width="100%"
-      height="fit-content"
-      isColumn={true}
-      gap={4}
-      alignItems="flex-end"
-    >
-      <TextArea
-        onChange={onInputHandler}
-        value={value}
-        placeholder={placeholder}
-      />
-      <Text fontSize={12} color={colors.gray[400]}>
-        {inputCount}/1500
-      </Text>
-    </Flex>
-  );
-};
-
-const SearchContent = () => {
-  const [isShow, setIsShow] = useState(false);
-  return (
-    <Flex alignItems="center" height="fit-content" width="fit-content" gap={32}>
-      <InputContainer
-        isBlocked={true}
-        readOnly={true}
-        width="300px"
-        placeholder="중학교 이름을 입력해주세요."
-      />
-      <PreviousButton onClick={() => setIsShow(true)}>검색</PreviousButton>
-      <SchoolSearchModal isShow={isShow} setIsShow={setIsShow} />
-    </Flex>
-  );
+type ISearchType = {
+  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>; //다른 페이지에서 버튼 클릭 시 창 열림 백그라운드 클릭 시 창 닫힘 설정
+  selectedValue?: string | null;
 };
 
 export const FormElement = ({
@@ -231,9 +70,11 @@ export const FormElement = ({
   setSelectedRadio,
   dropDownValues = [],
   onDropDownChange,
+  selectedValue,
+  setSelectedValue,
 }: IFormElementType) => {
   const [isHover, setIsHover] = useState(false);
-  const [localSelectedRadio, setLocalSelectedRadio] = useState('');
+  const [localSelectedRadio, setLocalSelectedRadio] = useState<string>('');
   const [localDropDownValues, setLocalDropDownValues] = useState<
     (string | number)[]
   >(() =>
@@ -273,13 +114,39 @@ export const FormElement = ({
     handleSetSelectedRadio(radioLabel);
   };
 
+  const hasValue = () => {
+    switch (type) {
+      case 'input':
+      case 'textArea':
+        return typeof value === 'string' ? value.trim() !== '' : !!value;
+      case 'imgSelector':
+        return !!imgUrl;
+      case 'radio':
+        return !!currentSelectedRadio;
+      case 'dropDown':
+        return currentDropDownValues.length > 0;
+      case 'search':
+        return selectedValue;
+      default:
+        return false;
+    }
+  };
+
+  const isFilled = hasValue();
+
   return (
     <FormContainer>
-      <Flex gap={6} alignItems="center" height="fit-content" width="100%">
+      <Flex
+        gap={6}
+        alignItems="center"
+        height="fit-content"
+        width="100%"
+        justifyContent="space-between"
+      >
         <Flex
           gap={54}
           justifyContent="flex-start"
-          width="100%"
+          width={type === 'textArea' ? '100%' : 'fit-content'}
           height="fit-content"
           alignItems={type === 'textArea' ? 'flex-start' : 'center'}
         >
@@ -289,9 +156,14 @@ export const FormElement = ({
             width="fit-content"
             height="fit-content"
           >
-            <Text fontSize={24} fontWeight={600}>
-              {label}
-            </Text>
+            <CheckContainer>
+              <CheckWrapper>
+                <Check
+                  color={isFilled ? colors.orange[800] : colors.gray[200]}
+                />
+              </CheckWrapper>
+              <Label>{label}</Label>
+            </CheckContainer>
             {warning && (
               <SpeechBubbleContainer>
                 {isHover && <SpeechBubble>{warning}</SpeechBubble>}
@@ -352,7 +224,12 @@ export const FormElement = ({
               onChange={onChange}
             />
           )}
-          {type === 'search' && <SearchContent />}
+          {type === 'search' && setSelectedValue && (
+            <SearchContent
+              selectedValue={selectedValue}
+              setSelectedValue={setSelectedValue}
+            />
+          )}
         </Flex>
         {explanation && (
           <Text fontSize={16} fontWeight={300} color={colors.gray[400]}>
@@ -363,6 +240,24 @@ export const FormElement = ({
     </FormContainer>
   );
 };
+
+const Label = styled.div`
+  white-space: nowrap;
+  font-size: 24px;
+  font-weight: 600;
+`;
+
+const CheckContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 24px;
+`;
+
+const CheckWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const SpeechBubbleContainer = styled.div`
   position: relative;
@@ -411,143 +306,9 @@ const SpeechBubble = styled.div`
   }
 `;
 
-const ImgContent = styled.img`
-  width: 100%;
-`;
-
-const Radio = styled.div<{ isClick: boolean }>`
-  width: 28px;
-  height: 28px;
-  border-radius: 14px;
-  border: 1px solid
-    ${({ isClick }) => (isClick ? colors.orange[800] : colors.gray[200])};
-  background-color: ${({ isClick }) =>
-    isClick ? colors.orange[800] : 'transparent'};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const InputContainer = styled.input<{ isBlocked?: boolean; width?: string }>`
-  width: ${({ width }) => (width ? width : '100%')};
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid ${colors.gray[300]};
-  padding: 10px 0 10px 12px;
-  background-color: ${colors.extra.realWhite};
-  color: ${colors.gray[500]};
-  font-size: 16px;
-  opacity: ${({ isBlocked }) => (isBlocked ? 0.4 : 1)};
-  pointer-events: ${({ isBlocked }) => (isBlocked ? 'none' : 'cursor')};
-  &::placeholder {
-    color: ${colors.gray[300]};
-    font-size: 16px;
-  }
-`;
-
-const HoverSelector = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 16px;
-  background-color: #0000003e;
-`;
-
-const ImgSelector = styled.div<{ imgUrl?: string | null }>`
-  position: relative;
-  width: 150px;
-  height: 190px;
-  border-radius: 4px;
-  border: 1px solid ${colors.gray[300]};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  overflow: hidden;
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  height: 440px;
-  border-radius: 6px;
-  border: 1px solid ${colors.gray[300]};
-  padding: 12px 24px;
-  color: ${colors.gray[500]};
-  font-size: 16px;
-  background-color: ${colors.extra.realWhite};
-  &::placeholder {
-    color: ${colors.gray[300]};
-  }
-  resize: none;
-`;
-
 const FormContainer = styled.div`
   width: 100%;
   padding: 32px 0;
   display: flex;
-  align-items: center;
   border-bottom: 1px solid ${colors.gray[200]};
-`;
-
-const DropDownImg = styled.img<{ isClick: boolean }>`
-  width: 24px;
-  transform: rotate(${({ isClick }) => (isClick ? '-180deg' : '0deg')});
-  transition: 0.35s;
-`;
-
-const DropOption = styled.div`
-  width: 100%;
-  height: 40px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  &:hover {
-    transition: 0.35s ease-in-out;
-    background-color: ${colors.orange[100]};
-  }
-`;
-
-const DropContainer = styled.div<{ width: number | null }>`
-  display: flex;
-  flex-direction: column;
-  border: 1px solid ${colors.gray[300]};
-  border-radius: 4px;
-  width: ${({ width }) => (width ? `${width}px` : 'auto')};
-  position: absolute;
-  top: 39px;
-  z-index: 1;
-  background-color: ${colors.extra.realWhite};
-`;
-
-const DropAllContainer = styled.div`
-  width: fit-content;
-  height: fit-content;
-  position: relative;
-`;
-
-const DropHead = styled.div`
-  padding: 8px 16px;
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid ${colors.gray[300]};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  color: ${colors.gray[500]};
-  font-size: 16px;
 `;

@@ -7,6 +7,7 @@ interface AttendanceFormProps {
   value: string;
   onChange: (value: string) => void;
   defaultCount?: number;
+  width?: string;
 }
 
 export const AttendanceForm: React.FC<AttendanceFormProps> = ({
@@ -14,6 +15,7 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
   value,
   onChange,
   defaultCount,
+  width = '100%',
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -27,7 +29,7 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
   };
 
   return (
-    <Container>
+    <Container width={width}>
       <HeaderRow>
         {value && <CheckIcon>✓</CheckIcon>}
         <Title>{title}</Title>
@@ -49,8 +51,8 @@ export const AttendanceForm: React.FC<AttendanceFormProps> = ({
   );
 };
 
-const Container = styled.div`
-  width: 100%;
+const Container = styled.div<Pick<AttendanceFormProps, 'width'>>`
+  width: ${({ width }) => width};
   margin-bottom: 16px;
 `;
 

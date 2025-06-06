@@ -1,6 +1,7 @@
 import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { PreviousButton } from './PreviousButton';
+import { useNavigate } from 'react-router-dom';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -15,6 +16,7 @@ export const ApplicationNav = ({
 }: IApplicationNavType) => {
   // 한 번에 보여줄 페이지 수
   const pagesPerGroup = 6;
+  const navigate = useNavigate();
 
   // 현재 그룹의 첫 번째 페이지 번호 계산
   const currentGroupStart =
@@ -38,10 +40,12 @@ export const ApplicationNav = ({
 
   // 마지막 페이지에서 제출 버튼 클릭 시 실행되는 함수
   const completeClick = () => {
-    //제출 api
+    navigate('/submitted');
   };
   return (
     <Flex
+      paddingTop="44px"
+      paddingBottom="44px"
       height="fit-content"
       alignItems="end"
       gap={20}
