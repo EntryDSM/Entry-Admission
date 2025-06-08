@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { AuthInput } from '@entry/ui';
 import { EntryAuthTitle } from '../components';
-import { useEffect, useState } from 'react';
 
 export const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -77,7 +77,9 @@ export const LoginPage = () => {
           >
             회원가입
           </div>
-          <AuthLink>비밀번호 찾기</AuthLink>
+          <AuthLink onClick={() => navigate('/find-password')}>
+            비밀번호 찾기
+          </AuthLink>
           <div style={{ cursor: 'pointer' }}>관리자 로그인</div>
         </LoginKindContainer>
       </LoginPageContainer>
