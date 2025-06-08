@@ -37,7 +37,7 @@ export const NoPathHeader = () => {
 };
 
 export const AdminHeader = () => {
-  const [datas, setDatas] = useState<{ name: string }>({
+  const [datas, _] = useState<{ name: string }>({
     name: '홍길동',
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
@@ -164,7 +164,7 @@ export const AdminHeader = () => {
 };
 
 export const CommonHeader = () => {
-  const [datas, setDatas] = useState<{ name: string }>({
+  const [datas, _] = useState<{ name: string }>({
     name: '홍길동',
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
