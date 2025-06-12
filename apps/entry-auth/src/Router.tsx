@@ -1,6 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
-import { LoginPage, SignUpPage } from './pages';
+import {
+  ChangePasswordPage,
+  FindPasswordPage,
+  LoginPage,
+  SignUpPage,
+} from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -14,6 +19,14 @@ export const Router = createBrowserRouter([
       {
         path: '/signup',
         element: <SignUpPage />,
+      },
+      {
+        path: '/change-password',
+        element: <ChangePasswordPage />,
+      },
+      {
+        path: '/find-password',
+        element: <FindPasswordPage />,
       },
     ],
   },
