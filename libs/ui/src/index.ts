@@ -1,5 +1,6 @@
 export * from './Title';
 export * from './assets';
+export * from './contexts';
 export * from './Footer';
 export * from './BaseHeader';
 export * from './Button';

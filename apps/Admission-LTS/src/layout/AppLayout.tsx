@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { ApplicationNav } from '@entry/ui';
+import { ApplicationNav, usePageData } from '@entry/ui';
 import { Flex } from '@entry/design-token';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ export const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
+  const [datas, setDatas] = usePageData('first');
 
   //page 전환 시 스크롤 상단으로
   useEffect(() => {
@@ -19,23 +20,35 @@ export const AppLayout = () => {
     '/second',
     '/third',
     '/fourth',
-    '/ged/score',
-    '/first-expected-graduate',
-    '/second-expected-graduate',
-    '/third-expected-graduate',
+    '/first-graduate',
+    '/second-graduate',
+    '/third-graduate',
     '/activity',
+    '/application-preview',
     '/submit-check',
   ];
 
+  const gedPageRoutes = [
+    '/first',
+    '/second',
+    '/third',
+    '/fourth',
+    '/ged/score',
+    '/application-preview',
+    '/submit-check',
+  ];
+
+  console.log(datas.graduationType);
+  const useGedRoutes = datas.graduationType === '검정고시 (중학교 졸업 학력)';
+  const routes = useGedRoutes ? gedPageRoutes : pageRoutes;
+
   const currentPath = location.pathname;
-  const currentIndex = pageRoutes.findIndex((path) =>
-    currentPath.includes(path)
-  );
+  const currentIndex = routes.findIndex((path) => currentPath.includes(path));
 
   const [currentPage, setCurrentPage] = useState(currentIndex + 1 || 1);
 
   useEffect(() => {
-    const path = pageRoutes[currentPage - 1];
+    const path = routes[currentPage - 1];
     if (path && !currentPath.includes(path)) {
       navigate(path);
     }

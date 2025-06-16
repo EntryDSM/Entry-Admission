@@ -1,21 +1,10 @@
 import { Flex } from '@entry/design-token';
 import { FormElement } from '@entry/ui';
-import React, { useState } from 'react';
+import React from 'react';
+import { usePageData } from '@entry/ui';
 
 export const First = () => {
-  const [datas, setDatas] = useState<{
-    typeSelection: string;
-    regionSelection: string;
-    graduationType: string;
-    graduationDate: (string | number)[];
-    specialNote: string;
-  }>({
-    typeSelection: '',
-    regionSelection: '',
-    graduationType: '',
-    graduationDate: [2023, 1],
-    specialNote: '',
-  });
+  const [datas, setDatas] = usePageData('first'); //context 데이터
 
   // Radio data
   const formRadioData = [
@@ -40,45 +29,29 @@ export const First = () => {
   const handleTypeSelection: React.Dispatch<React.SetStateAction<string>> = (
     value
   ) => {
-    setDatas((prev) => ({
-      ...prev,
-      typeSelection:
-        typeof value === 'function' ? value(prev.typeSelection) : value,
-    }));
+    setDatas({ ...datas, typeSelection: value });
   };
 
   const handleRegionSelection: React.Dispatch<React.SetStateAction<string>> = (
     value
   ) => {
-    setDatas((prev) => ({
-      ...prev,
-      regionSelection:
-        typeof value === 'function' ? value(prev.regionSelection) : value,
-    }));
+    setDatas({ ...datas, regionSelection: value });
   };
 
   const handleGraduationTypeSelection: React.Dispatch<
     React.SetStateAction<string>
   > = (value) => {
-    setDatas((prev) => ({
-      ...prev,
-      graduationType:
-        typeof value === 'function' ? value(prev.graduationType) : value,
-    }));
+    setDatas({ ...datas, graduationType: value });
   };
 
   const handleSpecialNoteSelection: React.Dispatch<
     React.SetStateAction<string>
   > = (value) => {
-    setDatas((prev) => ({
-      ...prev,
-      specialNote:
-        typeof value === 'function' ? value(prev.specialNote) : value,
-    }));
+    setDatas({ ...datas, specialNote: value });
   };
 
   const handleDropdownChange = (values: (string | number)[]) => {
-    setDatas((prev) => ({ ...prev, graduationDate: values }));
+    setDatas({ ...datas, graduationDate: values });
   };
 
   const formDropDownData = [

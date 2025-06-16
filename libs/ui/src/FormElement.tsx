@@ -35,7 +35,7 @@ type IInputType = ITextAreaType & {
 
 type ITextAreaType = {
   placeholder?: string;
-  value?: string | null | number;
+  value?: string;
   onChange?: (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => void;
@@ -111,7 +111,12 @@ export const FormElement = ({
   };
 
   const handleRadioSelect = (radioLabel: string) => {
-    handleSetSelectedRadio(radioLabel);
+    if (currentSelectedRadio === radioLabel) {
+      //다시 클릭 시 초기화
+      handleSetSelectedRadio('');
+    } else {
+      handleSetSelectedRadio(radioLabel);
+    }
   };
 
   const hasValue = () => {

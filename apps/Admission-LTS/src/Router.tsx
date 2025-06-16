@@ -11,7 +11,9 @@ import {
   First,
   Fourth,
   Landing,
-  Score,
+  ScoreFirst,
+  ScoreSecond,
+  ScoreThird,
   Second,
   SubmitCheck,
   Submitted,
@@ -49,16 +51,16 @@ export const Router = createBrowserRouter([
                 element: <ScoreLayout />,
                 children: [
                   {
-                    path: 'first-expected-graduate',
-                    element: <Score />,
+                    path: 'first-graduate',
+                    element: <ScoreFirst />,
                   },
                   {
-                    path: 'second-expected-graduate',
-                    element: <Score />,
+                    path: 'second-graduate',
+                    element: <ScoreSecond />,
                   },
                   {
-                    path: 'third-expected-graduate',
-                    element: <Score />,
+                    path: 'third-graduate',
+                    element: <ScoreThird />,
                   },
                   {
                     path: 'activity',

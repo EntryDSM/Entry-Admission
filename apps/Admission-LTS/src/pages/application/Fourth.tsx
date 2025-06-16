@@ -1,28 +1,21 @@
 import { Flex } from '@entry/design-token';
-import { FormElement } from '@entry/ui';
-import { useState } from 'react';
+import { FormElement, usePageData } from '@entry/ui';
 
 export const Fourth = () => {
-  const [datas, setDatas] = useState<{
-    personalStmt: string;
-    studyPlan: string;
-  }>({
-    personalStmt: '',
-    studyPlan: '',
-  });
+  const [datas, setDatas] = usePageData('fourth');
 
   const handlePersonalStmtChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, personalStmt: value }));
+    setDatas({ ...datas, personalStmt: value });
   };
 
   const handleStudyPlanChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, studyPlan: value }));
+    setDatas({ ...datas, studyPlan: value });
   };
 
   console.log(datas);

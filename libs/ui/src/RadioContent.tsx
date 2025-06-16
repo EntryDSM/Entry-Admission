@@ -1,6 +1,6 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { Check } from '@entry/ui';
-import  styled  from '@emotion/styled';
+import styled from '@emotion/styled';
 
 interface IRadioType {
   label: string;

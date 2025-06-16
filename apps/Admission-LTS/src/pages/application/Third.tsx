@@ -1,49 +1,40 @@
 import { Flex } from '@entry/design-token';
-import { FormElement } from '@entry/ui';
+import { FormElement, usePageData } from '@entry/ui';
 import { useEffect, useState } from 'react';
 
 export const Third = () => {
-  const [datas, setDatas] = useState<{
-    schoolName: string | null;
-    studentId: number | null;
-    schoolPhone: string | null;
-    teacherName: string | null;
-  }>({
-    schoolName: null,
-    studentId: null,
-    schoolPhone: null,
-    teacherName: null,
-  });
+  const [datas, setDatas] = usePageData('third');
+
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
   console.log(datas);
 
   useEffect(() => {
-    setDatas((prev) => ({
-      ...prev,
+    setDatas({
+      ...datas,
       schoolName: selectedValue,
-    }));
+    });
   }, [selectedValue]);
 
   const handleSchoolPhoneChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, schoolPhone: value }));
+    setDatas({ ...datas, schoolPhone: value });
   };
 
   const handleStudentIdChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, studentId: value }));
+    setDatas({ ...datas, studentId: value });
   };
 
   const handleTeacherNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, teacherName: value }));
+    setDatas({ ...datas, teacherName: value });
   };
 
   return (

@@ -1,7 +1,8 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { ImageChange, Photo } from '@entry/ui';
 import styled from '@emotion/styled';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { usePageData } from '@entry/ui';
 
 interface IImgType {
   imgUrl?: string | null;
@@ -12,6 +13,13 @@ interface IImgType {
 export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
   const imgRef = useRef<HTMLInputElement>(null);
   const [isHover, setIsHover] = useState(false);
+  const [{ idPhoto }] = usePageData('second');
+
+  useEffect(() => {
+    if (idPhoto !== null) {
+      setImgUrl(idPhoto);
+    }
+  }, [idPhoto]);
 
   const handleChange = () => {
     const file = imgRef.current?.files?.[0];

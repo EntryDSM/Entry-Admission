@@ -2,7 +2,10 @@ import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { PreviousButton } from './PreviousButton';
 import { useNavigate } from 'react-router-dom';
-        
+import { toast } from 'react-toastify';
+import { useApplicationData, useCheckPageData } from '@entry/ui';
+import { useEffect, useState } from 'react';
+
 interface IApplicationNavType {
   totalPages: number;
   currentPage: number;
@@ -14,6 +17,10 @@ export const ApplicationNav = ({
   currentPage,
   setCurrentPage,
 }: IApplicationNavType) => {
+  const [isBlocked, setIsBlocked] = useState<boolean>(true);
+  const { saveToStorage } = useApplicationData();
+  const [datas, _] = useCheckPageData('check');
+
   // 한 번에 보여줄 페이지 수
   const pagesPerGroup = 6;
   const navigate = useNavigate();
@@ -29,14 +36,25 @@ export const ApplicationNav = ({
   );
 
   // 이전 페이지로 이동하는 이벤트 핸들러
-  const handlePrevPage = () => {
+  const handlePrevPage = async () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
+    //페이지 넘어갈 시 임시저장 기능
+    await saveToStorage();
+    toast.success('임시저장이 완료되었습니다.');
   };
 
   // 다음 페이지로 이동하는 이벤트 핸들러
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    //페이지 넘어갈 시 임시저장 기능
+    await saveToStorage();
+    toast.success('임시저장이 완료되었습니다.');
   };
+
+  //check가 확인했습니다인지 확인
+  useEffect(() => {
+    setIsBlocked(datas.message === '확인했습니다' ? false : true);
+  }, [datas.message]);
 
   // 마지막 페이지에서 제출 버튼 클릭 시 실행되는 함수
   const completeClick = () => {
@@ -80,7 +98,9 @@ export const ApplicationNav = ({
       {currentPage < totalPages ? (
         <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
       ) : (
-        <PreviousButton onClick={completeClick}>제출</PreviousButton>
+        <PreviousButton isBlocked={isBlocked} onClick={completeClick}>
+          제출
+        </PreviousButton>
       )}
     </Flex>
   );

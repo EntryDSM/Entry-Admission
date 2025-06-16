@@ -1,13 +1,13 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { InputContent } from '@entry/ui';
+import { InputContent, useCheckPageData } from '@entry/ui';
 import React, { useState } from 'react';
 
 export const SubmitCheck = () => {
-  const [datas, setDatas] = useState<string>('');
+  const [datas, setDatas] = useCheckPageData('check');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setDatas(value);
+    setDatas({ ...datas, message: value });
   };
 
   return (
@@ -39,6 +39,7 @@ export const SubmitCheck = () => {
           </Text>
         </Flex>
         <InputContent
+          value={datas.message}
           onChange={handleInputChange}
           placeholder='“확인했습니다"라고 작성해 주세요.'
         />

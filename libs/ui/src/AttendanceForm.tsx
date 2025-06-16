@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
 import { Check } from '@entry/ui';
 
 interface IAttendanceFormType {
   title: string;
-  value: string;
+  value: string | number | null;
   onChange: (value: string) => void;
   defaultCount?: number;
   width?: string;
@@ -18,9 +18,14 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   onChange,
   defaultCount,
   width = '100%',
-  suffix
+  suffix,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [isFilled, setIsFilled] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsFilled(!!value || value === 0);
+  }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const onlyNums = e.target.value.replace(/[^0-9]/g, '');
@@ -33,9 +38,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
         <CheckMark hasValue={!!value}>
           <Check />
         </CheckMark>
-        <Text>
-          {title}
-        </Text>
+        <Text>{title}</Text>
       </HeaderRow>
       <InputWrapper>
         <StyledInput
@@ -47,9 +50,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
           hasValue={!!value}
           isFocused={isFocused}
         />
-        <InputSuffix>
-          {suffix}
-        </InputSuffix>
+        <InputSuffix isFilled={isFilled}>{suffix}</InputSuffix>
       </InputWrapper>
     </Container>
   );
@@ -92,25 +93,25 @@ const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
   text-align: right;
 `;
 
-const InputSuffix = styled.span`
+const InputSuffix = styled.span<{ isFilled: boolean }>`
   position: absolute;
   top: 50%;
   right: 23px;
   transform: translateY(-50%);
   font-size: 16px;
-  color: ${colors.gray[500]};
+  color: ${({ isFilled }) => (isFilled ? colors.gray[500] : colors.gray[300])};
   pointer-events: none;
 `;
 
 const CheckMark = styled.span<{ hasValue: boolean }>`
-  color: ${(props) => props.hasValue ? colors.orange[800] : colors.gray[300]};
+  color: ${(props) => (props.hasValue ? colors.orange[800] : colors.gray[300])};
   transition: color 0.2s;
-  
+
   svg {
     fill: currentColor !important;
     color: inherit !important;
   }
-  
+
   * {
     fill: currentColor !important;
     stroke: currentColor !important;

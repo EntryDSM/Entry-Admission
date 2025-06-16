@@ -1,45 +1,36 @@
 import { Flex } from '@entry/design-token';
 import { FormElement } from '@entry/ui';
 import React, { useEffect, useState } from 'react';
+import { usePageData } from '@entry/ui';
 
 export const Second = () => {
   const [imgUrlValue, setImgUrlValue] = useState<string | null>(null);
 
-  const [datas, setDatas] = useState<{
-    idPhoto: string | null;
-    applicantName: string;
-    dateOfBirth: (string | number)[];
-    specialNotes: string;
-  }>({
-    idPhoto: null,
-    applicantName: '',
-    dateOfBirth: [2023, 1, 1],
-    specialNotes: '',
-  });
+  console.log(imgUrlValue);
+
+  const [datas, setDatas] = usePageData('second');
 
   const handleNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const value = e.target.value;
-    setDatas((prev) => ({ ...prev, applicantName: value }));
+    setDatas({ ...datas, applicantName: value });
   };
 
   const handleDropdownChange = (values: (string | number)[]) => {
-    setDatas((prev) => ({ ...prev, dateOfBirth: values }));
+    setDatas({ ...datas, dateOfBirth: values });
   };
 
   const handleEtcChange: React.Dispatch<React.SetStateAction<string>> = (
     value
   ) => {
-    setDatas((prev) => ({
-      ...prev,
-      specialNotes:
-        typeof value === 'function' ? value(prev.specialNotes) : value,
-    }));
+    const newValue =
+      typeof value === 'function' ? value(datas.specialNotes) : value;
+    setDatas({ ...datas, specialNotes: newValue });
   };
 
   useEffect(() => {
-    setDatas((prev) => ({ ...prev, idPhoto: imgUrlValue }));
+    setDatas({ ...datas, idPhoto: imgUrlValue });
   }, [imgUrlValue]);
 
   //radio data
@@ -48,8 +39,6 @@ export const Second = () => {
       data: ['국가 유공자', '특례 입학 대상'],
     },
   ];
-
-  console.log(datas);
 
   //dropdown data
   const formDropDownData = [
@@ -91,7 +80,7 @@ export const Second = () => {
       />
       <FormElement
         type="radio"
-        label="특기 "
+        label="특기 사항"
         radioDatas={formRadioData[0].data}
         warning="특기사항에 해당하시는 항목이 있으면 체크해주세요."
         setSelectedRadio={handleEtcChange}

@@ -6,15 +6,15 @@ import { ScorePageNav } from '@entry/ui';
 export const ScoreLayout = () => {
   const datas = [
     {
-      path: '/first-expected-graduate',
+      path: '/first-graduate',
       name: '3학년 1학기',
     },
     {
-      path: '/second-expected-graduate',
+      path: '/second-graduate',
       name: '직전 학기',
     },
     {
-      path: '/third-expected-graduate',
+      path: '/third-graduate',
       name: '직직전 학기',
     },
     {

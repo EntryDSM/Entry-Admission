@@ -1,10 +1,10 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type ITextAreaType = {
   placeholder?: string;
-  value?: string | null | number;
+  value?: string;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
@@ -19,6 +19,10 @@ export const TextAreaContent = ({
     setInputCount(e.target.value.length);
     onChange?.(e); //전달받은 onChange도 실행
   };
+
+  useEffect(() => {
+    setInputCount(value?.length ?? 0);
+  }, []);
 
   return (
     <Flex
