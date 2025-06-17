@@ -66,7 +66,7 @@ export const AppLayout = () => {
         >
           <Outlet />
           <ApplicationNav
-            totalPages={pageRoutes.length}
+            totalPages={routes.length}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
