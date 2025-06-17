@@ -43,7 +43,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
       <InputWrapper>
         <StyledInput
           type="text"
-          value={value}
+          value={value ?? ''}
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
