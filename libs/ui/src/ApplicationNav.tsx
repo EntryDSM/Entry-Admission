@@ -1,6 +1,10 @@
 import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { SubButton } from './Button';
+import { PreviousButton } from './PreviousButton';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useApplicationData, useCheckPageData } from '@entry/ui';
+import { useEffect, useState } from 'react';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -13,34 +17,69 @@ export const ApplicationNav = ({
   currentPage,
   setCurrentPage,
 }: IApplicationNavType) => {
+  const [isBlocked, setIsBlocked] = useState<boolean>(true);
+  const { saveToStorage } = useApplicationData();
+  const [datas, _] = useCheckPageData('check');
+
+  // 한 번에 보여줄 페이지 수
   const pagesPerGroup = 6;
+  const navigate = useNavigate();
+
+  // 현재 그룹의 첫 번째 페이지 번호 계산
   const currentGroupStart =
     Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+
+  // 현재 그룹의 마지막 페이지 번호 계산
   const currentGroupEnd = Math.min(
     currentGroupStart + pagesPerGroup - 1,
     totalPages
   );
 
-  const handlePrevPage = () => {
+  // 이전 페이지로 이동하는 이벤트 핸들러
+  const handlePrevPage = async () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
+    //페이지 넘어갈 시 임시저장 기능
+    await saveToStorage();
+    toast.success('임시저장이 완료되었습니다.');
   };
 
-  const handleNextPage = () => {
+  // 다음 페이지로 이동하는 이벤트 핸들러
+  const handleNextPage = async () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    //페이지 넘어갈 시 임시저장 기능
+    await saveToStorage();
+    toast.success('임시저장이 완료되었습니다.');
+  };
+
+  //check가 확인했습니다인지 확인
+  useEffect(() => {
+    setIsBlocked(datas.message === '확인했습니다' ? false : true);
+  }, [datas.message]);
+
+  // 마지막 페이지에서 제출 버튼 클릭 시 실행되는 함수
+  const completeClick = () => {
+    navigate('/submitted');
   };
   return (
     <Flex
+      paddingTop="44px"
+      paddingBottom="44px"
       height="fit-content"
       alignItems="end"
       gap={20}
       width="100%"
       justifyContent="space-between"
     >
-      {currentPage > 1 ? (
-        <SubButton onClick={handlePrevPage}>이전</SubButton>
-      ) : (
-        <SubButton isBlocked={true}>이전</SubButton>
-      )}
+      <PreviousButton
+        backgroundColor={colors.gray[50]}
+        color={colors.orange[800]}
+        borderColor={colors.orange[800]}
+        onClick={handlePrevPage}
+        isBlocked={currentPage > 1 ? false : true}
+        hoverBackgroundColor={colors.gray[50]}
+      >
+        이전
+      </PreviousButton>
       <Flex gap={12} width="fit-content" height="fit-content">
         {Array.from(
           { length: currentGroupEnd - currentGroupStart + 1 },
@@ -57,11 +96,11 @@ export const ApplicationNav = ({
         )}
       </Flex>
       {currentPage < totalPages ? (
-        <SubButton width="" onClick={handleNextPage}>
-          다음
-        </SubButton>
+        <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
       ) : (
-        <SubButton isBlocked={true}>다음</SubButton>
+        <PreviousButton isBlocked={isBlocked} onClick={completeClick}>
+          제출
+        </PreviousButton>
       )}
     </Flex>
   );

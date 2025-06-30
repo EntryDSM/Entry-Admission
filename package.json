@@ -14,11 +14,12 @@
     "@types/axios": "^0.14.4",
     "axios": "^1.8.4",
     "isbot": "^4.4.0",
-    "react": "18.2.0",
+    "react": "18.3.1",
     "react-cookie": "^8.0.1",
-    "react-dom": "18.2.0",
+    "react-dom": "18.3.1",
     "react-router": "^7.2.0",
-    "react-router-dom": "6.29.0"
+    "react-router-dom": "6.29.0",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
@@ -38,8 +39,8 @@
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
     "@types/node": "^20.0.0",
-    "@types/react": "18.2.0",
-    "@types/react-dom": "18.2.0",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^3.0.0",
     "eslint": "^9.8.0",
