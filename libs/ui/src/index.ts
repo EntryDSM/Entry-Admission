@@ -21,3 +21,4 @@ export * from './InputContent';
 export * from './SearchContent';
 export * from './TextAreaContent';
 export * from './Page404';
+export * from './hooks';

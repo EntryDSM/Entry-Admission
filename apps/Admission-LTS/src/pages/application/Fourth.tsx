@@ -27,16 +27,16 @@ export const Fourth = () => {
         type="textArea"
         label="자기소개서"
         placeholder="내용을 입력하세요."
-        onChange={handlePersonalStmtChange}
-        value={datas.personalStmt}
+        onTextAreaChange={handlePersonalStmtChange}
+        textAreaValue={datas.personalStmt}
       />{' '}
       <FormElement
         width="300px"
         type="textArea"
         label="학업계획서"
         placeholder="내용을 입력하세요."
-        onChange={handleStudyPlanChange}
-        value={datas.studyPlan}
+        onTextAreaChange={handleStudyPlanChange}
+        textAreaValue={datas.studyPlan}
       />
     </Flex>
   );
