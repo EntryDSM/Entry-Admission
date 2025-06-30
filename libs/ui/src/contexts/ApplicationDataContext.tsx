@@ -21,10 +21,10 @@ interface ISecondPageType {
 }
 
 interface IThirdPageType {
-  schoolName: null;
-  studentId: null;
-  schoolPhone: null;
-  teacherName: null;
+  schoolName: string;
+  studentId: number | null;
+  schoolPhone: string;
+  teacherName: string;
 }
 
 interface IFourthPageType {
@@ -91,10 +91,10 @@ const initialState: ApplicationState = {
     specialNotes: '',
   },
   third: {
-    schoolName: null,
+    schoolName: '',
     studentId: null,
-    schoolPhone: null,
-    teacherName: null,
+    schoolPhone: '',
+    teacherName: '',
   },
   fourth: {
     personalStmt: '',

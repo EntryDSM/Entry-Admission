@@ -2,9 +2,15 @@ import { colors, Flex, Text } from '@entry/design-token';
 import { EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Landing = () => {
   const [name, setName] = useState<string>('김이름');
+  const navigate = useNavigate();
+
+  const handleStartClick = () => {
+    navigate('/first');
+  };
   return (
     <Flex isColumn={true} alignItems="center" gap={60} justifyContent="center">
       <Flex
@@ -87,7 +93,7 @@ export const Landing = () => {
           </ContentContainer>
         </Flex>
       </Flex>
-      <Btn>원서 접수 시작</Btn>
+      <Btn onClick={handleStartClick}>원서 접수 시작</Btn>
     </Flex>
   );
 };

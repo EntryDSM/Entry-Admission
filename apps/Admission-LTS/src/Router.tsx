@@ -30,6 +30,10 @@ export const Router = createBrowserRouter([
     children: [
       {
         path: '',
+        element: <Landing />,
+      },
+      {
+        path: '',
         element: <AppLayout />,
         children: [
           {
@@ -103,10 +107,6 @@ export const Router = createBrowserRouter([
       {
         path: '*',
         element: <Page404 />,
-      },
-      {
-        path: 'landing',
-        element: <Landing />,
       },
     ],
   },

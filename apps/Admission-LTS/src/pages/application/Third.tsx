@@ -1,20 +1,10 @@
 import { Flex } from '@entry/design-token';
 import { FormElement, usePageData } from '@entry/ui';
-import { useEffect, useState } from 'react';
 
 export const Third = () => {
   const [datas, setDatas] = usePageData('third');
 
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
-
   console.log(datas);
-
-  useEffect(() => {
-    setDatas({
-      ...datas,
-      schoolName: selectedValue,
-    });
-  }, [selectedValue]);
 
   const handleSchoolPhoneChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -40,8 +30,8 @@ export const Third = () => {
   return (
     <Flex isColumn={true} width="100%" height="fit-content">
       <FormElement
-        selectedValue={selectedValue}
-        setSelectedValue={setSelectedValue}
+        selectedValue={datas.schoolName}
+        setSelectedValue={(value) => setDatas({ ...datas, schoolName: value })}
         type="search"
         label="중학교 이름"
       />
@@ -49,24 +39,27 @@ export const Third = () => {
         width="300px"
         type="input"
         label="중학교 학번"
+        inputType="phone"
         placeholder="중학교 학번을 입력해주세요."
-        onChange={handleStudentIdChange}
+        onInputChange={handleStudentIdChange}
         value={datas.studentId}
       />
       <FormElement
         width="300px"
         type="input"
+        inputType="phone"
         label="중학교 전화번호"
         placeholder="중학교 전화번호를 입력해주세요."
-        onChange={handleSchoolPhoneChange}
+        onInputChange={handleSchoolPhoneChange}
         value={datas.schoolPhone}
       />
       <FormElement
         width="300px"
         type="input"
         label="중학교 교사 성명"
+        inputType="text"
         placeholder="중학교 교사 성명을 입력해주세요."
-        onChange={handleTeacherNameChange}
+        onInputChange={handleTeacherNameChange}
         value={datas.teacherName}
       />
     </Flex>

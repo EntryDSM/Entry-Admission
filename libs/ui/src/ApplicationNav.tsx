@@ -18,8 +18,14 @@ export const ApplicationNav = ({
   setCurrentPage,
 }: IApplicationNavType) => {
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
-  const { saveToStorage } = useApplicationData();
+  const { saveToStorage, state } = useApplicationData();
   const [datas, _] = useCheckPageData('check');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // state가 변경될 때마다 플래그 설정
+  useEffect(() => {
+    setHasUnsavedChanges(true);
+  }, [state]);
 
   // 한 번에 보여줄 페이지 수
   const pagesPerGroup = 6;
@@ -39,16 +45,22 @@ export const ApplicationNav = ({
   const handlePrevPage = async () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
     //페이지 넘어갈 시 임시저장 기능
-    await saveToStorage();
-    toast.success('임시저장이 완료되었습니다.');
+    if (hasUnsavedChanges) {
+      await saveToStorage();
+      toast.success('임시저장이 완료되었습니다.');
+      setHasUnsavedChanges(false);
+    }
   };
 
   // 다음 페이지로 이동하는 이벤트 핸들러
   const handleNextPage = async () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
     //페이지 넘어갈 시 임시저장 기능
-    await saveToStorage();
-    toast.success('임시저장이 완료되었습니다.');
+    if (hasUnsavedChanges) {
+      await saveToStorage();
+      toast.success('임시저장이 완료되었습니다.');
+      setHasUnsavedChanges(false);
+    }
   };
 
   //check가 확인했습니다인지 확인

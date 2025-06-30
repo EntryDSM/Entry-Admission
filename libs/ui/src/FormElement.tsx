@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 
 interface IFormElementType
   extends Partial<IInputType>,
+    Partial<ITextAreaType>,
     Partial<IImgType>,
     Partial<ISearchType> {
   label?: string;
@@ -26,29 +27,31 @@ interface IFormElementType
   setSelectedRadio?: React.Dispatch<React.SetStateAction<string>>;
   dropDownValues?: (string | number)[];
   onDropDownChange?: (values: (string | number)[]) => void;
+  inputType?: 'phone' | 'number' | 'text';
 }
 
-type IInputType = ITextAreaType & {
+type IInputType = {
+  value?: string | number | null;
+  onInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   width?: string;
   readonly?: boolean;
+  placeholder?: string;
 };
 
 type ITextAreaType = {
   placeholder?: string;
-  value?: string;
-  onChange?: (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => void;
+  textAreaValue?: string;
+  onTextAreaChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
 type IImgType = {
   imgUrl?: string | null;
-  setImgUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  setImgUrl?: React.Dispatch<React.SetStateAction<string | null>>;
   onFileChange?: (file: File | null) => void;
 };
 
 type ISearchType = {
-  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>; //다른 페이지에서 버튼 클릭 시 창 열림 백그라운드 클릭 시 창 닫힘 설정
+  setSelectedValue?: React.Dispatch<React.SetStateAction<string | null>>;
   selectedValue?: string | null;
 };
 
@@ -62,7 +65,9 @@ export const FormElement = ({
   width,
   placeholder,
   value,
-  onChange,
+  onInputChange,
+  textAreaValue,
+  onTextAreaChange,
   imgUrl,
   setImgUrl,
   onFileChange,
@@ -72,6 +77,7 @@ export const FormElement = ({
   onDropDownChange,
   selectedValue,
   setSelectedValue,
+  inputType,
 }: IFormElementType) => {
   const [isHover, setIsHover] = useState(false);
   const [localSelectedRadio, setLocalSelectedRadio] = useState<string>('');
@@ -112,7 +118,6 @@ export const FormElement = ({
 
   const handleRadioSelect = (radioLabel: string) => {
     if (currentSelectedRadio === radioLabel) {
-      //다시 클릭 시 초기화
       handleSetSelectedRadio('');
     } else {
       handleSetSelectedRadio(radioLabel);
@@ -122,8 +127,9 @@ export const FormElement = ({
   const hasValue = () => {
     switch (type) {
       case 'input':
+        return value !== null && value !== undefined && value !== '';
       case 'textArea':
-        return typeof value === 'string' ? value.trim() !== '' : !!value;
+        return typeof textAreaValue === 'string' && textAreaValue.trim() !== '';
       case 'imgSelector':
         return !!imgUrl;
       case 'radio':
@@ -131,7 +137,7 @@ export const FormElement = ({
       case 'dropDown':
         return currentDropDownValues.length > 0;
       case 'search':
-        return selectedValue;
+        return selectedValue !== null && selectedValue !== undefined;
       default:
         return false;
     }
@@ -181,6 +187,7 @@ export const FormElement = ({
               </SpeechBubbleContainer>
             )}
           </Flex>
+
           {type === 'imgSelector' && setImgUrl && (
             <ImageContent
               imgUrl={imgUrl}
@@ -188,6 +195,7 @@ export const FormElement = ({
               onFileChange={onFileChange}
             />
           )}
+
           {type === 'dropDown' && dropDownDatas.length > 0 && (
             <Flex width="fit-content" height="fit-content" gap={16}>
               {dropDownDatas.map((data, index) => (
@@ -203,14 +211,17 @@ export const FormElement = ({
               ))}
             </Flex>
           )}
+
           {type === 'input' && (
             <InputContent
               width={width}
               placeholder={placeholder}
-              value={value}
-              onChange={onChange}
+              value={value ?? ''}
+              onChange={onInputChange}
+              type={inputType}
             />
           )}
+
           <Flex width="fit-content" height="fit-content" gap={32}>
             {type === 'radio' &&
               radioDatas?.map((data, index) => (
@@ -222,13 +233,15 @@ export const FormElement = ({
                 />
               ))}
           </Flex>
+
           {type === 'textArea' && (
             <TextAreaContent
-              value={value}
+              value={textAreaValue ?? ''}
               placeholder={placeholder}
-              onChange={onChange}
+              onChange={onTextAreaChange}
             />
           )}
+
           {type === 'search' && setSelectedValue && (
             <SearchContent
               selectedValue={selectedValue}

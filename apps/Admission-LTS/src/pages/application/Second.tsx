@@ -66,7 +66,8 @@ export const Second = () => {
         type="input"
         label="지원자 성명"
         placeholder="지원자 성명"
-        onChange={handleNameChange}
+        inputType="text"
+        onInputChange={handleNameChange}
         value={datas.applicantName}
       />
       <FormElement
