@@ -12,88 +12,115 @@ interface IApplicationNavType {
   setCurrentPage: (page: number) => void;
 }
 
+// 페이지네이션 관련 상수
+const PAGES_PER_GROUP = 6;
+
 export const ApplicationNav = ({
   totalPages,
   currentPage,
   setCurrentPage,
 }: IApplicationNavType) => {
-  const [isBlocked, setIsBlocked] = useState<boolean>(true);
-  const { saveToStorage, state } = useApplicationData();
-  const [datas, _] = useCheckPageData('check');
+  // 제출 버튼 활성화 상태
+  const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
+
+  // 저장 관련 상태
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const previousStateRef = useRef<string | null>(null); // 이전 상태를 저장할 ref
+  const previousDataRef = useRef<string | null>(null);
+  const isSavingRef = useRef<boolean>(false);
+  const isNavigationSavingRef = useRef<boolean>(false);
 
-  // 초기 상태 설정
-  useEffect(() => {
-    if (state && previousStateRef.current === null) {
-      previousStateRef.current = JSON.stringify(state);
-      setHasUnsavedChanges(false); // 초기 로딩 시에는 변경사항 없음
-    }
-  }, [state]);
-
-  // 실제로 state가 변경되었을 때만 플래그 설정
-  useEffect(() => {
-    if (state && previousStateRef.current) {
-      const currentStateString = JSON.stringify(state);
-      if (currentStateString !== previousStateRef.current) {
-        setHasUnsavedChanges(true);
-      }
-    }
-  }, [state]);
-
-  // 한 번에 보여줄 페이지 수
-  const pagesPerGroup = 6;
+  // 훅들
+  const { saveToStorage, state } = useApplicationData();
+  const [checkData] = useCheckPageData('check');
   const navigate = useNavigate();
 
-  // 현재 그룹의 첫 번째 페이지 번호 계산
-  const currentGroupStart =
-    Math.floor((currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+  // 페이지네이션 계산
+  const paginationInfo = calculatePaginationInfo(currentPage, totalPages);
 
-  // 현재 그룹의 마지막 페이지 번호 계산
-  const currentGroupEnd = Math.min(
-    currentGroupStart + pagesPerGroup - 1,
-    totalPages
-  );
+  // 초기 데이터 설정
+  useEffect(() => {
+    if (state && previousDataRef.current === null) {
+      previousDataRef.current = JSON.stringify(state);
+      setHasUnsavedChanges(false);
+    }
+  }, [state]);
 
-  // 저장 후 상태 업데이트 함수
-  const updateSavedState = () => {
+  // 데이터 변경 감지
+  useEffect(() => {
+    if (!state || !previousDataRef.current || isSavingRef.current) {
+      return;
+    }
+
+    const currentDataString = JSON.stringify(state);
+    const hasChanged = currentDataString !== previousDataRef.current;
+    setHasUnsavedChanges(hasChanged);
+  }, [state]);
+
+  // 제출 버튼 활성화 조건 확인
+  useEffect(() => {
+    const isConfirmed = checkData.message === '확인했습니다';
+    setIsSubmitBlocked(!isConfirmed);
+  }, [checkData.message]);
+
+  // 저장 완료 후 상태 업데이트
+  const updateAfterSave = () => {
     if (state) {
-      previousStateRef.current = JSON.stringify(state);
+      previousDataRef.current = JSON.stringify(state);
       setHasUnsavedChanges(false);
     }
   };
 
-  // 이전 페이지로 이동하는 이벤트 핸들러
-  const handlePrevPage = async () => {
-    // 페이지 넘어갈 시 변경사항이 있을 때만 임시저장
-    if (hasUnsavedChanges) {
-      await saveToStorage();
-      toast.success('임시저장이 완료되었습니다.');
-      updateSavedState();
+  // 페이지 이동 전 저장 처리
+  const saveBeforeNavigation = async () => {
+    if (
+      !hasUnsavedChanges ||
+      isSavingRef.current ||
+      isNavigationSavingRef.current
+    ) {
+      return;
     }
 
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    isNavigationSavingRef.current = true;
+    isSavingRef.current = true;
+
+    try {
+      await saveToStorage();
+      toast.success('임시저장이 완료되었습니다.');
+      updateAfterSave();
+    } catch (error) {
+      console.error('저장 실패:', error);
+      toast.error('저장에 실패했습니다.');
+    } finally {
+      isNavigationSavingRef.current = false;
+      isSavingRef.current = false;
+    }
   };
 
-  // 다음 페이지로 이동하는 이벤트 핸들러
+  // 이벤트 핸들러들
+  const handlePreviousPage = async () => {
+    await saveBeforeNavigation();
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   const handleNextPage = async () => {
-    // 페이지 넘어갈 시 변경사항이 있을 때만 임시저장
-    if (hasUnsavedChanges) {
-      await saveToStorage();
-      toast.success('임시저장이 완료되었습니다.');
-      updateSavedState();
+    await saveBeforeNavigation();
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
-
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  //check가 확인했습니다인지 확인
-  useEffect(() => {
-    setIsBlocked(datas.message === '확인했습니다' ? false : true);
-  }, [datas.message]);
+  const handlePageClick = async (targetPage: number) => {
+    if (targetPage === currentPage) {
+      return; // 현재 페이지와 동일하면 아무것도 하지 않음
+    }
 
-  // 마지막 페이지에서 제출 버튼 클릭 시 실행되는 함수
-  const completeClick = () => {
+    await saveBeforeNavigation();
+    setCurrentPage(targetPage);
+  };
+
+  const handleSubmit = () => {
     navigate('/submitted');
   };
 
@@ -107,35 +134,28 @@ export const ApplicationNav = ({
       width="100%"
       justifyContent="space-between"
     >
+      {/* 이전 버튼 */}
       <PreviousButton
         backgroundColor={colors.gray[50]}
         color={colors.orange[800]}
         borderColor={colors.orange[800]}
-        onClick={handlePrevPage}
-        isBlocked={currentPage > 1 ? false : true}
+        onClick={handlePreviousPage}
+        isBlocked={currentPage <= 1}
         hoverBackgroundColor={colors.gray[50]}
       >
         이전
       </PreviousButton>
+
+      {/* 페이지 인디케이터 */}
       <Flex gap={12} width="fit-content" height="fit-content">
-        {Array.from(
-          { length: currentGroupEnd - currentGroupStart + 1 },
-          (_, i) => {
-            const page = currentGroupStart + i;
-            return (
-              <Nav
-                key={page}
-                isActive={currentPage === page}
-                onClick={() => setCurrentPage(page)}
-              ></Nav>
-            );
-          }
-        )}
+        {renderPageIndicators(paginationInfo, currentPage, handlePageClick)}
       </Flex>
+
+      {/* 다음/제출 버튼 */}
       {currentPage < totalPages ? (
         <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
       ) : (
-        <PreviousButton isBlocked={isBlocked} onClick={completeClick}>
+        <PreviousButton isBlocked={isSubmitBlocked} onClick={handleSubmit}>
           제출
         </PreviousButton>
       )}
@@ -143,7 +163,39 @@ export const ApplicationNav = ({
   );
 };
 
-const Nav = styled.nav<{ isActive: boolean }>`
+// 페이지네이션 정보 계산 함수
+function calculatePaginationInfo(currentPage: number, totalPages: number) {
+  const groupStart =
+    Math.floor((currentPage - 1) / PAGES_PER_GROUP) * PAGES_PER_GROUP + 1;
+  const groupEnd = Math.min(groupStart + PAGES_PER_GROUP - 1, totalPages);
+
+  return { groupStart, groupEnd };
+}
+
+// 페이지 인디케이터 렌더링 함수
+function renderPageIndicators(
+  paginationInfo: { groupStart: number; groupEnd: number },
+  currentPage: number,
+  onPageClick: (page: number) => void
+) {
+  const { groupStart, groupEnd } = paginationInfo;
+  const pageCount = groupEnd - groupStart + 1;
+
+  return Array.from({ length: pageCount }, (_, index) => {
+    const pageNumber = groupStart + index;
+
+    return (
+      <PageIndicator
+        key={pageNumber}
+        isActive={currentPage === pageNumber}
+        onClick={() => onPageClick(pageNumber)}
+      />
+    );
+  });
+}
+
+// 스타일드 컴포넌트
+const PageIndicator = styled.nav<{ isActive: boolean }>`
   cursor: pointer;
   width: 54px;
   height: 4px;
@@ -152,5 +204,10 @@ const Nav = styled.nav<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s ease-in;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: ${({ isActive }) =>
+      isActive ? colors.orange[800] : colors.orange[400]};
+  }
 `;

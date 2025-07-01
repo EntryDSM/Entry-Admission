@@ -6,56 +6,100 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useApplicationData } from '@entry/ui';
 import { toast } from 'react-toastify';
 
+// 자동 저장 관련 상수
+const AUTO_SAVE_DELAY = 3000; // 3초
+
 export const ApplicationLayout = () => {
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previousStateRef = useRef<string | null>(null);
+  // 저장 관련 상태
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousDataRef = useRef<string | null>(null);
+  const isSavingRef = useRef<boolean>(false);
 
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
-  // 컴포넌트 마운트 시 저장된 데이터 로딩
+  // 초기 데이터 로딩
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  // 초기 로딩 시 이전 상태 설정
+  // 초기 상태 설정 (한 번만 실행)
   useEffect(() => {
-    if (state && previousStateRef.current === null) {
-      previousStateRef.current = JSON.stringify(state);
+    if (state && previousDataRef.current === null) {
+      previousDataRef.current = JSON.stringify(state);
     }
   }, [state]);
 
-  const handleTempSave = async () => {
-    await saveToStorage();
-    // 저장 후 이전 상태 업데이트
-    if (state) {
-      previousStateRef.current = JSON.stringify(state);
+  // 수동 저장 함수
+  const handleManualSave = async () => {
+    if (isSavingRef.current) {
+      console.log('이미 저장 중입니다.');
+      return;
     }
-    toast.success('임시저장이 완료되었습니다.');
+
+    await performSave();
   };
 
-  // 키 입력 후 3초 이상 변화 없으면 저장
-  const triggerDebouncedSave = useCallback(() => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(async () => {
-      await saveToStorage();
-      // 저장 후 이전 상태 업데이트
-      if (state) {
-        previousStateRef.current = JSON.stringify(state);
-      }
-      toast.success('임시저장이 완료되었습니다.');
-    }, 3000);
-  }, [saveToStorage, state]);
+  // 실제 저장 로직
+  const performSave = async () => {
+    isSavingRef.current = true;
 
-  // 실제로 데이터가 변경되었을 때만 저장 트리거
-  useEffect(() => {
-    if (state && previousStateRef.current) {
-      const currentStateString = JSON.stringify(state);
-      // 이전 상태와 현재 상태를 비교
-      if (currentStateString !== previousStateRef.current) {
-        triggerDebouncedSave();
-      }
+    try {
+      await saveToStorage();
+      updateSavedDataReference();
+      toast.success('임시저장이 완료되었습니다.');
+    } catch (error) {
+      console.error('저장 실패:', error);
+      toast.error('저장에 실패했습니다.');
+    } finally {
+      isSavingRef.current = false;
     }
-  }, [state, triggerDebouncedSave]);
+  };
+
+  // 저장 완료 후 기준 데이터 업데이트
+  const updateSavedDataReference = () => {
+    if (state) {
+      previousDataRef.current = JSON.stringify(state);
+    }
+  };
+
+  // 자동 저장 타이머 설정
+  const scheduleAutoSave = useCallback(() => {
+    // 기존 타이머가 있으면 취소
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // 새로운 자동 저장 타이머 설정
+    autoSaveTimerRef.current = setTimeout(async () => {
+      if (!isSavingRef.current) {
+        await performSave();
+      }
+    }, AUTO_SAVE_DELAY);
+  }, []);
+
+  // 데이터 변경 감지 및 자동 저장 트리거
+  useEffect(() => {
+    // 초기 로딩 중이거나 저장 중이면 무시
+    if (!state || !previousDataRef.current || isSavingRef.current) {
+      return;
+    }
+
+    const currentDataString = JSON.stringify(state);
+    const hasDataChanged = currentDataString !== previousDataRef.current;
+
+    if (hasDataChanged) {
+      scheduleAutoSave();
+    }
+  }, [state, scheduleAutoSave]);
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Flex width="100%" height="fit-content">
@@ -76,7 +120,7 @@ export const ApplicationLayout = () => {
               <Text fontSize={32} fontWeight={600}>
                 지원자 전형 구분
               </Text>
-              <PreviousButton onClick={handleTempSave}>
+              <PreviousButton onClick={handleManualSave}>
                 임시 저장
               </PreviousButton>
             </Flex>
