@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 
 export const ApplicationLayout = () => {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousStateRef = useRef<string | null>(null);
 
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
@@ -16,8 +17,19 @@ export const ApplicationLayout = () => {
     loadFromStorage();
   }, [loadFromStorage]);
 
+  // 초기 로딩 시 이전 상태 설정
+  useEffect(() => {
+    if (state && previousStateRef.current === null) {
+      previousStateRef.current = JSON.stringify(state);
+    }
+  }, [state]);
+
   const handleTempSave = async () => {
     await saveToStorage();
+    // 저장 후 이전 상태 업데이트
+    if (state) {
+      previousStateRef.current = JSON.stringify(state);
+    }
     toast.success('임시저장이 완료되었습니다.');
   };
 
@@ -26,14 +38,22 @@ export const ApplicationLayout = () => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(async () => {
       await saveToStorage();
+      // 저장 후 이전 상태 업데이트
+      if (state) {
+        previousStateRef.current = JSON.stringify(state);
+      }
       toast.success('임시저장이 완료되었습니다.');
     }, 3000);
-  }, [saveToStorage]);
+  }, [saveToStorage, state]);
 
-  // data가 바뀔 때마다 triggerDebouncedSave 실행
+  // 실제로 데이터가 변경되었을 때만 저장 트리거
   useEffect(() => {
-    if (state) {
-      triggerDebouncedSave();
+    if (state && previousStateRef.current) {
+      const currentStateString = JSON.stringify(state);
+      // 이전 상태와 현재 상태를 비교
+      if (currentStateString !== previousStateRef.current) {
+        triggerDebouncedSave();
+      }
     }
   }, [state, triggerDebouncedSave]);
 

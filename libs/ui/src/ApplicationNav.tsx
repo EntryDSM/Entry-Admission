@@ -4,7 +4,7 @@ import { PreviousButton } from './PreviousButton';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApplicationData, useCheckPageData } from '@entry/ui';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -21,10 +21,24 @@ export const ApplicationNav = ({
   const { saveToStorage, state } = useApplicationData();
   const [datas, _] = useCheckPageData('check');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const previousStateRef = useRef<string | null>(null); // 이전 상태를 저장할 ref
 
-  // state가 변경될 때마다 플래그 설정
+  // 초기 상태 설정
   useEffect(() => {
-    setHasUnsavedChanges(true);
+    if (state && previousStateRef.current === null) {
+      previousStateRef.current = JSON.stringify(state);
+      setHasUnsavedChanges(false); // 초기 로딩 시에는 변경사항 없음
+    }
+  }, [state]);
+
+  // 실제로 state가 변경되었을 때만 플래그 설정
+  useEffect(() => {
+    if (state && previousStateRef.current) {
+      const currentStateString = JSON.stringify(state);
+      if (currentStateString !== previousStateRef.current) {
+        setHasUnsavedChanges(true);
+      }
+    }
   }, [state]);
 
   // 한 번에 보여줄 페이지 수
@@ -41,26 +55,36 @@ export const ApplicationNav = ({
     totalPages
   );
 
-  // 이전 페이지로 이동하는 이벤트 핸들러
-  const handlePrevPage = async () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-    //페이지 넘어갈 시 임시저장 기능
-    if (hasUnsavedChanges) {
-      await saveToStorage();
-      toast.success('임시저장이 완료되었습니다.');
+  // 저장 후 상태 업데이트 함수
+  const updateSavedState = () => {
+    if (state) {
+      previousStateRef.current = JSON.stringify(state);
       setHasUnsavedChanges(false);
     }
   };
 
-  // 다음 페이지로 이동하는 이벤트 핸들러
-  const handleNextPage = async () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    //페이지 넘어갈 시 임시저장 기능
+  // 이전 페이지로 이동하는 이벤트 핸들러
+  const handlePrevPage = async () => {
+    // 페이지 넘어갈 시 변경사항이 있을 때만 임시저장
     if (hasUnsavedChanges) {
       await saveToStorage();
       toast.success('임시저장이 완료되었습니다.');
-      setHasUnsavedChanges(false);
+      updateSavedState();
     }
+
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // 다음 페이지로 이동하는 이벤트 핸들러
+  const handleNextPage = async () => {
+    // 페이지 넘어갈 시 변경사항이 있을 때만 임시저장
+    if (hasUnsavedChanges) {
+      await saveToStorage();
+      toast.success('임시저장이 완료되었습니다.');
+      updateSavedState();
+    }
+
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   //check가 확인했습니다인지 확인
@@ -72,6 +96,7 @@ export const ApplicationNav = ({
   const completeClick = () => {
     navigate('/submitted');
   };
+
   return (
     <Flex
       paddingTop="44px"
