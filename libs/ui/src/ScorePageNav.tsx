@@ -19,8 +19,16 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
     navigate(path);
   };
 
+  // 단계 수에 따른 Line width 계산
+  const getLineWidth = () => {
+    if (datas.length === 2) return '928px';
+    if (datas.length === 4) return '196px';
+    if (datas.length === 5) return '140px'; // 졸업자용
+    return '150px'; // 기본값
+  };
+
   return (
-    <Flex width="fit-content" height="fit-content" gap={20} alignItems="center">
+    <Flex width="fit-content" height="fit-content" gap={20} alignItems="center" flexWrap="nowrap">
       {datas.map((data, index) => (
         <Flex
           width="fit-content"
@@ -31,7 +39,7 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
         >
           {index !== 0 && (
             <Line
-              width={datas.length === 2 ? '928px' : '196px'}
+              width={getLineWidth()}
               isActive={index <= activeIndex}
             />
           )}

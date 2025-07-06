@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
-import { MainButton, SubButton, NoticePinIcon } from '@entry/ui';
+import {  NoticePinIcon } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
 
 interface NoticeItem {
