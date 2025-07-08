@@ -86,7 +86,7 @@ export const Landing = () => {
                 fontWeight={500}
                 color={colors.orange[800]}
               >
-                {name}{' '}
+                {name}
               </Text>
               ’ 지원자님 계정으로 로그인되어 있습니다.
             </Text>
