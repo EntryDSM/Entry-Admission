@@ -25,7 +25,7 @@ export const ApplicationNav = ({
   setCurrentPage,
 }: IApplicationNavType) => {
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [_, setHasUnsavedChanges] = useState(false);
   const isNavigationSavingRef = useRef<boolean>(false);
 
   const { saveToStorage, state } = useApplicationData();
