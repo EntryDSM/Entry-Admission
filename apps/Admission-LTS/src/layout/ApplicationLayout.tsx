@@ -4,95 +4,72 @@ import { PreviousButton } from '@entry/ui';
 import { Flex, Text } from '@entry/design-token';
 import { useCallback, useEffect, useRef } from 'react';
 import { useApplicationData } from '@entry/ui';
-import { toast } from 'react-toastify';
-
-// 자동 저장 관련 상수
-const AUTO_SAVE_DELAY = 3000; // 3초
+import {
+  skipNextAutoSave,
+  previousDataRef,
+  isSavingRef,
+  performSave,
+  hasChanged,
+  AUTO_SAVE_DELAY,
+} from '@entry/ui';
 
 export const ApplicationLayout = () => {
-  // 저장 관련 상태
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previousDataRef = useRef<string | null>(null);
-  const isSavingRef = useRef<boolean>(false);
-
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
-  // 초기 데이터 로딩
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  // 초기 상태 설정 (한 번만 실행)
   useEffect(() => {
     if (state && previousDataRef.current === null) {
       previousDataRef.current = JSON.stringify(state);
     }
   }, [state]);
 
-  // 수동 저장 함수
   const handleManualSave = async () => {
     if (isSavingRef.current) {
       console.log('이미 저장 중입니다.');
       return;
     }
-
-    await performSave();
+    await performSave(state, saveToStorage);
   };
 
-  // 실제 저장 로직
-  const performSave = async () => {
-    isSavingRef.current = true;
-
-    try {
-      await saveToStorage();
-      updateSavedDataReference();
-      toast.success('임시저장이 완료되었습니다.');
-    } catch (error) {
-      console.error('저장 실패:', error);
-      toast.error('저장에 실패했습니다.');
-    } finally {
-      isSavingRef.current = false;
-    }
-  };
-
-  // 저장 완료 후 기준 데이터 업데이트
-  const updateSavedDataReference = () => {
-    if (state) {
-      previousDataRef.current = JSON.stringify(state);
-    }
-  };
-
-  // 자동 저장 타이머 설정
   const scheduleAutoSave = useCallback(() => {
-    // 기존 타이머가 있으면 취소
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
 
-    // 새로운 자동 저장 타이머 설정
     autoSaveTimerRef.current = setTimeout(async () => {
-      if (!isSavingRef.current) {
-        await performSave();
+      if (!isSavingRef.current && hasChanged(state)) {
+        await performSave(state, saveToStorage);
       }
     }, AUTO_SAVE_DELAY);
-  }, []);
+  }, [state, saveToStorage]);
 
-  // 데이터 변경 감지 및 자동 저장 트리거
   useEffect(() => {
-    // 초기 로딩 중이거나 저장 중이면 무시
-    if (!state || !previousDataRef.current || isSavingRef.current) {
-      return;
-    }
+    if (!state || !previousDataRef.current || isSavingRef.current) return;
 
     const currentDataString = JSON.stringify(state);
     const hasDataChanged = currentDataString !== previousDataRef.current;
 
+    if (skipNextAutoSave.current) {
+      console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          skipNextAutoSave.current = false;
+        });
+      });
+      previousDataRef.current = currentDataString;
+      return;
+    }
+
     if (hasDataChanged) {
+      console.log('[AUTO SAVE TRIGGER]');
       scheduleAutoSave();
     }
   }, [state, scheduleAutoSave]);
 
-  // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
     return () => {
       if (autoSaveTimerRef.current) {

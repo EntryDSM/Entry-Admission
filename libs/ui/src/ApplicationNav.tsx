@@ -2,9 +2,14 @@ import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { PreviousButton } from './PreviousButton';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useApplicationData, useCheckPageData } from '@entry/ui';
 import { useEffect, useState, useRef } from 'react';
+import {
+  skipNextAutoSave,
+  previousDataRef,
+  performSave,
+  hasChanged,
+} from './utils/skipNextAutoSave';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -12,7 +17,6 @@ interface IApplicationNavType {
   setCurrentPage: (page: number) => void;
 }
 
-// 페이지네이션 관련 상수
 const PAGES_PER_GROUP = 6;
 
 export const ApplicationNav = ({
@@ -20,24 +24,16 @@ export const ApplicationNav = ({
   currentPage,
   setCurrentPage,
 }: IApplicationNavType) => {
-  // 제출 버튼 활성화 상태
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
-
-  // 저장 관련 상태
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const previousDataRef = useRef<string | null>(null);
-  const isSavingRef = useRef<boolean>(false);
   const isNavigationSavingRef = useRef<boolean>(false);
 
-  // 훅들
   const { saveToStorage, state } = useApplicationData();
   const [checkData] = useCheckPageData('check');
   const navigate = useNavigate();
 
-  // 페이지네이션 계산
   const paginationInfo = calculatePaginationInfo(currentPage, totalPages);
 
-  // 초기 데이터 설정
   useEffect(() => {
     if (state && previousDataRef.current === null) {
       previousDataRef.current = JSON.stringify(state);
@@ -45,24 +41,19 @@ export const ApplicationNav = ({
     }
   }, [state]);
 
-  // 데이터 변경 감지
   useEffect(() => {
-    if (!state || !previousDataRef.current || isSavingRef.current) {
-      return;
-    }
+    if (!state || !previousDataRef.current) return;
 
     const currentDataString = JSON.stringify(state);
-    const hasChanged = currentDataString !== previousDataRef.current;
-    setHasUnsavedChanges(hasChanged);
+    const hasDataChanged = currentDataString !== previousDataRef.current;
+    setHasUnsavedChanges(hasDataChanged);
   }, [state]);
 
-  // 제출 버튼 활성화 조건 확인
   useEffect(() => {
     const isConfirmed = checkData.message === '확인했습니다';
     setIsSubmitBlocked(!isConfirmed);
   }, [checkData.message]);
 
-  // 저장 완료 후 상태 업데이트
   const updateAfterSave = () => {
     if (state) {
       previousDataRef.current = JSON.stringify(state);
@@ -70,52 +61,40 @@ export const ApplicationNav = ({
     }
   };
 
-  // 페이지 이동 전 저장 처리
   const saveBeforeNavigation = async () => {
-    if (
-      !hasUnsavedChanges ||
-      isSavingRef.current ||
-      isNavigationSavingRef.current
-    ) {
+    if (!hasChanged(state)) {
       return;
     }
 
+    if (isNavigationSavingRef.current) return;
+
     isNavigationSavingRef.current = true;
-    isSavingRef.current = true;
 
     try {
-      await saveToStorage();
-      toast.success('임시저장이 완료되었습니다.');
-      updateAfterSave();
+      skipNextAutoSave.current = true;
+      const wasSaved = await performSave(state, saveToStorage);
+      if (wasSaved) {
+        updateAfterSave();
+      }
     } catch (error) {
       console.error('저장 실패:', error);
-      toast.error('저장에 실패했습니다.');
     } finally {
       isNavigationSavingRef.current = false;
-      isSavingRef.current = false;
     }
   };
 
-  // 이벤트 핸들러들
   const handlePreviousPage = async () => {
     await saveBeforeNavigation();
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
   const handleNextPage = async () => {
     await saveBeforeNavigation();
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const handlePageClick = async (targetPage: number) => {
-    if (targetPage === currentPage) {
-      return; // 현재 페이지와 동일하면 아무것도 하지 않음
-    }
-
+    if (targetPage === currentPage) return;
     await saveBeforeNavigation();
     setCurrentPage(targetPage);
   };
@@ -134,7 +113,6 @@ export const ApplicationNav = ({
       width="100%"
       justifyContent="space-between"
     >
-      {/* 이전 버튼 */}
       <PreviousButton
         backgroundColor={colors.gray[50]}
         color={colors.orange[800]}
@@ -145,13 +123,9 @@ export const ApplicationNav = ({
       >
         이전
       </PreviousButton>
-
-      {/* 페이지 인디케이터 */}
       <Flex gap={12} width="fit-content" height="fit-content">
         {renderPageIndicators(paginationInfo, currentPage, handlePageClick)}
       </Flex>
-
-      {/* 다음/제출 버튼 */}
       {currentPage < totalPages ? (
         <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
       ) : (
@@ -163,16 +137,13 @@ export const ApplicationNav = ({
   );
 };
 
-// 페이지네이션 정보 계산 함수
 function calculatePaginationInfo(currentPage: number, totalPages: number) {
   const groupStart =
     Math.floor((currentPage - 1) / PAGES_PER_GROUP) * PAGES_PER_GROUP + 1;
   const groupEnd = Math.min(groupStart + PAGES_PER_GROUP - 1, totalPages);
-
   return { groupStart, groupEnd };
 }
 
-// 페이지 인디케이터 렌더링 함수
 function renderPageIndicators(
   paginationInfo: { groupStart: number; groupEnd: number },
   currentPage: number,
@@ -183,7 +154,6 @@ function renderPageIndicators(
 
   return Array.from({ length: pageCount }, (_, index) => {
     const pageNumber = groupStart + index;
-
     return (
       <PageIndicator
         key={pageNumber}
@@ -194,7 +164,6 @@ function renderPageIndicators(
   });
 }
 
-// 스타일드 컴포넌트
 const PageIndicator = styled.nav<{ isActive: boolean }>`
   cursor: pointer;
   width: 54px;
