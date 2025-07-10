@@ -1,23 +1,29 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Flex, Text } from '@entry/design-token';
-import { AttendanceForm, usePageData } from '@entry/ui';
+import { Text } from '@entry/design-token';
+import { AttendanceForm, CertCheckForm, usePageData } from '@entry/ui';
 
 const Container = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 48px;
   width: 100%;
   height: fit-content;
 `;
 
 const Section = styled.div`
-  flex: 1;
-  width: calc(50% - 24px);
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
+`;
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
 `;
 
 export const Activity = () => {
@@ -57,19 +63,21 @@ export const Activity = () => {
     safeSetActivityData({ ...safeActivityData, volunteerHours: value });
   };
 
+  const handleDsmAlgorithmChange = (value: 'O' | 'X') => {
+    safeSetActivityData({ ...safeActivityData, dsmAlgorithm: value });
+  };
+
+  const handleInfoProcessingChange = (value: 'O' | 'X') => {
+    safeSetActivityData({ ...safeActivityData, infoProcessing: value });
+  };
+
   return (
     <Container>
       <Section>
         <Text fontSize={24} fontWeight={600}>
           출석
         </Text>
-        <Flex
-          height="fit-content"
-          flexWrap="wrap"
-          width="100%"
-          gapX={22}
-          gapY={24}
-        >
+        <GridContainer>
           <AttendanceForm
             width={'100%'}
             title="미인정 결석"
@@ -102,20 +110,37 @@ export const Activity = () => {
             suffix="회"
             defaultCount={10}
           />
-        </Flex>
+        </GridContainer>
       </Section>
       <Section>
         <Text fontSize={24} fontWeight={600}>
           봉사
         </Text>
         <AttendanceForm 
-          width={'100%'} 
+          width={'748px'} 
           title="봉사시간" 
           value={safeActivityData?.volunteerHours || ''}
           onChange={handleVolunteerHoursChange}
           suffix="시간"
           defaultCount={10} 
         /> 
+      </Section>
+      <Section>
+        <Text fontSize={24} fontWeight={600}>
+          자격증
+        </Text>
+        <CertCheckForm
+          width={'100%'}
+          title="DSM 알고리즘 대회 입상"
+          value={safeActivityData?.dsmAlgorithm || null}
+          onChange={handleDsmAlgorithmChange}
+        />
+        <CertCheckForm
+          width={'100%'}
+          title="정보처리기능사 자격증 취득"
+          value={safeActivityData?.infoProcessing || null}
+          onChange={handleInfoProcessingChange}
+        />
       </Section>
     </Container>
   );

@@ -38,19 +38,21 @@ export const Button = ({
 };
 
 const BtnContainer = styled.button<Omit<IBtnType, 'onClick' | 'children'>>`
+  height: 48px;
+  min-width: 83px;
   opacity: ${({ isBlocked }) => (isBlocked ? 0.5 : 1)};
   pointer-events: ${({ isBlocked }) => (isBlocked ? 'none' : 'cursor')};
-  width: ${({ width }) => width};
-  padding: 24px 48px;
-  border-radius: 24px;
+  padding: 12px 24px;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 20px;
   color: ${({ color }) => color};
   background-color: ${({ backgroundColor }) => backgroundColor};
-  border: 1px solid ${({ borderColor }) => borderColor};
+  border: 2px solid ${({ borderColor }) => borderColor};
   cursor: pointer;
+  white-space: nowrap;
   &:hover {
     background-color: ${({ hoverBackgroundColor }) => hoverBackgroundColor};
     transition: 0.35s ease-in-out;

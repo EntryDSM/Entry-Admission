@@ -63,6 +63,15 @@ export const CalculateLayout = () => {
     getCurrentType()
   );
 
+  // ScorePageNav용 절대 경로 데이터 생성
+  const getScoreNavData = () => {
+    const basePath = CALCULATION_TYPES.find((t) => t.key === activeType)?.basePath;
+    return SCORE_PAGES[activeType].map((data) => ({
+      ...data,
+      path: `${basePath}${data.path}`
+    }));
+  };
+
   const currentData = SCORE_PAGES[activeType].find((data) =>
     location.pathname.includes(data.path)
   );
@@ -118,7 +127,6 @@ export const CalculateLayout = () => {
         <ContentWrapper>
           <MainContainer>
             <ContentContainer>
-              {/* 상단 타입 선택 - 새로운 컴포넌트 사용 */}
               <TabSection
                 options={CALCULATION_TYPES}
                 activeType={activeType}
@@ -134,7 +142,7 @@ export const CalculateLayout = () => {
                     관련 항목이 없는 경우 ✕ 로 기입하세요.
                   </Text>
                 </TitleSection>
-                <ScorePageNav datas={SCORE_PAGES[activeType]} />
+                <ScorePageNav datas={getScoreNavData()} />
               </TitleContainer>
 
               <Main>
@@ -148,8 +156,11 @@ export const CalculateLayout = () => {
                   backgroundColor={
                     currentStep === 0 ? '#E5E5E5' : 'transparent'
                   }
-                  color={currentStep === 0 ? '#999' : '#666'}
-                  borderColor="#E5E5E5"
+                  hoverBackgroundColor={
+                    currentStep === 0 ? '#E5E5E5' : 'transparent'
+                  }
+                  color={currentStep === 0 ? '#999' : colors.orange[800]}
+                  borderColor={currentStep === 0 ? '#999' : colors.orange[800]}
                   isBlocked={currentStep === 0}
                 >
                   이전
