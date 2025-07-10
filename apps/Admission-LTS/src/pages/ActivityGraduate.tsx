@@ -1,7 +1,7 @@
 import { Flex, Text } from '@entry/design-token';
 import { AttendanceForm } from '@entry/ui';
 
-export const Activity = () => {
+export const ActivityGraduate = () => {
   return (
     <>
       <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">

@@ -65,7 +65,12 @@ interface ApplicationState {
   firstGraduate: IScoreType;
   secondGraduate: IScoreType;
   thirdGraduate: IScoreType;
-  activity: IActivityType;
+  fourthGraduate: IScoreType;
+  activityGraduate: IActivityType;
+  firstGraduateProspective: IScoreType;
+  secondGraduateProspective: IScoreType;
+  thirdGraduateProspective: IScoreType;
+  activityGraduateProspective: IActivityType;
 }
 
 type ApplicationAction =
@@ -132,7 +137,40 @@ const initialState: ApplicationState = {
     sci: null, // 과학
     tech: null, // 기술 · 가정
   },
-  activity: {},
+  fourthGraduate: {
+    kor: null, // 국어
+    soc: null, // 사회
+    his: null, // 역사
+    math: null, // 수학
+    sci: null, // 과학
+    tech: null, // 기술 · 가정
+  },
+  activityGraduate: {},
+  firstGraduateProspective: {
+    kor: null, // 국어
+    soc: null, // 사회
+    his: null, // 역사
+    math: null, // 수학
+    sci: null, // 과학
+    tech: null, // 기술 · 가정
+  },
+  secondGraduateProspective: {
+    kor: null, // 국어
+    soc: null, // 사회
+    his: null, // 역사
+    math: null, // 수학
+    sci: null, // 과학
+    tech: null, // 기술 · 가정
+  },
+  thirdGraduateProspective: {
+    kor: null, // 국어
+    soc: null, // 사회
+    his: null, // 역사
+    math: null, // 수학
+    sci: null, // 과학
+    tech: null, // 기술 · 가정
+  },
+  activityGraduateProspective: {},
 };
 
 const applicationReducer = (

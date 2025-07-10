@@ -8,14 +8,15 @@ export const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
-  const [datas, setDatas] = usePageData('first');
+  const [datas, _] = usePageData('first');
 
-  //page 전환 시 스크롤 상단으로
+  // page 전환 시 스크롤 상단으로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+  
 
-  const pageRoutes = [
+  const pageGraduateRoutes = [
     '/first',
     '/second',
     '/third',
@@ -23,7 +24,21 @@ export const AppLayout = () => {
     '/first-graduate',
     '/second-graduate',
     '/third-graduate',
-    '/activity',
+    '/fourth-graduate',
+    '/activity-graduate',
+    '/application-preview',
+    '/submit-check',
+  ];
+
+  const pageProspectiveGraduateRoutes = [
+    '/first',
+    '/second',
+    '/third',
+    '/fourth',
+    '/first-prospective-graduate',
+    '/second-prospective-graduate',
+    '/third-prospective-graduate',
+    '/activity-prospective-graduate',
     '/application-preview',
     '/submit-check',
   ];
@@ -38,13 +53,24 @@ export const AppLayout = () => {
     '/submit-check',
   ];
 
-  console.log(datas.graduationType);
-  const useGedRoutes = datas.graduationType === '검정고시 (중학교 졸업 학력)';
-  const routes = useGedRoutes ? gedPageRoutes : pageRoutes;
+  // graduationType에 따라 routes 선택
+  const { graduationType } = datas;
+
+  const routes = (() => {
+    if (graduationType === '검정고시 (중학교 졸업 학력)') {
+      return gedPageRoutes;
+    }
+    if (graduationType === '졸업 예정') {
+      return pageProspectiveGraduateRoutes;
+    }
+    if (graduationType === '졸업') {
+      return pageGraduateRoutes;
+    }
+    return []; // fallback
+  })();
 
   const currentPath = location.pathname;
   const currentIndex = routes.findIndex((path) => currentPath.includes(path));
-
   const [currentPage, setCurrentPage] = useState(currentIndex + 1 || 1);
 
   useEffect(() => {
@@ -69,6 +95,7 @@ export const AppLayout = () => {
             totalPages={routes.length}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
+            graduationType={graduationType}
           />
         </Flex>
       </Flex>

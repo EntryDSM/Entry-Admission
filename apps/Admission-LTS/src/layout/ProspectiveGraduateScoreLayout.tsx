@@ -3,22 +3,22 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
 
-export const ScoreLayout = () => {
+export const ProspectiveGraduateScoreLayout = () => {
   const datas = [
     {
-      path: '/first-graduate',
+      path: '/first-prospective-graduate',
       name: '3학년 1학기',
     },
     {
-      path: '/second-graduate',
+      path: '/second-prospective-graduate',
       name: '직전 학기',
     },
     {
-      path: '/third-graduate',
+      path: '/third-prospective-graduate',
       name: '직직전 학기',
     },
     {
-      path: '/activity',
+      path: '/activity-prospective-graduate',
       name: '출석 및 봉사',
     },
   ];

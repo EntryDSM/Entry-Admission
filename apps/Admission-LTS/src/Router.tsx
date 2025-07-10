@@ -3,17 +3,23 @@ import {
   AppLayout,
   ApplicationLayout,
   GedScoreLayout,
+  GraduateScoreLayout,
+  ProspectiveGraduateScoreLayout,
   RootLayout,
-  ScoreLayout,
 } from './layout';
 import {
-  Activity,
+  ActivityGraduate,
+  ActivityProspectiveGraduate,
   First,
   Fourth,
   Landing,
   ScoreFirst,
+  ScoreFirstProspectiveGraduate,
+  ScoreFourth,
   ScoreSecond,
+  ScoreSecondProspectiveGraduate,
   ScoreThird,
+  ScoreThirdProspectiveGraduate,
   Second,
   SubmitCheck,
   Submitted,
@@ -52,7 +58,7 @@ export const Router = createBrowserRouter([
               },
               {
                 path: '',
-                element: <ScoreLayout />,
+                element: <GraduateScoreLayout />,
                 children: [
                   {
                     path: 'first-graduate',
@@ -67,8 +73,34 @@ export const Router = createBrowserRouter([
                     element: <ScoreThird />,
                   },
                   {
-                    path: 'activity',
-                    element: <Activity />,
+                    path: 'fourth-graduate',
+                    element: <ScoreFourth />,
+                  },
+                  {
+                    path: 'activity-graduate',
+                    element: <ActivityGraduate />,
+                  },
+                ],
+              },
+              {
+                path: '',
+                element: <ProspectiveGraduateScoreLayout />,
+                children: [
+                  {
+                    path: 'first-prospective-graduate',
+                    element: <ScoreFirstProspectiveGraduate />,
+                  },
+                  {
+                    path: 'second-prospective-graduate',
+                    element: <ScoreSecondProspectiveGraduate />,
+                  },
+                  {
+                    path: 'third-prospective-graduate',
+                    element: <ScoreThirdProspectiveGraduate />,
+                  },
+                  {
+                    path: 'activity-prospective-graduate',
+                    element: <ActivityProspectiveGraduate />,
                   },
                 ],
               },
