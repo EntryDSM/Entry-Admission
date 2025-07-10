@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout, CalculateLayout } from './layout';
-import { Main, NoticeDetailPage, ScoreFirst, ScoreSecond, ScoreThird, Activity } from './pages';
+import { Main, NoticeDetailPage, ScoreFirst, ScoreSecond, ScoreThird, Activity, QEDScore } from './pages';
 import { NoticePage } from './pages/NoticePage';
 
 export const Router = createBrowserRouter([
@@ -73,7 +73,7 @@ export const Router = createBrowserRouter([
           // 검정고시 플로우
           {
             path: 'qe/score',
-            element: <ScoreFirst />
+            element: <QEDScore />
           },
           {
             path: 'qe/activity',

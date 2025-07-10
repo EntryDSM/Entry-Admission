@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
-import {  NoticePinIcon } from '@entry/ui';
+import {  NoticePinIcon, TabSection } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
+
 
 interface NoticeItem {
   id: number;
@@ -11,12 +12,21 @@ interface NoticeItem {
   isNew: boolean;
 }
 
+const TAB_OPTIONS = [
+  { key: 'admission', label: '입학 공지사항' },
+  { key: 'orientation', label: '예비 신입생 안내' }
+];
+
 export const NoticePage = () => {
   const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>('admission');
   const navigate = useNavigate();
   
   const handleNoticeClick = (id: number) => {
     navigate(`/notice/${id}`);
+  };
+  
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab as 'admission' | 'orientation');
   };
   
   const noticeItems: NoticeItem[] = [
@@ -42,20 +52,11 @@ export const NoticePage = () => {
           </SubTitle>
         </TitleSection>
 
-        <TabSection>
-          <TabButton 
-            isActive={activeTab === 'admission'} 
-            onClick={() => setActiveTab('admission')}
-          >
-            입학 공지사항
-          </TabButton>
-          <TabButton 
-            isActive={activeTab === 'orientation'} 
-            onClick={() => setActiveTab('orientation')}
-          >
-            예비 신입생 안내
-          </TabButton>
-        </TabSection>
+        <TabSection
+          options={TAB_OPTIONS}
+          activeType={activeTab}
+          onTypeChange={handleTabChange}
+        />
 
         <TableContainer>
           <TableHeader>
@@ -100,30 +101,6 @@ const ContentWrapper = styled.div`
 
 const TitleSection = styled.div`
   margin-bottom: 16px;
-`;
-
-const TabSection = styled.div`
-  display: flex;
-  gap: 2px;
-  margin-top: 20px;
-  margin-bottom: 30px;
-`;
-
-const TabButton = styled.div<{ isActive: boolean }>`
-  padding: 12px 24px;
-  background-color: ${({ isActive }) => isActive ? colors.orange[500] : "none"};
-  color: ${({ isActive }) => isActive ? colors.orange[800] : colors.gray[400]};
-  border: 1px solid none;
-  border-bottom: none;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    background-color: ${({ isActive }) => isActive ? "none" : colors.gray[50]};
-  }
 `;
 
 const TableContainer = styled.div`

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Text } from '@entry/design-token';
-import { Button, Cancel } from '@entry/ui';
+import { Button } from '@entry/ui';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -25,11 +25,6 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        {/* X 버튼 */}
-        <CloseButton onClick={onClose}>
-          <Cancel isClicked={true} />
-        </CloseButton>
-
         {/* 제목 */}
         <Title>성적 산출 결과</Title>
         
@@ -37,20 +32,30 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
         <ResultList>
           {results.map((result, index) => (
             <ResultItem key={index}>
-              <Text fontSize={18} fontWeight={500}>
+              <Text fontSize={24} fontWeight={400}>
                 {result.name}
               </Text>
-              <Text fontSize={18} fontWeight={600} color="#FF6B35">
-                {result.score} / {result.total}
-              </Text>
+              <ScoreText>
+                <Text fontSize={24} fontWeight={600} color="#FF6B35">
+                  {result.score}
+                </Text>
+                <Text fontSize={24} fontWeight={400} color="#999999">
+                  {' / '}
+                </Text>
+                <Text fontSize={24} fontWeight={400} color="#999999">
+                  {result.total}
+                </Text>
+              </ScoreText>
             </ResultItem>
           ))}
         </ResultList>
 
         {/* 닫기 버튼 */}
-        <StyledButton onClick={onClose}>
-          닫기
-        </StyledButton>
+        <ButtonWrapper>
+          <Button onClick={onClose}>
+            닫기
+          </Button>
+        </ButtonWrapper>
       </ModalContainer>
     </ModalOverlay>
   );
@@ -72,41 +77,21 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background-color: white;
-  border-radius: 12px;
-  padding: 32px;
-  width: 500px;
-  max-width: 90vw;
-  max-height: 90vh;
+  border-radius: 24px;
+  padding: 32px 36px;
+  width: 970px;
+  height: 429px;
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 32px;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #FF6B35;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  &:hover {
-    background-color: #E55A2B;
-  }
+  justify-content: space-between;
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 600;
-  text-align: center;
+  text-align: left;
   margin: 0;
   color: #333;
 `;
@@ -114,7 +99,9 @@ const Title = styled.h2`
 const ResultList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 48px;
+  flex: 1;
+  justify-content: center;
 `;
 
 const ResultItem = styled.div`
@@ -123,18 +110,12 @@ const ResultItem = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled.button`
-  width: 100%;
-  background-color: #FF6B35;
-  color: white;
-  border: 1px solid #FF6B35;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #E55A2B;
-  }
+const ScoreText = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `;

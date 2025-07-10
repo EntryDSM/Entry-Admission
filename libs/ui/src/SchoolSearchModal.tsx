@@ -3,7 +3,7 @@ import { colors, Flex, Text } from '@entry/design-token';
 import { SearchBar } from './SearchBar';
 import { useRef, useState } from 'react';
 import { PreviousButton } from './PreviousButton';
-import { Check, Search } from '@entry/ui';
+import { Check, Search } from './assets';
 
 interface ISchoolSearchModalType {
   setIsShow: React.Dispatch<React.SetStateAction<boolean>>;

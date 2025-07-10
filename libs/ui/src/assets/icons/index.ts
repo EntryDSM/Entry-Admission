@@ -11,5 +11,6 @@ export * from './Photo';
 export * from './Caution';
 export * from './ImageChange';
 export * from './Search';
+export * from './OXIcons';
 export { default as dropdownArrow } from './dropdownArrow.svg';
 export * from './Eye';

@@ -1,22 +1,43 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Flex, Text } from '@entry/design-token';
-import { AttendanceForm, usePageData } from '@entry/ui';
+import styled from '@emotion/styled';
+import { Text } from '@entry/design-token';
+import { AttendanceForm, CertCheckForm, usePageData } from '@entry/ui';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  width: 100%;
+  height: fit-content;
+`;
+
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+`;
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+`;
 
 export const Activity = () => {
   const location = useLocation();
   
-  // 경로에 따라 다른 키 사용
   const getDataKey = () => {
     if (location.pathname.includes('primary/activity')) return 'primaryActivity';
     if (location.pathname.includes('graduated/activity')) return 'graduatedActivity';
     if (location.pathname.includes('qe/activity')) return 'qeActivity';
-    return 'activity'; // 기본값
+    return 'activity';
   };
   
   const [activityData, setActivityData] = usePageData(getDataKey());
   
-  // 초기값이 없으면 빈 객체로 설정
   const safeActivityData = activityData || {};
   const safeSetActivityData = (data: any) => {
     setActivityData(data || {});
@@ -42,21 +63,23 @@ export const Activity = () => {
     safeSetActivityData({ ...safeActivityData, volunteerHours: value });
   };
 
+  const handleDsmAlgorithmChange = (value: 'O' | 'X') => {
+    safeSetActivityData({ ...safeActivityData, dsmAlgorithm: value });
+  };
+
+  const handleInfoProcessingChange = (value: 'O' | 'X') => {
+    safeSetActivityData({ ...safeActivityData, infoProcessing: value });
+  };
+
   return (
-    <>
-      <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
+    <Container>
+      <Section>
         <Text fontSize={24} fontWeight={600}>
           출석
         </Text>
-        <Flex
-          height="fit-content"
-          flexWrap="wrap"
-          width="100%"
-          gapX={22}
-          gapY={24}
-        >
+        <GridContainer>
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 결석"
             value={safeActivityData?.absences || ''}
             onChange={handleAbsencesChange}
@@ -64,7 +87,7 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 조퇴"
             value={safeActivityData?.earlyLeaves || ''}
             onChange={handleEarlyLeavesChange}
@@ -72,7 +95,7 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 지각"
             value={safeActivityData?.lateArrivals || ''}
             onChange={handleLateArrivalsChange}
@@ -80,16 +103,16 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 결과"
             value={safeActivityData?.resultMissing || ''}
             onChange={handleResultMissingChange}
             suffix="회"
             defaultCount={10}
           />
-        </Flex>
-      </Flex>
-      <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
+        </GridContainer>
+      </Section>
+      <Section>
         <Text fontSize={24} fontWeight={600}>
           봉사
         </Text>
@@ -101,7 +124,24 @@ export const Activity = () => {
           suffix="시간"
           defaultCount={10} 
         /> 
-      </Flex>
-    </>
+      </Section>
+      <Section>
+        <Text fontSize={24} fontWeight={600}>
+          자격증
+        </Text>
+        <CertCheckForm
+          width={'100%'}
+          title="DSM 알고리즘 대회 입상"
+          value={safeActivityData?.dsmAlgorithm || null}
+          onChange={handleDsmAlgorithmChange}
+        />
+        <CertCheckForm
+          width={'100%'}
+          title="정보처리기능사 자격증 취득"
+          value={safeActivityData?.infoProcessing || null}
+          onChange={handleInfoProcessingChange}
+        />
+      </Section>
+    </Container>
   );
 };

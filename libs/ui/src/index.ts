@@ -7,11 +7,10 @@ export * from './Button';
 export * from './PageNav';
 export * from './ScorePageNav';
 export * from './AttendanceForm';
+export * from './CertCheckForm';
 export * from './PreviousButton';
 export * from './Inputs';
 export * from './ApplicationNav';
-export * from './AttendanceForm';
-export * from './PreviousButton';
 export * from './FormElement';
 export * from './SearchBar';
 export * from './DropDownContent';
@@ -22,4 +21,5 @@ export * from './SearchContent';
 export * from './TextAreaContent';
 export * from './Page404';
 export * from './hooks';
+export * from './TabSection'
 export * from './utils';

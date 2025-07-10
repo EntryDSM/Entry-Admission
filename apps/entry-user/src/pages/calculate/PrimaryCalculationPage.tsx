@@ -81,7 +81,7 @@ export const PrimaryCalculationPage = () => {
         </Flex>
       </Flex>
 
-      <Flex flex={1} paddingY="40px">
+      <Flex flex={1} paddingY="40px" width="100%">
         {renderStepContent()}
       </Flex>
 
