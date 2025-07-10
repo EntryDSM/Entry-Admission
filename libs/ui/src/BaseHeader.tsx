@@ -368,7 +368,7 @@ const HeaderContainer = styled.header<{ scrollPosition?: number }>`
     ${({ scrollPosition }) =>
       scrollPosition ? colors.gray[200] : 'transparent'};
   transition: 0.4s ease-in-out;
-  z-index: 10;
+  z-index: 100;
 `;
 
 const NoPathHeaderContainer = styled(HeaderContainer)`

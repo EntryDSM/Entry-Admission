@@ -41,6 +41,12 @@ const style = css`
     -ms-user-select: none;
     user-select: none;
   }
+
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   label {
     cursor: pointer;
     background-color: transparent;
