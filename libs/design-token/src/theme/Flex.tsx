@@ -1,6 +1,8 @@
 interface IFlexType {
   children?: React.ReactNode;
   gap?: number;
+  gapX?: number;
+  gapY?: number;
   isColumn?: boolean;
   justifyContent?: string;
   alignItems?: string;
@@ -13,14 +15,16 @@ interface IFlexType {
   className?: string;
   style?: React.CSSProperties;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  key?: string | number;
+  flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
 }
 
 export const Flex = ({
   height = '100vh',
   width = '100vw',
   children,
-  gap = 0,
+  gap,
+  gapX,
+  gapY,
   isColumn = false,
   justifyContent = 'flex-start',
   alignItems = 'flex-start',
@@ -28,25 +32,37 @@ export const Flex = ({
   paddingLeft = '0',
   paddingBottom = '0',
   paddingRight = '0',
+  flexWrap = 'nowrap',
   className,
   style = {},
   onClick,
-  key,
 }: IFlexType) => {
+  // gap 설정
+  let finalGap: string | number | undefined;
+
+  if (gapY !== undefined || gapX !== undefined) {
+    const y = gapY ?? 0;
+    const x = gapX ?? 0;
+    finalGap = `${y}px ${x}px`;
+  } else if (gap !== undefined) {
+    finalGap = gap;
+  }
+
   const inlineStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: isColumn ? 'column' : 'row',
+    flexWrap,
     justifyContent,
     alignItems,
     width,
     height,
-    gap,
+    gap: finalGap,
     padding: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`,
     ...style,
   };
 
   return (
-    <div key={key} onClick={onClick} className={className} style={inlineStyle}>
+    <div onClick={onClick} className={className} style={inlineStyle}>
       {children}
     </div>
   );

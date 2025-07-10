@@ -1,4 +1,8 @@
-export const Check = () => {
+interface ICheckType {
+  color?: string;
+}
+
+export const Check = ({ color = '#FF7C33' }: ICheckType) => {
   return (
     <svg
       width="18"
@@ -9,7 +13,7 @@ export const Check = () => {
     >
       <path
         d="M6.54961 12.9996L0.849609 7.29961L2.27461 5.87461L6.54961 10.1496L15.7246 0.974609L17.1496 2.39961L6.54961 12.9996Z"
-        fill="#FF7C33"
+        fill={color}
       />
     </svg>
   );

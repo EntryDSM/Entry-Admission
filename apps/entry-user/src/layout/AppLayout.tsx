@@ -1,12 +1,8 @@
 import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
-import { ApplicationNav, CommonHeader } from '@entry/ui';
-import { useState } from 'react';
+import { CommonHeader } from '@entry/ui';
 
 export const AppLayout = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 30;
-
   return (
     <>
       <CommonHeader />

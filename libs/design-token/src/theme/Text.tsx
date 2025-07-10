@@ -14,6 +14,7 @@ interface ITextType {
   bottom?: string;
   right?: string;
   isSpan?: boolean;
+  textAlign?: Property.TextAlign;
 }
 
 export const Text = ({
@@ -29,6 +30,7 @@ export const Text = ({
   left,
   right,
   bottom,
+  textAlign,
   isSpan = false,
 }: ITextType) => {
   const style: React.CSSProperties = {
@@ -45,6 +47,7 @@ export const Text = ({
     overflow: isOverFlow ? 'hidden' : undefined,
     whiteSpace: isOverFlow ? 'nowrap' : undefined,
     display: isSpan ? 'inline' : 'block',
+    textAlign,
   };
 
   return (

@@ -34,8 +34,8 @@ export const GradeSelector = ({
       ))}
       <Grade
         isCancel={true}
-        isSelected={selected === null}
-        onSelect={() => handleSelect(null)}
+        isSelected={selected === 'x'}
+        onSelect={() => handleSelect('x')}
         width={isSmall ? '30px' : '45px'}
         height={isSmall ? '30px' : '45px'}
       />

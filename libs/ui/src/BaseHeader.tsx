@@ -4,8 +4,40 @@ import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+export const NoPathHeader = () => {
+  const [scrollPosition, setScrollPosition] = useState<number>(0);
+
+  // 스크롤 시 setScrollPosition 변경
+  const updateScroll = () => {
+    setScrollPosition(window.scrollY || document.documentElement.scrollTop);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', updateScroll);
+    return () => {
+      window.removeEventListener('scroll', updateScroll);
+    };
+  }, []);
+
+  return (
+    <NoPathHeaderContainer scrollPosition={scrollPosition}>
+      <Flex
+        gap={12}
+        alignItems="center"
+        height="fit-content"
+        width="fit-content"
+      >
+        <EntryLogo />
+        <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
+          EntryDSM
+        </Text>
+      </Flex>
+    </NoPathHeaderContainer>
+  );
+};
+
 export const AdminHeader = () => {
-  const [datas, setDatas] = useState<{ name: string }>({
+  const [datas, _] = useState<{ name: string }>({
     name: '홍길동',
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
@@ -121,11 +153,7 @@ export const AdminHeader = () => {
       {isSideClick && (
         <SideNavContainer>
           {navData.map((data) => (
-            <SideNavContent
-              key={data.path}
-              isPath={pathname.includes(data.path)}
-              onClick={() => navClick(data.path)}
-            >
+            <SideNavContent key={data.path} onClick={() => navClick(data.path)}>
               {data.name}
             </SideNavContent>
           ))}
@@ -136,7 +164,7 @@ export const AdminHeader = () => {
 };
 
 export const CommonHeader = () => {
-  const [datas, setDatas] = useState<{ name: string }>({
+  const [datas, _] = useState<{ name: string }>({
     name: '홍길동',
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
@@ -184,7 +212,6 @@ export const CommonHeader = () => {
 
   const sideClick = () => {
     setIsSideClick(!isSideClick);
-    console.log('click');
   };
 
   return (
@@ -256,11 +283,7 @@ export const CommonHeader = () => {
       {isSideClick && (
         <SideNavContainer>
           {navData.map((data) => (
-            <SideNavContent
-              key={data.name}
-              isPath={pathname.includes(data.path)}
-              onClick={() => navClick(data.path)}
-            >
+            <SideNavContent key={data.name} onClick={() => navClick(data.path)}>
               {data.name}
             </SideNavContent>
           ))}
@@ -336,7 +359,8 @@ const HeaderContainer = styled.header<{ scrollPosition?: number }>`
   width: 100vw;
   height: 70px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  padding: 0 120px;
   align-items: center;
   background-color: ${({ scrollPosition }) =>
     scrollPosition ? colors.extra.realWhite : 'transparent'};
@@ -347,7 +371,11 @@ const HeaderContainer = styled.header<{ scrollPosition?: number }>`
   z-index: 100;
 `;
 
-const NavContent = styled.nav<{ isPath: boolean }>`
+const NoPathHeaderContainer = styled(HeaderContainer)`
+  justify-content: flex-start;
+`;
+
+const NavContent = styled.nav<{ isPath?: boolean }>`
   padding: 8px 12px;
   border-radius: 12px;
   display: flex;
