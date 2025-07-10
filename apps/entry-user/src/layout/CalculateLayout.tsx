@@ -2,15 +2,28 @@ import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
-import { ScorePageNav, Button, ApplicationDataProvider } from '@entry/ui';
+import {
+  ScorePageNav,
+  Button,
+  ApplicationDataProvider,
+  TabSection,
+} from '@entry/ui';
 import { ScoreResultModal } from '../components';
 
 type CalculationType = 'primary' | 'graduated' | 'qe';
 
 const CALCULATION_TYPES = [
-  { key: 'primary' as const, label: '졸업 예정자', basePath: '/calculate/primary' },
-  { key: 'graduated' as const, label: '졸업자', basePath: '/calculate/graduated' },
-  { key: 'qe' as const, label: '검정고시', basePath: '/calculate/qe' }
+  {
+    key: 'primary' as const,
+    label: '졸업 예정자',
+    basePath: '/calculate/primary',
+  },
+  {
+    key: 'graduated' as const,
+    label: '졸업자',
+    basePath: '/calculate/graduated',
+  },
+  { key: 'qe' as const, label: '검정고시', basePath: '/calculate/qe' },
 ];
 
 const SCORE_PAGES = {
@@ -18,26 +31,26 @@ const SCORE_PAGES = {
     { path: '/first-graduate', name: '3학년 1학기' },
     { path: '/second-graduate', name: '직전 학기' },
     { path: '/third-graduate', name: '직직전 학기' },
-    { path: '/activity', name: '출석 및 봉사' }
+    { path: '/activity', name: '출석 및 봉사' },
   ],
   graduated: [
     { path: '/third2', name: '3학년 2학기' },
     { path: '/third1', name: '3학년 1학기' },
     { path: '/second2', name: '2학년 2학기' },
     { path: '/second1', name: '2학년 1학기' },
-    { path: '/activity', name: '출석 및 봉사' }
+    { path: '/activity', name: '출석 및 봉사' },
   ],
   qe: [
     { path: '/score', name: '검정고시 점수' },
-    { path: '/activity', name: '출석 및 봉사' }
-  ]
+    { path: '/activity', name: '출석 및 봉사' },
+  ],
 };
 
 export const CalculateLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showResultModal, setShowResultModal] = useState(false);
-  
+
   // 현재 어떤 타입인지 경로로 판단
   const getCurrentType = (): CalculationType => {
     if (location.pathname.includes('/calculate/primary')) return 'primary';
@@ -46,8 +59,10 @@ export const CalculateLayout = () => {
     return 'primary';
   };
 
-  const [activeType, setActiveType] = useState<CalculationType>(getCurrentType());
-  
+  const [activeType, setActiveType] = useState<CalculationType>(
+    getCurrentType()
+  );
+
   const currentData = SCORE_PAGES[activeType].find((data) =>
     location.pathname.includes(data.path)
   );
@@ -66,13 +81,19 @@ export const CalculateLayout = () => {
   const handleTypeChange = (type: CalculationType) => {
     setActiveType(type);
     const firstPage = SCORE_PAGES[type][0];
-    navigate(`${CALCULATION_TYPES.find(t => t.key === type)?.basePath}${firstPage.path}`);
+    navigate(
+      `${CALCULATION_TYPES.find((t) => t.key === type)?.basePath}${
+        firstPage.path
+      }`
+    );
   };
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       const nextPage = SCORE_PAGES[activeType][currentStep + 1];
-      const basePath = CALCULATION_TYPES.find(t => t.key === activeType)?.basePath;
+      const basePath = CALCULATION_TYPES.find(
+        (t) => t.key === activeType
+      )?.basePath;
       navigate(`${basePath}${nextPage.path}`);
     }
   };
@@ -80,7 +101,9 @@ export const CalculateLayout = () => {
   const handlePrevious = () => {
     if (currentStep > 0) {
       const prevPage = SCORE_PAGES[activeType][currentStep - 1];
-      const basePath = CALCULATION_TYPES.find(t => t.key === activeType)?.basePath;
+      const basePath = CALCULATION_TYPES.find(
+        (t) => t.key === activeType
+      )?.basePath;
       navigate(`${basePath}${prevPage.path}`);
     }
   };
@@ -93,68 +116,59 @@ export const CalculateLayout = () => {
     <ApplicationDataProvider>
       <PageContainer>
         <ContentWrapper>
-          <Flex width="100%" height="100vh" isColumn={true}>
-        
-        {/* 기존 ScoreLayout 구조 */}
-        <Flex width="100%" height="fit-content" isColumn={true} flex={1} padding="40px">
-          {/* 상단 타입 선택 */}
-          <TabSection>
-            {CALCULATION_TYPES.map((type) => (
-              <TabButton
-                key={type.key}
-                isActive={activeType === type.key}
-                onClick={() => handleTypeChange(type.key)}
-              >
-                {type.label}
-              </TabButton>
-            ))}
-          </TabSection>
-          
-          <TitleContainer>
-            <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
-              <Text fontSize={32} fontWeight={600}>
-                {currentData ? currentData.name : 'Error'}
-              </Text>
-              <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
-                관련 항목이 없는 경우 ✕ 로 기입하세요.
-              </Text>
-            </Flex>
-            <ScorePageNav datas={SCORE_PAGES[activeType]} />
-          </TitleContainer>
-          <Main>
-            <Outlet />
-          </Main>
-          
-          {/* 하단 버튼 */}
-          <Flex justifyContent="space-between" marginTop="44px" width="100%" height="auto">
-          <Button
-            onClick={handlePrevious}
-            backgroundColor={currentStep === 0 ? '#E5E5E5' : 'transparent'}
-            color={currentStep === 0 ? '#999' : '#666'}
-            borderColor="#E5E5E5"
-            isBlocked={currentStep === 0}
-          >
-            이전
-          </Button>
-          
-          {isLastStep ? (
-            <Button onClick={handleComplete}>
-              완료
-            </Button>
-          ) : (
-            <Button onClick={handleNext}>
-              다음
-            </Button>
-          )}
-        </Flex>
+          <MainContainer>
+            <ContentContainer>
+              {/* 상단 타입 선택 - 새로운 컴포넌트 사용 */}
+              <TabSection
+                options={CALCULATION_TYPES}
+                activeType={activeType}
+                onTypeChange={handleTypeChange}
+              />
 
-        {/* 결과 모달 */}
-        <ScoreResultModal 
-          isOpen={showResultModal} 
-          onClose={() => setShowResultModal(false)} 
-        />
-        </Flex>
-      </Flex>
+              <TitleContainer>
+                <TitleSection>
+                  <Text fontSize={32} fontWeight={600}>
+                    {currentData ? currentData.name : 'Error'}
+                  </Text>
+                  <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
+                    관련 항목이 없는 경우 ✕ 로 기입하세요.
+                  </Text>
+                </TitleSection>
+                <ScorePageNav datas={SCORE_PAGES[activeType]} />
+              </TitleContainer>
+
+              <Main>
+                <Outlet />
+              </Main>
+
+              {/* 하단 버튼 */}
+              <ButtonContainer>
+                <Button
+                  onClick={handlePrevious}
+                  backgroundColor={
+                    currentStep === 0 ? '#E5E5E5' : 'transparent'
+                  }
+                  color={currentStep === 0 ? '#999' : '#666'}
+                  borderColor="#E5E5E5"
+                  isBlocked={currentStep === 0}
+                >
+                  이전
+                </Button>
+
+                {isLastStep ? (
+                  <Button onClick={handleComplete}>완료</Button>
+                ) : (
+                  <Button onClick={handleNext}>다음</Button>
+                )}
+              </ButtonContainer>
+
+              {/* 결과 모달 */}
+              <ScoreResultModal
+                isOpen={showResultModal}
+                onClose={() => setShowResultModal(false)}
+              />
+            </ContentContainer>
+          </MainContainer>
         </ContentWrapper>
       </PageContainer>
     </ApplicationDataProvider>
@@ -177,28 +191,36 @@ const ContentWrapper = styled.div`
   flex-direction: column;
 `;
 
-const TabSection = styled.div`
+const MainContainer = styled.div`
+  width: 100%;
+  height: 100vh;
   display: flex;
-  gap: 16px;
-  margin-top: 44px;
-  margin-bottom: 44px;
+  flex-direction: column;
 `;
 
-const TabButton = styled.div<{ isActive: boolean }>`
-  padding: 12px 24px;
-  background-color: ${({ isActive }) => isActive ? colors.orange[500] : "none"};
-  color: ${({ isActive }) => isActive ? colors.orange[800] : colors.gray[400]};
-  border: 1px solid none;
-  border-bottom: none;
-  border-radius: 12px;
-  font-weight: 500;
-  font-size: 24px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+const ContentContainer = styled.div`
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 40px;
+`;
 
-  &:hover {
-    background-color: ${({ isActive }) => isActive ? "none" : colors.gray[50]};
-  }
+const TitleSection = styled.div`
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 44px;
+  width: 100%;
+  height: auto;
 `;
 
 const TitleContainer = styled.div`
@@ -207,7 +229,7 @@ const TitleContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   min-height: 80px;
-  
+
   @media (max-width: 1200px) {
     flex-direction: column;
     align-items: flex-start;

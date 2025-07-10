@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
-import { ScoreFirst, Activity } from '../';
+import { QEDScore, Activity } from '../';
 
 const STEPS = [
   { key: 'qeScore', label: '검정고시 점수' },
@@ -31,7 +31,7 @@ export const QECalculationPage = () => {
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return <ScoreFirst />;
+        return <QEDScore />;
       case 1:
         return <Activity />;
       default:
@@ -84,7 +84,7 @@ export const QECalculationPage = () => {
         </Flex>
       </Flex>
 
-      <Flex flex={1} paddingY="40px">
+      <Flex flex={1} paddingY="40px" width="100%">
         {renderStepContent()}
       </Flex>
 

@@ -1,22 +1,37 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import styled from '@emotion/styled';
 import { Flex, Text } from '@entry/design-token';
 import { AttendanceForm, usePageData } from '@entry/ui';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+  width: 100%;
+  height: fit-content;
+`;
+
+const Section = styled.div`
+  flex: 1;
+  width: calc(50% - 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;
 
 export const Activity = () => {
   const location = useLocation();
   
-  // 경로에 따라 다른 키 사용
   const getDataKey = () => {
     if (location.pathname.includes('primary/activity')) return 'primaryActivity';
     if (location.pathname.includes('graduated/activity')) return 'graduatedActivity';
     if (location.pathname.includes('qe/activity')) return 'qeActivity';
-    return 'activity'; // 기본값
+    return 'activity';
   };
   
   const [activityData, setActivityData] = usePageData(getDataKey());
   
-  // 초기값이 없으면 빈 객체로 설정
   const safeActivityData = activityData || {};
   const safeSetActivityData = (data: any) => {
     setActivityData(data || {});
@@ -43,8 +58,8 @@ export const Activity = () => {
   };
 
   return (
-    <>
-      <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
+    <Container>
+      <Section>
         <Text fontSize={24} fontWeight={600}>
           출석
         </Text>
@@ -56,7 +71,7 @@ export const Activity = () => {
           gapY={24}
         >
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 결석"
             value={safeActivityData?.absences || ''}
             onChange={handleAbsencesChange}
@@ -64,7 +79,7 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 조퇴"
             value={safeActivityData?.earlyLeaves || ''}
             onChange={handleEarlyLeavesChange}
@@ -72,7 +87,7 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 지각"
             value={safeActivityData?.lateArrivals || ''}
             onChange={handleLateArrivalsChange}
@@ -80,7 +95,7 @@ export const Activity = () => {
             defaultCount={10}
           />
           <AttendanceForm
-            width={'748px'}
+            width={'100%'}
             title="미인정 결과"
             value={safeActivityData?.resultMissing || ''}
             onChange={handleResultMissingChange}
@@ -88,20 +103,20 @@ export const Activity = () => {
             defaultCount={10}
           />
         </Flex>
-      </Flex>
-      <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
+      </Section>
+      <Section>
         <Text fontSize={24} fontWeight={600}>
           봉사
         </Text>
         <AttendanceForm 
-          width={'748px'} 
+          width={'100%'} 
           title="봉사시간" 
           value={safeActivityData?.volunteerHours || ''}
           onChange={handleVolunteerHoursChange}
           suffix="시간"
           defaultCount={10} 
         /> 
-      </Flex>
-    </>
+      </Section>
+    </Container>
   );
 };
