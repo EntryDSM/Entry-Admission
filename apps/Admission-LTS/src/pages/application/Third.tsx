@@ -39,7 +39,7 @@ export const Third = () => {
         width="300px"
         type="input"
         label="중학교 학번"
-        inputType="phone"
+        inputType="number"
         placeholder="중학교 학번을 입력해주세요."
         onInputChange={handleStudentIdChange}
         value={datas.studentId}

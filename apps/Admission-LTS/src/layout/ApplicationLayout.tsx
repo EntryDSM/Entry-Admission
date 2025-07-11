@@ -4,38 +4,79 @@ import { PreviousButton } from '@entry/ui';
 import { Flex, Text } from '@entry/design-token';
 import { useCallback, useEffect, useRef } from 'react';
 import { useApplicationData } from '@entry/ui';
-import { toast } from 'react-toastify';
+import {
+  skipNextAutoSave,
+  previousDataRef,
+  isSavingRef,
+  performSave,
+  hasChanged,
+  AUTO_SAVE_DELAY,
+} from '@entry/ui';
 
 export const ApplicationLayout = () => {
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
-  // 컴포넌트 마운트 시 저장된 데이터 로딩
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  const handleTempSave = async () => {
-    await saveToStorage();
-    toast.success('임시저장이 완료되었습니다.');
+  useEffect(() => {
+    if (state && previousDataRef.current === null) {
+      previousDataRef.current = JSON.stringify(state);
+    }
+  }, [state]);
+
+  const handleManualSave = async () => {
+    if (isSavingRef.current) {
+      console.log('이미 저장 중입니다.');
+      return;
+    }
+    await performSave(state, saveToStorage);
   };
 
-  // 키 입력 후 3초 이상 변화 없으면 저장
-  const triggerDebouncedSave = useCallback(() => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(async () => {
-      await saveToStorage();
-      toast.success('임시저장이 완료되었습니다.');
-    }, 3000);
-  }, [saveToStorage]);
-
-  // data가 바뀔 때마다 triggerDebouncedSave 실행
-  useEffect(() => {
-    if (state) {
-      triggerDebouncedSave();
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
     }
-  }, [state, triggerDebouncedSave]);
+
+    autoSaveTimerRef.current = setTimeout(async () => {
+      if (!isSavingRef.current && hasChanged(state)) {
+        await performSave(state, saveToStorage);
+      }
+    }, AUTO_SAVE_DELAY);
+  }, [state, saveToStorage]);
+
+  useEffect(() => {
+    if (!state || !previousDataRef.current || isSavingRef.current) return;
+
+    const currentDataString = JSON.stringify(state);
+    const hasDataChanged = currentDataString !== previousDataRef.current;
+
+    if (skipNextAutoSave.current) {
+      console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          skipNextAutoSave.current = false;
+        });
+      });
+      previousDataRef.current = currentDataString;
+      return;
+    }
+
+    if (hasDataChanged) {
+      console.log('[AUTO SAVE TRIGGER]');
+      scheduleAutoSave();
+    }
+  }, [state, scheduleAutoSave]);
+
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Flex width="100%" height="fit-content">
@@ -56,7 +97,7 @@ export const ApplicationLayout = () => {
               <Text fontSize={32} fontWeight={600}>
                 지원자 전형 구분
               </Text>
-              <PreviousButton onClick={handleTempSave}>
+              <PreviousButton onClick={handleManualSave}>
                 임시 저장
               </PreviousButton>
             </Flex>

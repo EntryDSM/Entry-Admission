@@ -6,3 +6,4 @@ export * from './scheduleTable';
 export * from './subject';
 export * from './notice';
 export * from './common';
+export * from "./landing"

@@ -21,14 +21,39 @@ export const InputContent = ({
 }: IInputType) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
+    const onlyNums = input.replace(/[^0-9]/g, '');
     let processedValue = input;
 
     if (type === 'phone') {
-      processedValue = input
-        .replace(/[^0-9]/g, '') // 숫자만
-        .replace(/(^01[016789])(\d{3,4})(\d{4})$/, '$1-$2-$3'); // 하이픈 자동 삽입
+      // 9~11자리 번호 기준
+      if (onlyNums.startsWith('02')) {
+        // 02 지역번호 (2자리) - 총 9~10자리
+        if (onlyNums.length === 9) {
+          processedValue = onlyNums.replace(/^(02)(\d{3})(\d{4})$/, '$1-$2-$3');
+        } else if (onlyNums.length === 10) {
+          processedValue = onlyNums.replace(/^(02)(\d{4})(\d{4})$/, '$1-$2-$3');
+        }
+      } else {
+        // 그 외 3자리 지역번호 or 휴대폰
+        if (onlyNums.length === 10) {
+          // 000-000-0000 형식 (070 등)
+          processedValue = onlyNums.replace(
+            /^(0\d{2})(\d{3})(\d{4})$/,
+            '$1-$2-$3'
+          );
+        } else if (onlyNums.length === 11) {
+          // 000-0000-0000 형식 (010 등)
+          processedValue = onlyNums.replace(
+            /^(0\d{2})(\d{4})(\d{4})$/,
+            '$1-$2-$3'
+          );
+        } else {
+          // type이 지정되지 않은 경우
+          processedValue = input;
+        }
+      }
     } else if (type === 'number') {
-      processedValue = input.replace(/[^0-9]/g, '');
+      processedValue = onlyNums;
     } else if (type === 'text') {
       processedValue = input.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣\s]/g, '');
     }
@@ -46,6 +71,8 @@ export const InputContent = ({
 
   return (
     <InputContainer
+      type="text"
+      maxLength={type === 'phone' ? 13 : undefined}
       width={width}
       value={value ?? ''}
       onChange={handleChange}
