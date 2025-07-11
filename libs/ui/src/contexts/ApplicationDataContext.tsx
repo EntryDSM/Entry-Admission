@@ -41,6 +41,11 @@ interface IGedScoreType {
   math: number | null;
 }
 
+interface IGedAttendanceVolunteerType {
+  dsmAlgorithm: 'O' | 'X' | null;
+  certificate: 'O' | 'X' | null;
+}
+
 interface IScoreType {
   kor: string | null; // 국어
   soc: string | null; // 사회
@@ -52,8 +57,13 @@ interface IScoreType {
 }
 
 interface IActivityType {
-  // Activity 페이지 데이터 구조
-  [key: string]: any;
+  unexcusedEarlyLeave: string; //미인정 조퇴
+  unexcusedTardiness: string; //미인정 지각
+  unexcusedResult: string; //미인정 결과
+  unexcusedAbsence: string; //미인정 결석
+  dsmAlgorithm: 'O' | 'X' | null;
+  certificate: 'O' | 'X' | null;
+  volunteer: string; //봉사시간
 }
 
 interface ApplicationState {
@@ -62,6 +72,7 @@ interface ApplicationState {
   third: IThirdPageType;
   fourth: IFourthPageType;
   gedScore: IGedScoreType;
+  attendanceVolunteer: IGedAttendanceVolunteerType;
   firstGraduate: IScoreType;
   secondGraduate: IScoreType;
   thirdGraduate: IScoreType;
@@ -113,6 +124,10 @@ const initialState: ApplicationState = {
     techAndHomeEconomics: null,
     math: null,
   },
+  attendanceVolunteer: {
+    dsmAlgorithm: null,
+    certificate: null,
+  },
   firstGraduate: {
     kor: null, // 국어
     soc: null, // 사회
@@ -145,7 +160,15 @@ const initialState: ApplicationState = {
     sci: null, // 과학
     tech: null, // 기술 · 가정
   },
-  activityGraduate: {},
+  activityGraduate: {
+    unexcusedEarlyLeave: '', //미인정 조퇴
+    unexcusedTardiness: '', //미인정 지각
+    unexcusedResult: '', //미인정 결과
+    unexcusedAbsence: '', //미인정 결석
+    dsmAlgorithm: null,
+    certificate: null,
+    volunteer: '', //봉사시간
+  },
   firstGraduateProspective: {
     kor: null, // 국어
     soc: null, // 사회
@@ -170,7 +193,15 @@ const initialState: ApplicationState = {
     sci: null, // 과학
     tech: null, // 기술 · 가정
   },
-  activityGraduateProspective: {},
+  activityGraduateProspective: {
+    unexcusedEarlyLeave: '', //미인정 조퇴
+    unexcusedTardiness: '', //미인정 지각
+    unexcusedResult: '', //미인정 결과
+    unexcusedAbsence: '', //미인정 결석
+    dsmAlgorithm: null,
+    certificate: null,
+    volunteer: '', //봉사시간
+  },
 };
 
 const applicationReducer = (

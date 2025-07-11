@@ -14,7 +14,6 @@ export const AppLayout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-  
 
   const pageGraduateRoutes = [
     '/first',
@@ -49,6 +48,7 @@ export const AppLayout = () => {
     '/third',
     '/fourth',
     '/ged/score',
+    '/ged/attendance-volunteer',
     '/application-preview',
     '/submit-check',
   ];

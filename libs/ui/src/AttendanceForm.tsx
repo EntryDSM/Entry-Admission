@@ -42,6 +42,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
       </HeaderRow>
       <InputWrapper>
         <StyledInput
+          suffix={suffix}
           type="text"
           value={value ?? ''}
           onChange={handleChange}
@@ -73,7 +74,11 @@ const InputWrapper = styled.div`
   width: 100%;
 `;
 
-const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
+const StyledInput = styled.input<{
+  hasValue: boolean;
+  isFocused: boolean;
+  suffix: string;
+}>`
   width: 100%;
   height: 48px;
   border: 2px solid
@@ -86,7 +91,8 @@ const StyledInput = styled.input<{ hasValue: boolean; isFocused: boolean }>`
         ? colors.orange[800]
         : colors.gray[300]};
   border-radius: 12px;
-  padding: 0 40px 0 20px;
+  padding: ${({ suffix }) =>
+    suffix && suffix.length > 1 ? '0 54px 0 20px' : '0 40px 0 20px'};
   font-size: 16px;
   outline: none;
   box-sizing: border-box;

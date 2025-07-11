@@ -1,25 +1,32 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
 
 export const GedScoreLayout = () => {
   const datas = [
     {
-      path: '/',
+      path: '/ged/score',
       name: '검정고시 점수',
     },
     {
-      path: '/',
+      path: '/ged/attendance-volunteer',
       name: '출석 및 봉사',
     },
   ];
+
+  const location = useLocation();
+
+  const currentData = datas.find((data) =>
+    location.pathname.includes(data.path)
+  );
+
   return (
     <Flex width="100%" height="fit-content" isColumn={true}>
       <TitleContainer>
         <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
           <Text fontSize={32} fontWeight={600}>
-            3학년 2학기
+            {currentData ? currentData.name : 'Error'}
           </Text>
           <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
             관련 항목이 없는 경우 ✕ 로 기입하세요.

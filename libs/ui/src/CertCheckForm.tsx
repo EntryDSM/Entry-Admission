@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
-import { Check, OActivate, ONoActivate, XActivate, XNoActivate } from '@entry/ui';
+import {
+  Check,
+  OActivate,
+  ONoActivate,
+  XActivate,
+  XNoActivate,
+} from '@entry/ui';
 
 interface ICertCheckFormType {
   title: string;
@@ -29,17 +35,15 @@ export const CertCheckForm: React.FC<ICertCheckFormType> = ({
           <CheckMark hasValue={!!value}>
             <Check />
           </CheckMark>
-          <Text fontSize={32} fontWeight={600}>{title}</Text>
+          <Text fontSize={32} fontWeight={600}>
+            {title}
+          </Text>
         </LeftSection>
         <ButtonWrapper>
-          <IconButton
-            onClick={() => onChange('O')}
-          >
+          <IconButton onClick={() => onChange('O')}>
             {value === 'O' ? <OActivate /> : <ONoActivate />}
           </IconButton>
-          <IconButton
-            onClick={() => onChange('X')}
-          >
+          <IconButton onClick={() => onChange('X')}>
             {value === 'X' ? <XActivate /> : <XNoActivate />}
           </IconButton>
         </ButtonWrapper>
