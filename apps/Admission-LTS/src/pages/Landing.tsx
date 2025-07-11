@@ -47,7 +47,7 @@ export const Landing = () => {
           </ContentContainer>
           <ContentContainer>
             <Text fontSize={18} fontWeight={500}>
-              원서 접수는{' '}
+              원서 접수는
               <Text
                 isSpan={true}
                 fontSize={18}
