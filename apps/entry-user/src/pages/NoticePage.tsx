@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { colors, Flex, Text } from '@entry/design-token';
-import {  NoticePinIcon, TabSection } from '@entry/ui';
+import { colors, Flex } from '@entry/design-token';
+import { NoticePinIcon, TabSection } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
-
 
 interface NoticeItem {
   id: number;
@@ -46,8 +45,8 @@ export const NoticePage = () => {
     <PageContainer>
       <ContentWrapper>
         <TitleSection>
-          <Text fontSize={28} fontWeight={700}>공지 사항</Text>
-          <SubTitle fontSize={14} color={colors.gray[400]}>
+          <Title>공지 사항</Title>
+          <SubTitle>
             학교에서 게시한 입학 공지사항을 확인하세요
           </SubTitle>
         </TitleSection>
@@ -101,6 +100,19 @@ const ContentWrapper = styled.div`
 
 const TitleSection = styled.div`
   margin-bottom: 16px;
+`;
+
+const Title = styled.h1`
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: inherit;
+`;
+
+const SubTitle = styled.p`
+  font-size: 16px;
+  color: ${colors.gray[400]};
+  margin: 12px 0 40px 0;
 `;
 
 const TableContainer = styled.div`
@@ -157,8 +169,4 @@ const NewIconWrapper = styled.span`
   margin-right: 8px;
   display: inline-flex;
   align-items: center;
-`;
-
-const SubTitle = styled(Text)`
-  margin-top: 8px;
 `;
