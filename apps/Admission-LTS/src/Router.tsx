@@ -27,7 +27,7 @@ import {
 } from './pages';
 import { ApplicationPreview } from './pages/applicationCheck';
 import { Page404 } from '@entry/ui';
-import { GedScore } from './pages/ged';
+import { AttendanceVolunteer, GedScore } from './pages/ged';
 
 export const Router = createBrowserRouter([
   {
@@ -53,6 +53,10 @@ export const Router = createBrowserRouter([
                   {
                     path: 'score',
                     element: <GedScore />,
+                  },
+                  {
+                    path: 'attendance-volunteer',
+                    element: <AttendanceVolunteer />,
                   },
                 ],
               },
