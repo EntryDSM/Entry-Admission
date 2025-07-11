@@ -43,7 +43,7 @@ export const GedScore = () => {
           defaultCount={10}
           suffix="점"
           value={datas.korean}
-        />{' '}
+        />
         <AttendanceForm
           onChange={handleSocialStudiesChange}
           width={'498px'}

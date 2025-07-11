@@ -19,7 +19,7 @@ export const ActivityGraduate = () => {
             width={'748px'}
             title="미인정 결석"
             defaultCount={10}
-          />{' '}
+          />
           <AttendanceForm
             width={'748px'}
             title="미인정 조퇴"
