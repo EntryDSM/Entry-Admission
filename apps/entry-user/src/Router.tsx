@@ -1,7 +1,16 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout, CalculateLayout } from './layout';
-import { Main, NoticeDetailPage, ScoreFirst, ScoreSecond, ScoreThird, Activity, QEDScore } from './pages';
-import { NoticePage } from './pages/NoticePage';
+import {
+  Landing,
+  NoticeDetailPage,
+  ScoreFirst,
+  ScoreSecond,
+  ScoreThird,
+  Activity,
+  QEDScore,
+  Main,
+  NoticePage,
+} from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -10,10 +19,11 @@ export const Router = createBrowserRouter([
     children: [
       {
         path: '/',
+        element: <Main />,
       },
       {
         path: '/landing',
-        element: <Main />,
+        element: <Landing />,
       },
       {
         path: '/notice',
@@ -30,57 +40,59 @@ export const Router = createBrowserRouter([
           // 기본 리다이렉트
           {
             path: '',
-            element: <Navigate to="/calculate/primary/first-graduate" replace />
+            element: (
+              <Navigate to="/calculate/primary/first-graduate" replace />
+            ),
           },
           // 가듨예정자 플로우
           {
             path: 'primary/first-graduate',
-            element: <ScoreFirst />
+            element: <ScoreFirst />,
           },
           {
-            path: 'primary/second-graduate', 
-            element: <ScoreSecond />
+            path: 'primary/second-graduate',
+            element: <ScoreSecond />,
           },
           {
             path: 'primary/third-graduate',
-            element: <ScoreThird />
+            element: <ScoreThird />,
           },
           {
             path: 'primary/activity',
-            element: <Activity />
+            element: <Activity />,
           },
           // 가듨자 플로우
           {
             path: 'graduated/third2',
-            element: <ScoreThird />
+            element: <ScoreThird />,
           },
           {
             path: 'graduated/third1',
-            element: <ScoreThird />
+            element: <ScoreThird />,
           },
           {
             path: 'graduated/second2',
-            element: <ScoreSecond />
+            element: <ScoreSecond />,
           },
           {
-            path: 'graduated/second1', 
-            element: <ScoreSecond />
+            path: 'graduated/second1',
+            element: <ScoreSecond />,
           },
           {
             path: 'graduated/activity',
-            element: <Activity />
+            element: <Activity />,
           },
           // 검정고시 플로우
           {
             path: 'qe/score',
-            element: <QEDScore />
+            element: <QEDScore />,
           },
           {
             path: 'qe/activity',
-            element: <Activity />
-          }
-        ]
-      }
+            element: <Activity />,
+          },
+        ],
+      },
     ],
   },
   {
