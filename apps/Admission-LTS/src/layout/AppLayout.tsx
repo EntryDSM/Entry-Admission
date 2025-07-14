@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { ApplicationNav, usePageData } from '@entry/ui';
 import { Flex } from '@entry/design-token';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export const AppLayout = () => {
   const navigate = useNavigate();
@@ -10,8 +10,12 @@ export const AppLayout = () => {
   const { pathname } = location;
   const [datas, _] = usePageData('first');
 
+  const mainRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
   }, [pathname]);
 
   const pageGraduateRoutes = [
@@ -52,7 +56,6 @@ export const AppLayout = () => {
     '/submit-check',
   ];
 
-  // graduationType에 따라 routes 선택
   const { graduationType } = datas;
 
   const routes = (() => {
@@ -65,7 +68,7 @@ export const AppLayout = () => {
     if (graduationType === '졸업') {
       return pageGraduateRoutes;
     }
-    return []; // fallback
+    return [];
   })();
 
   const currentPath = location.pathname;
@@ -80,7 +83,7 @@ export const AppLayout = () => {
   }, [currentPage, routes, currentPath, navigate]);
 
   return (
-    <Main>
+    <Main ref={mainRef}>
       <Flex isColumn gap={125} height="calc(100vh - 70px)" width="100%">
         <Flex
           isColumn
@@ -105,4 +108,6 @@ export const AppLayout = () => {
 const Main = styled.main`
   width: 100vw;
   padding: 40px 160px;
+  height: 100%;
+  overflow-y: auto;
 `;

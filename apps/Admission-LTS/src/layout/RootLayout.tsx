@@ -2,19 +2,22 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NoPathHeader } from '@entry/ui';
 import { ToastContainer } from 'react-toastify';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const RootLayout = () => {
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
   }, [location.pathname]);
 
   return (
     <>
       <NoPathHeader />
-      <Main>
+      <Main ref={mainRef}>
         <Outlet />
       </Main>
       <ToastContainer
@@ -34,4 +37,6 @@ export const RootLayout = () => {
 
 const Main = styled.main`
   width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
 `;

@@ -7,15 +7,47 @@ import { useEffect, useState } from 'react';
 export const NoPathHeader = () => {
   const [scrollPosition, setScrollPosition] = useState<number>(0);
 
-  // 스크롤 시 setScrollPosition 변경
-  const updateScroll = () => {
-    setScrollPosition(window.scrollY || document.documentElement.scrollTop);
-  };
-
   useEffect(() => {
-    window.addEventListener('scroll', updateScroll);
+    const updateScroll = () => {
+      const mainElements = document.querySelectorAll('main');
+      let maxScrollPosition = 0;
+
+      mainElements.forEach((mainElement) => {
+        const scrollTop = mainElement.scrollTop;
+        if (scrollTop > maxScrollPosition) {
+          maxScrollPosition = scrollTop;
+        }
+      });
+
+      setScrollPosition(maxScrollPosition);
+    };
+
+    const attachScrollListeners = () => {
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
+
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.addEventListener('scroll', updateScroll, { passive: true });
+      });
+    };
+
+    attachScrollListeners();
+
+    const observer = new MutationObserver(() => {
+      attachScrollListeners();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
     return () => {
-      window.removeEventListener('scroll', updateScroll);
+      observer.disconnect();
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
     };
   }, []);
 
@@ -42,15 +74,47 @@ export const AdminHeader = () => {
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
 
-  // 스크롤 시 setScrollPosition 변경
-  const updateScroll = () => {
-    setScrollPosition(window.scrollY || document.documentElement.scrollTop);
-  };
-
   useEffect(() => {
-    window.addEventListener('scroll', updateScroll);
+    const updateScroll = () => {
+      const mainElements = document.querySelectorAll('main');
+      let maxScrollPosition = 0;
+
+      mainElements.forEach((mainElement) => {
+        const scrollTop = mainElement.scrollTop;
+        if (scrollTop > maxScrollPosition) {
+          maxScrollPosition = scrollTop;
+        }
+      });
+
+      setScrollPosition(maxScrollPosition);
+    };
+
+    const attachScrollListeners = () => {
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
+
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.addEventListener('scroll', updateScroll, { passive: true });
+      });
+    };
+
+    attachScrollListeners();
+
+    const observer = new MutationObserver(() => {
+      attachScrollListeners();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
     return () => {
-      window.removeEventListener('scroll', updateScroll);
+      observer.disconnect();
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
     };
   }, []);
 
@@ -169,15 +233,47 @@ export const CommonHeader = () => {
   });
   const [scrollPosition, setScrollPosition] = useState<number>(0);
 
-  // 스크롤 시 setScrollPosition 변경
-  const updateScroll = () => {
-    setScrollPosition(window.scrollY || document.documentElement.scrollTop);
-  };
-
   useEffect(() => {
-    window.addEventListener('scroll', updateScroll);
+    const updateScroll = () => {
+      const mainElements = document.querySelectorAll('main');
+      let maxScrollPosition = 0;
+
+      mainElements.forEach((mainElement) => {
+        const scrollTop = mainElement.scrollTop;
+        if (scrollTop > maxScrollPosition) {
+          maxScrollPosition = scrollTop;
+        }
+      });
+
+      setScrollPosition(maxScrollPosition);
+    };
+
+    const attachScrollListeners = () => {
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
+
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.addEventListener('scroll', updateScroll, { passive: true });
+      });
+    };
+
+    attachScrollListeners();
+
+    const observer = new MutationObserver(() => {
+      attachScrollListeners();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
     return () => {
-      window.removeEventListener('scroll', updateScroll);
+      observer.disconnect();
+      document.querySelectorAll('main').forEach((mainElement) => {
+        mainElement.removeEventListener('scroll', updateScroll);
+      });
     };
   }, []);
 

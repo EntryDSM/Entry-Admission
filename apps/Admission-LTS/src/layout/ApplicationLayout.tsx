@@ -17,9 +17,12 @@ export const ApplicationLayout = () => {
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -77,7 +80,7 @@ export const ApplicationLayout = () => {
 
   return (
     <Flex width="100%" height="fit-content">
-      <Main>
+      <Main ref={mainRef}>
         <Flex isColumn={true} gap={125} height="fit-content" width="100%">
           <Flex
             isColumn={true}
@@ -98,6 +101,8 @@ export const ApplicationLayout = () => {
 };
 
 const Main = styled.main`
-  margin-top: 70px;
+  padding-top: 70px;
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
 `;

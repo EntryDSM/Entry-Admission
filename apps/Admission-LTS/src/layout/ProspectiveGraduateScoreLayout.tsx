@@ -2,32 +2,23 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const ProspectiveGraduateScoreLayout = () => {
   const datas = [
-    {
-      path: '/first-prospective-graduate',
-      name: '3학년 1학기',
-    },
-    {
-      path: '/second-prospective-graduate',
-      name: '직전 학기',
-    },
-    {
-      path: '/third-prospective-graduate',
-      name: '직직전 학기',
-    },
-    {
-      path: '/activity-prospective-graduate',
-      name: '출석 및 봉사',
-    },
+    { path: '/first-prospective-graduate', name: '3학년 1학기' },
+    { path: '/second-prospective-graduate', name: '직전 학기' },
+    { path: '/third-prospective-graduate', name: '직직전 학기' },
+    { path: '/activity-prospective-graduate', name: '출석 및 봉사' },
   ];
 
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
   }, [location.pathname]);
 
   const currentData = datas.find((data) =>
@@ -37,7 +28,7 @@ export const ProspectiveGraduateScoreLayout = () => {
   return (
     <Flex width="100%" height="fit-content" isColumn={true}>
       <TitleContainer>
-        <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
+        <Flex width="fit-content" height="fit-content" isColumn gap={12}>
           <Text fontSize={32} fontWeight={600}>
             {currentData ? currentData.name : 'Error'}
           </Text>
@@ -47,7 +38,7 @@ export const ProspectiveGraduateScoreLayout = () => {
         </Flex>
         <ScorePageNav datas={datas} />
       </TitleContainer>
-      <Main>
+      <Main ref={mainRef}>
         <Outlet />
       </Main>
     </Flex>
@@ -60,10 +51,12 @@ const TitleContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 36px 0px;
+  gap: 36px 0;
 `;
 
 const Main = styled.main`
   width: 100%;
   margin: 40px 0 60px 0;
+  height: 100%;
+  overflow-y: auto;
 `;
