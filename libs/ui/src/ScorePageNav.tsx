@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 interface IScorePageNav {
   datas: { path: string; name: string }[];
@@ -10,6 +10,10 @@ interface IScorePageNav {
 export const ScorePageNav = ({ datas }: IScorePageNav) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const activeIndex = useMemo(() => {
     return datas.findIndex((data) => location.pathname.endsWith(data.path));
@@ -28,7 +32,13 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
   };
 
   return (
-    <Flex width="fit-content" height="fit-content" gap={20} alignItems="center" flexWrap="nowrap">
+    <Flex
+      width="fit-content"
+      height="fit-content"
+      gap={20}
+      alignItems="center"
+      flexWrap="nowrap"
+    >
       {datas.map((data, index) => (
         <Flex
           width="fit-content"
@@ -38,10 +48,7 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
           key={index}
         >
           {index !== 0 && (
-            <Line
-              width={getLineWidth()}
-              isActive={index <= activeIndex}
-            />
+            <Line width={getLineWidth()} isActive={index <= activeIndex} />
           )}
           <Flex
             onClick={() => navClick(index, data.path)}

@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
+import { useEffect } from 'react';
 
 export const GedScoreLayout = () => {
   const datas = [
@@ -16,6 +17,10 @@ export const GedScoreLayout = () => {
   ];
 
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const currentData = datas.find((data) =>
     location.pathname.includes(data.path)

@@ -1,9 +1,16 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { NoPathHeader } from '@entry/ui';
 import { ToastContainer } from 'react-toastify';
+import { useEffect } from 'react';
 
 export const RootLayout = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <>
       <NoPathHeader />

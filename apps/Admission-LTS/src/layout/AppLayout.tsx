@@ -10,7 +10,6 @@ export const AppLayout = () => {
   const { pathname } = location;
   const [datas, _] = usePageData('first');
 
-  // page 전환 시 스크롤 상단으로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
@@ -78,7 +77,7 @@ export const AppLayout = () => {
     if (path && !currentPath.includes(path)) {
       navigate(path);
     }
-  }, [currentPage]);
+  }, [currentPage, routes, currentPath, navigate]);
 
   return (
     <Main>

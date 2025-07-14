@@ -10,7 +10,6 @@ interface IFirstPageType {
   regionSelection: string;
   graduationType: string;
   graduationDate: (string | number)[];
-  specialNote: string;
 }
 
 interface ISecondPageType {
@@ -98,7 +97,6 @@ const initialState: ApplicationState = {
     regionSelection: '',
     graduationType: '',
     graduationDate: [2023, 1],
-    specialNote: '',
   },
   second: {
     idPhoto: null,

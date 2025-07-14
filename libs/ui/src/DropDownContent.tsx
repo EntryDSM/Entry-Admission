@@ -100,6 +100,7 @@ const DropOption = styled.div`
     transition: 0.35s ease-in-out;
     background-color: ${colors.orange[100]};
   }
+  flex-shrink: 0;
 `;
 
 const DropContainer = styled.div<{ width: number | null }>`
@@ -109,6 +110,8 @@ const DropContainer = styled.div<{ width: number | null }>`
   border-radius: 4px;
   width: ${({ width }) => (width ? `${width}px` : 'auto')};
   position: absolute;
+  max-height: 200px;
+  overflow-y: auto;
   top: 39px;
   z-index: 1;
   background-color: ${colors.extra.realWhite};
