@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
+import { useEffect, useRef } from 'react';
 
 export const GedScoreLayout = () => {
   const datas = [
@@ -16,6 +17,13 @@ export const GedScoreLayout = () => {
   ];
 
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
 
   const currentData = datas.find((data) =>
     location.pathname.includes(data.path)
@@ -34,7 +42,7 @@ export const GedScoreLayout = () => {
         </Flex>
         <ScorePageNav datas={datas} />
       </TitleContainer>
-      <Main>
+      <Main ref={mainRef}>
         <Outlet />
       </Main>
     </Flex>
@@ -53,4 +61,6 @@ const TitleContainer = styled.div`
 const Main = styled.main`
   width: 100%;
   margin: 40px 0 60px 0;
+  height: 100%;
+  overflow-y: auto;
 `;

@@ -2,32 +2,25 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
+import { useEffect, useRef } from 'react';
 
 export const GraduateScoreLayout = () => {
   const datas = [
-    {
-      path: '/first-graduate',
-      name: '3학년 2학기',
-    },
-    {
-      path: '/second-graduate',
-      name: '3학년 1학기',
-    },
-    {
-      path: '/third-graduate',
-      name: '2학년 2학기',
-    },
-    {
-      path: '/fourth-graduate',
-      name: '2학년 1학기',
-    },
-    {
-      path: '/activity-graduate',
-      name: '출석 및 봉사',
-    },
+    { path: '/first-graduate', name: '3학년 2학기' },
+    { path: '/second-graduate', name: '3학년 1학기' },
+    { path: '/third-graduate', name: '2학년 2학기' },
+    { path: '/fourth-graduate', name: '2학년 1학기' },
+    { path: '/activity-graduate', name: '출석 및 봉사' },
   ];
 
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
 
   const currentData = datas.find((data) =>
     location.pathname.includes(data.path)
@@ -36,7 +29,7 @@ export const GraduateScoreLayout = () => {
   return (
     <Flex width="100%" height="fit-content" isColumn={true}>
       <TitleContainer>
-        <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
+        <Flex width="fit-content" height="fit-content" isColumn gap={12}>
           <Text fontSize={32} fontWeight={600}>
             {currentData ? currentData.name : 'Error'}
           </Text>
@@ -46,7 +39,7 @@ export const GraduateScoreLayout = () => {
         </Flex>
         <ScorePageNav datas={datas} />
       </TitleContainer>
-      <Main>
+      <Main ref={mainRef}>
         <Outlet />
       </Main>
     </Flex>
@@ -65,4 +58,6 @@ const TitleContainer = styled.div`
 const Main = styled.main`
   width: 100%;
   margin: 40px 0 60px 0;
+  height: 100%;
+  overflow-y: auto;
 `;

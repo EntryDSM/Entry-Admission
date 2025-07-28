@@ -1,9 +1,16 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { CertCheckForm, usePageData } from '@entry/ui';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const AttendanceVolunteer = () => {
   const [datas, setDatas] = usePageData('attendanceVolunteer');
 
+  // const location = useLocation();
+
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
+  // }, [location.pathname]);
   const safeData = datas || { dsmAlgorithm: null, certificate: null };
 
   const dsmAlgorithmChange = (value: 'O' | 'X' | null) => {
