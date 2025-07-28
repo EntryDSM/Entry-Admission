@@ -5,14 +5,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Landing = () => {
-  const [name, setName] = useState<string>('김이름');
+  const [name, _] = useState<string>('김이름');
   const navigate = useNavigate();
 
   const handleStartClick = () => {
     navigate('/first');
   };
   return (
-    <Flex isColumn={true} alignItems="center" gap={60} justifyContent="center">
+    <Flex
+      width="100%"
+      height="calc(100vh - 70px)"
+      isColumn={true}
+      alignItems="center"
+      gap={60}
+      justifyContent="center"
+    >
       <Flex
         width="560px"
         height="fit-content"

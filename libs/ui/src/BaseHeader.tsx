@@ -4,52 +4,28 @@ import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-export const NoPathHeader = () => {
+// 공통 스크롤 감지 훅
+const useScrollY = () => {
   const [scrollPosition, setScrollPosition] = useState<number>(0);
 
   useEffect(() => {
-    const updateScroll = () => {
-      const mainElements = document.querySelectorAll('main');
-      let maxScrollPosition = 0;
-
-      mainElements.forEach((mainElement) => {
-        const scrollTop = mainElement.scrollTop;
-        if (scrollTop > maxScrollPosition) {
-          maxScrollPosition = scrollTop;
-        }
-      });
-
-      setScrollPosition(maxScrollPosition);
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
     };
 
-    const attachScrollListeners = () => {
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
-
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.addEventListener('scroll', updateScroll, { passive: true });
-      });
-    };
-
-    attachScrollListeners();
-
-    const observer = new MutationObserver(() => {
-      attachScrollListeners();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // mount 시 초기 스크롤 감지
 
     return () => {
-      observer.disconnect();
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  return scrollPosition;
+};
+
+export const NoPathHeader = () => {
+  const scrollPosition = useScrollY();
 
   return (
     <NoPathHeaderContainer scrollPosition={scrollPosition}>
@@ -69,86 +45,22 @@ export const NoPathHeader = () => {
 };
 
 export const AdminHeader = () => {
-  const [datas, _] = useState<{ name: string }>({
-    name: '홍길동',
-  });
-  const [scrollPosition, setScrollPosition] = useState<number>(0);
-
-  useEffect(() => {
-    const updateScroll = () => {
-      const mainElements = document.querySelectorAll('main');
-      let maxScrollPosition = 0;
-
-      mainElements.forEach((mainElement) => {
-        const scrollTop = mainElement.scrollTop;
-        if (scrollTop > maxScrollPosition) {
-          maxScrollPosition = scrollTop;
-        }
-      });
-
-      setScrollPosition(maxScrollPosition);
-    };
-
-    const attachScrollListeners = () => {
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
-
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.addEventListener('scroll', updateScroll, { passive: true });
-      });
-    };
-
-    attachScrollListeners();
-
-    const observer = new MutationObserver(() => {
-      attachScrollListeners();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      observer.disconnect();
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
-    };
-  }, []);
-
-  //navigation nav content
-  const navData = [
-    {
-      name: '공지사항',
-      path: '/a',
-    },
-    {
-      name: '자주 묻는 질문',
-      path: '/b',
-    },
-    {
-      name: '성적 산출',
-      path: '/c',
-    },
-    {
-      name: '전형 요강',
-      path: '/d',
-    },
-  ];
+  const scrollPosition = useScrollY();
+  const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
-  const [isSideClick, setIsSideClick] = useState<boolean>(false);
+  const navData = [
+    { name: '공지사항', path: '/a' },
+    { name: '자주 묻는 질문', path: '/b' },
+    { name: '성적 산출', path: '/c' },
+    { name: '전형 요강', path: '/d' },
+  ];
 
   const navClick = (path: string) => {
     setIsSideClick(false);
     navigate(path);
-  };
-
-  const sideClick = () => {
-    setIsSideClick(!isSideClick);
   };
 
   return (
@@ -159,7 +71,7 @@ export const AdminHeader = () => {
         height="fit-content"
         width="fit-content"
       >
-        <EntryLogo isAdmin={true} />
+        <EntryLogo isAdmin />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
           EntryDSM
         </Text>
@@ -195,15 +107,10 @@ export const AdminHeader = () => {
           <NavContent onClick={() => navClick('/mypage')}>
             마이페이지
           </NavContent>
-          <Text
-            isSpan={true}
-            fontSize={18}
-            fontWeight={500}
-            color={colors.gray[500]}
-          >
+          <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
             {datas.name}
             <Text
-              isSpan={true}
+              isSpan
               fontSize={18}
               fontWeight={400}
               color={colors.gray[500]}
@@ -212,7 +119,7 @@ export const AdminHeader = () => {
             </Text>
           </Text>
         </Flex>
-        <SideBarBtnIcon onClick={sideClick} />
+        <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
       </Flex>
       {isSideClick && (
         <SideNavContainer>
@@ -228,86 +135,22 @@ export const AdminHeader = () => {
 };
 
 export const CommonHeader = () => {
-  const [datas, _] = useState<{ name: string }>({
-    name: '홍길동',
-  });
-  const [scrollPosition, setScrollPosition] = useState<number>(0);
-
-  useEffect(() => {
-    const updateScroll = () => {
-      const mainElements = document.querySelectorAll('main');
-      let maxScrollPosition = 0;
-
-      mainElements.forEach((mainElement) => {
-        const scrollTop = mainElement.scrollTop;
-        if (scrollTop > maxScrollPosition) {
-          maxScrollPosition = scrollTop;
-        }
-      });
-
-      setScrollPosition(maxScrollPosition);
-    };
-
-    const attachScrollListeners = () => {
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
-
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.addEventListener('scroll', updateScroll, { passive: true });
-      });
-    };
-
-    attachScrollListeners();
-
-    const observer = new MutationObserver(() => {
-      attachScrollListeners();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      observer.disconnect();
-      document.querySelectorAll('main').forEach((mainElement) => {
-        mainElement.removeEventListener('scroll', updateScroll);
-      });
-    };
-  }, []);
-
-  //navigation nav content
-  const navData = [
-    {
-      name: '공지사항',
-      path: '/a',
-    },
-    {
-      name: '자주 묻는 질문',
-      path: '/b',
-    },
-    {
-      name: '성적 산출',
-      path: '/c',
-    },
-    {
-      name: '전형 요강',
-      path: '/d',
-    },
-  ];
+  const scrollPosition = useScrollY();
+  const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
-  const [isSideClick, setIsSideClick] = useState<boolean>(false);
+  const navData = [
+    { name: '공지사항', path: '/notice' },
+    { name: '자주 묻는 질문', path: '/d' },
+    { name: '성적 산출', path: '/calculate' },
+    { name: '전형 요강', path: '/d' },
+  ];
 
   const navClick = (path: string) => {
     setIsSideClick(false);
     navigate(path);
-  };
-
-  const sideClick = () => {
-    setIsSideClick(!isSideClick);
   };
 
   return (
@@ -338,8 +181,8 @@ export const CommonHeader = () => {
           {navData.map((data) => (
             <NavContent
               key={data.name}
-              onClick={() => navClick(data.path)}
               isPath={pathname.includes(data.path)}
+              onClick={() => navClick(data.path)}
             >
               {data.name}
             </NavContent>
@@ -357,15 +200,10 @@ export const CommonHeader = () => {
           >
             마이페이지
           </NavContent>
-          <Text
-            isSpan={true}
-            fontSize={18}
-            fontWeight={500}
-            color={colors.gray[500]}
-          >
+          <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
             {datas.name}
             <Text
-              isSpan={true}
+              isSpan
               fontSize={18}
               fontWeight={400}
               color={colors.gray[500]}
@@ -374,7 +212,7 @@ export const CommonHeader = () => {
             </Text>
           </Text>
         </Flex>
-        <SideBarBtnIcon onClick={sideClick} />
+        <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
       </Flex>
       {isSideClick && (
         <SideNavContainer>
@@ -403,6 +241,8 @@ export const AuthHeader = () => {
     </AuthHeaderContainer>
   );
 };
+
+// ================== styled components ==================
 
 const LogoContainer = styled.div`
   display: flex;
