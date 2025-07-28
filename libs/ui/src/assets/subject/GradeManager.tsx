@@ -26,6 +26,7 @@ export const GradeManager = ({
     수학: 'math',
     과학: 'sci',
     '기술 · 가정': 'tech',
+    영어: 'eng',
   };
 
   const handleGlobalGradeChange = (grade: string | null) => {
