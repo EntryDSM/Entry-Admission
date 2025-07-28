@@ -1,7 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout, CalculateLayout } from './layout';
-import { Main, NoticeDetailPage, ScoreFirst, ScoreSecond, ScoreThird, Activity, QEDScore } from './pages';
+import { Main, NoticeDetailPage, AdmissionOverviewPage, MyPage, ScoreFirst, ScoreSecond, ScoreThird, Activity, QEDScore } from './pages';
 import { NoticePage } from './pages/NoticePage';
+import { FaqPage } from './pages/FaqPage';
 
 export const Router = createBrowserRouter([
   {
@@ -22,6 +23,18 @@ export const Router = createBrowserRouter([
       {
         path: '/notice/:id',
         element: <NoticeDetailPage />,
+      },
+      {
+        path: '/faq',
+        element: <FaqPage />,
+      },
+      {
+        path: '/admission-overview',
+        element: <AdmissionOverviewPage />,
+      },
+      {
+        path: '/mypage',
+        element: <MyPage />,
       },
       {
         path: '/calculate',

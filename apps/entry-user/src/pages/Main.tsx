@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { keyframes, css } from '@emotion/react';
 import { colors } from '@entry/design-token';
-import { school } from '@entry/ui';
-import { ArrowBottom, GrowToImg } from '../assets';
+import { school, ArrowBottom, GrowToImg } from '../assets';
 import { BannerContainer } from '../components/landing/clubBanner';
 import {
   AwardsSection,

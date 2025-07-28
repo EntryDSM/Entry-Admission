@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
-import { Check, OActivate, ONoActivate, XActivate, XNoActivate } from '@entry/ui';
+import { Check, OActivate, ONoActivate, XActivate, XNoActivate } from './assets';
 
 interface ICertCheckFormType {
   title: string;

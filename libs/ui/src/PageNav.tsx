@@ -1,4 +1,4 @@
-import { colors, Flex } from '@entry/design-token';
+import { colors } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { ArrowNav } from './assets';
 
@@ -35,7 +35,7 @@ export const PageNav = ({
   };
 
   return (
-    <Flex alignItems="center" gap={20}>
+    <Container>
       {currentGroupStart > 1 ? (
         <NavChange onClick={handlePrevGroup}>
           <ArrowNav />
@@ -69,9 +69,17 @@ export const PageNav = ({
           <ArrowNav isRight={true} isBlocked={true} />
         </NavChange>
       )}
-    </Flex>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+`;
+
 const NavChange = styled.button`
   background-color: transparent;
   width: fit-content;

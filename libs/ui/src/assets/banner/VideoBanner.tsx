@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { AnimationBox, MouLogoImgs } from '@entry/ui';
+import { AnimationBox, MouLogoImgs } from '../index';;
 
 export const VideoBanner = () => {
   return (

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
-import { CommonHeader } from '@entry/ui';
+import { CommonHeader, Footer } from '@entry/ui';
 
 export const AppLayout = () => {
   return (
@@ -9,6 +9,7 @@ export const AppLayout = () => {
       <Main>
         <Outlet />
       </Main>
+      <Footer />
     </>
   );
 };

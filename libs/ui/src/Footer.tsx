@@ -1,8 +1,6 @@
-export * from './assets';
-export * from './Footer';
 import { colors } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { EntryLogo } from '@entry/ui';
+import { EntryLogo } from './assets';
 
 export const Footer = () => {
   return (

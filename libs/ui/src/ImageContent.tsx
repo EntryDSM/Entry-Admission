@@ -1,8 +1,8 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { ImageChange, Photo } from '@entry/ui';
+import { ImageChange, Photo } from './assets';
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
-import { usePageData } from '@entry/ui';
+import { usePageData } from './contexts';
 
 interface IImgType {
   imgUrl?: string | null;

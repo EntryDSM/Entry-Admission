@@ -1,15 +1,12 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
-import {
-  Caution,
-  Check,
-  DropDownContent,
-  ImageContent,
-  InputContent,
-  RadioContent,
-  SearchContent,
-  TextAreaContent,
-} from '@entry/ui';
+import { Caution, Check } from './assets';
+import { DropDownContent } from './DropDownContent';
+import { ImageContent } from './ImageContent';
+import { InputContent } from './InputContent';
+import { RadioContent } from './RadioContent';
+import { SearchContent } from './SearchContent';
+import { TextAreaContent } from './TextAreaContent';
 import React, { useEffect, useState } from 'react';
 
 interface IFormElementType

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
-import { Cancel } from '@entry/ui';
+import { Cancel } from '../index';
 
 interface IGradeType {
   grade?: string;

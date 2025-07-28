@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
-import { Check } from '@entry/ui';
+import { Check } from './assets';
 
 interface IAttendanceFormType {
   title: string;
