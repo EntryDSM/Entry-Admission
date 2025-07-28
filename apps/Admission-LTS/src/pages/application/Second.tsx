@@ -1,14 +1,51 @@
+import React, { useState, useEffect } from 'react';
 import { Flex } from '@entry/design-token';
 import { FormElement } from '@entry/ui';
-import React, { useEffect, useState } from 'react';
 import { usePageData } from '@entry/ui';
+import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 
 export const Second = () => {
-  const [imgUrlValue, setImgUrlValue] = useState<string | null>(null);
-
-  console.log(imgUrlValue);
-
+  const [imgUrlValue, setImgUrlValue] = useState<string | File | null>(null);
   const [datas, setDatas] = usePageData('second');
+
+  // 1990~2025년 배열
+  const years = eachYearOfInterval({
+    start: new Date(1990, 0, 1),
+    end: new Date(2025, 11, 31),
+  }).map((d) => parseInt(format(d, 'yyyy')));
+
+  // 월은 1~12 고정
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  // 선택된 년, 월에 따라 일수 배열을 생성 (윤년, 30일, 31일)
+  const getDaysInMonth = (year: number, month: number) => {
+    if (!year || !month) return [];
+    const lastDay = lastDayOfMonth(new Date(year, month - 1));
+    const daysCount = getDate(lastDay);
+    return Array.from({ length: daysCount }, (_, i) => i + 1);
+  };
+
+  const selectedYear = datas.dateOfBirth?.[0] || years[0];
+  const selectedMonth = datas.dateOfBirth?.[1] || months[0];
+
+  // day 배열 계산
+  const days = getDaysInMonth(selectedYear as number, selectedMonth as number);
+
+  const formDropDownData = [
+    {
+      data: [
+        { label: '년', content: years },
+        { label: '월', content: months },
+        { label: '일', content: days },
+      ],
+    },
+  ];
+
+  const formRadioData = [
+    {
+      data: ['국가 유공자', '특례 입학 대상'],
+    },
+  ];
 
   const handleNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -21,40 +58,16 @@ export const Second = () => {
     setDatas({ ...datas, dateOfBirth: values });
   };
 
-  const handleEtcChange: React.Dispatch<React.SetStateAction<string>> = (
-    value
-  ) => {
-    const newValue =
-      typeof value === 'function' ? value(datas.specialNotes) : value;
-    setDatas({ ...datas, specialNotes: newValue });
+  const handleEtcChange = (value: string) => {
+    setDatas({ ...datas, specialNotes: value });
   };
 
   useEffect(() => {
     setDatas({ ...datas, idPhoto: imgUrlValue });
   }, [imgUrlValue]);
 
-  //radio data
-  const formRadioData = [
-    {
-      data: ['국가 유공자', '특례 입학 대상'],
-    },
-  ];
-
-  //dropdown data
-  const formDropDownData = [
-    {
-      data: [
-        { label: '년', content: [2023, 2024, 2025, 2026] },
-        { label: '월', content: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-        { label: '일', content: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-      ],
-    },
-  ];
-
-  console.log(datas);
-
   return (
-    <Flex isColumn={true} width="100%" height="fit-content">
+    <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
       <FormElement
         type="imgSelector"
         label="증명 사진"
@@ -73,10 +86,8 @@ export const Second = () => {
       <FormElement
         type="dropDown"
         label="생년월일"
-        explanation="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
-        dropDownDatas={formDropDownData[0].data}
-        warning="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
         onDropDownChange={handleDropdownChange}
+        dropDownDatas={formDropDownData[0].data}
         dropDownValues={datas.dateOfBirth}
       />
       <FormElement

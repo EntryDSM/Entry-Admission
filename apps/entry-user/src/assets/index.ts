@@ -3,3 +3,4 @@ export * from './landing/clubBanner';
 export * from './landing/clubLogo';
 export * from './landing/award';
 export * from './landing';
+export * from "./main"

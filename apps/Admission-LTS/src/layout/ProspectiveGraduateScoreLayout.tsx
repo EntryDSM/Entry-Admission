@@ -4,16 +4,12 @@ import { colors, Flex, Text } from '@entry/design-token';
 import { ScorePageNav } from '@entry/ui';
 import { useEffect, useRef } from 'react';
 
-export const GedScoreLayout = () => {
+export const ProspectiveGraduateScoreLayout = () => {
   const datas = [
-    {
-      path: '/ged/score',
-      name: '검정고시 점수',
-    },
-    {
-      path: '/ged/attendance-volunteer',
-      name: '출석 및 봉사',
-    },
+    { path: '/first-prospective-graduate', name: '3학년 1학기' },
+    { path: '/second-prospective-graduate', name: '직전 학기' },
+    { path: '/third-prospective-graduate', name: '직직전 학기' },
+    { path: '/activity-prospective-graduate', name: '출석 및 봉사' },
   ];
 
   const location = useLocation();
@@ -32,7 +28,7 @@ export const GedScoreLayout = () => {
   return (
     <Flex width="100%" height="fit-content" isColumn={true}>
       <TitleContainer>
-        <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
+        <Flex width="fit-content" height="fit-content" isColumn gap={12}>
           <Text fontSize={32} fontWeight={600}>
             {currentData ? currentData.name : 'Error'}
           </Text>
@@ -55,7 +51,7 @@ const TitleContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 36px 0px;
+  gap: 36px 0;
 `;
 
 const Main = styled.main`

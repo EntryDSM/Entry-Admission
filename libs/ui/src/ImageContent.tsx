@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { usePageData } from './contexts';
 
 interface IImgType {
-  imgUrl?: string | null;
-  setImgUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  imgUrl?: string | null | File;
+  setImgUrl: React.Dispatch<React.SetStateAction<string | null | File>>;
   onFileChange?: (file: File | null) => void;
 }
 
@@ -14,18 +14,35 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
   const imgRef = useRef<HTMLInputElement>(null);
   const [isHover, setIsHover] = useState(false);
   const [{ idPhoto }] = usePageData('second');
+  const lastIdPhotoRef = useRef<string | File | null>(null);
+
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (idPhoto !== null) {
+    if (idPhoto !== null && idPhoto !== lastIdPhotoRef.current) {
+      lastIdPhotoRef.current = idPhoto;
       setImgUrl(idPhoto);
     }
-  }, [idPhoto]);
+  }, [idPhoto, setImgUrl]);
+
+  // imgUrl 처리 로직 개선
+  useEffect(() => {
+    if (imgUrl) {
+      if (typeof imgUrl === 'string') {
+        setBlobUrl(imgUrl);
+      } else if (imgUrl instanceof File) {
+        const url = URL.createObjectURL(imgUrl);
+        setBlobUrl(url);
+      }
+    } else {
+      setBlobUrl(null);
+    }
+  }, [imgUrl]);
 
   const handleChange = () => {
     const file = imgRef.current?.files?.[0];
     if (file) {
-      const newUrl = URL.createObjectURL(file);
-      setImgUrl(newUrl);
+      setImgUrl(file);
       onFileChange?.(file);
     }
   };
@@ -35,9 +52,9 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
       onClick={() => imgRef.current?.click()}
-      imgUrl={imgUrl}
+      imgUrl={blobUrl}
     >
-      {isHover && imgUrl && (
+      {isHover && blobUrl && (
         <HoverSelector>
           <ImageChange />
           <Text fontSize={12} color={colors.gray[200]}>
@@ -46,8 +63,8 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
         </HoverSelector>
       )}
       <FileInput type="file" ref={imgRef} onChange={handleChange} />
-      {imgUrl ? (
-        <ImgContent src={imgUrl} alt="img" />
+      {blobUrl ? (
+        <ImgContentStyled src={blobUrl} alt="img" />
       ) : (
         <Flex
           isColumn={true}
@@ -79,7 +96,7 @@ const ImgSelector = styled.div<{ imgUrl?: string | File | null }>`
   overflow: hidden;
 `;
 
-const ImgContent = styled.img`
+const ImgContentStyled = styled.img`
   width: 100%;
 `;
 

@@ -1,12 +1,30 @@
 import { Flex } from '@entry/design-token';
 import { FormElement } from '@entry/ui';
-import React from 'react';
 import { usePageData } from '@entry/ui';
+import { eachYearOfInterval, format } from 'date-fns';
 
 export const First = () => {
-  const [datas, setDatas] = usePageData('first'); //context 데이터
+  const [datas, setDatas] = usePageData('first');
 
-  // Radio data
+  // 1990 ~ 2026 연도 생성
+  const yearDates = eachYearOfInterval({
+    start: new Date(1990, 0, 1),
+    end: new Date(2026, 11, 31),
+  });
+  const years = yearDates.map((date) => parseInt(format(date, 'yyyy')));
+
+  //월은 고정 1~12
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  const formDropDownData = [
+    {
+      data: [
+        { label: '년', content: years },
+        { label: '월', content: months },
+      ],
+    },
+  ];
+
   const formRadioData = [
     {
       name: '전형선택',
@@ -20,50 +38,23 @@ export const First = () => {
       name: '졸업구분',
       data: ['졸업 예정', '졸업', '검정고시 (중학교 졸업 학력)'],
     },
-    {
-      name: '특기사항',
-      data: ['국가 유공자', '특례 입학 대상'],
-    },
   ];
 
-  const handleTypeSelection: React.Dispatch<React.SetStateAction<string>> = (
-    value
-  ) => {
+  const handleTypeSelection = (value: string) => {
     setDatas({ ...datas, typeSelection: value });
   };
 
-  const handleRegionSelection: React.Dispatch<React.SetStateAction<string>> = (
-    value
-  ) => {
+  const handleRegionSelection = (value: string) => {
     setDatas({ ...datas, regionSelection: value });
   };
 
-  const handleGraduationTypeSelection: React.Dispatch<
-    React.SetStateAction<string>
-  > = (value) => {
+  const handleGraduationTypeSelection = (value: string) => {
     setDatas({ ...datas, graduationType: value });
-  };
-
-  const handleSpecialNoteSelection: React.Dispatch<
-    React.SetStateAction<string>
-  > = (value) => {
-    setDatas({ ...datas, specialNote: value });
   };
 
   const handleDropdownChange = (values: (string | number)[]) => {
     setDatas({ ...datas, graduationDate: values });
   };
-
-  const formDropDownData = [
-    {
-      data: [
-        { label: '년', content: [2023, 2024, 2025, 2026] },
-        { label: '월', content: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-      ],
-    },
-  ];
-
-  console.log(datas);
 
   return (
     <Flex width="100%" height="fit-content" isColumn={true} gap={16}>
@@ -92,19 +83,13 @@ export const First = () => {
       />
 
       <FormElement
+        explanation="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
+        warning="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
         label="졸업 연월"
         type="dropDown"
         dropDownDatas={formDropDownData[0].data}
         dropDownValues={datas.graduationDate}
         onDropDownChange={handleDropdownChange}
-      />
-
-      <FormElement
-        label="특기사항"
-        type="radio"
-        radioDatas={formRadioData[3].data}
-        selectedRadio={datas.specialNote}
-        setSelectedRadio={handleSpecialNoteSelection}
       />
     </Flex>
   );

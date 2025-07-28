@@ -21,7 +21,7 @@ interface IFormElementType
   radioDatas?: string[];
   dropDownDatas?: { label: string; content: (string | number)[] }[];
   selectedRadio?: string;
-  setSelectedRadio?: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedRadio?: (value: string) => void;
   dropDownValues?: (string | number)[];
   onDropDownChange?: (values: (string | number)[]) => void;
   inputType?: 'phone' | 'number' | 'text';
@@ -42,8 +42,8 @@ type ITextAreaType = {
 };
 
 type IImgType = {
-  imgUrl?: string | null;
-  setImgUrl?: React.Dispatch<React.SetStateAction<string | null>>;
+  imgUrl?: string | File | null;
+  setImgUrl?: React.Dispatch<React.SetStateAction<string | File | null>>;
   onFileChange?: (file: File | null) => void;
 };
 
@@ -176,6 +176,7 @@ export const FormElement = ({
               <SpeechBubbleContainer>
                 {isHover && <SpeechBubble>{warning}</SpeechBubble>}
                 <div
+                  style={{ width: '20px', height: '20px' }}
                   onMouseEnter={() => setIsHover(true)}
                   onMouseLeave={() => setIsHover(false)}
                 >

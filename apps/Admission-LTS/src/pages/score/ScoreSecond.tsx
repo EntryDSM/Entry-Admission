@@ -7,9 +7,6 @@ export const ScoreSecond = () => {
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
   const [subjectGrades, setSubjectGrades] = usePageData('secondGraduate');
 
-  console.log(subjectGrades);
-  console.log(globalGrade);
-
   return (
     <Flex width="100%" height="100%" isColumn={true}>
       <GradeManager

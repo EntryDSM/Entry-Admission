@@ -2,20 +2,23 @@ import styled from '@emotion/styled';
 import { ApplicationNav, usePageData } from '@entry/ui';
 import { Flex } from '@entry/design-token';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
-  const [datas, setDatas] = usePageData('first');
+  const [datas, _] = usePageData('first');
 
-  //page 전환 시 스크롤 상단으로
+  const mainRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
   }, [pathname]);
 
-  const pageRoutes = [
+  const pageGraduateRoutes = [
     '/first',
     '/second',
     '/third',
@@ -23,7 +26,21 @@ export const AppLayout = () => {
     '/first-graduate',
     '/second-graduate',
     '/third-graduate',
-    '/activity',
+    '/fourth-graduate',
+    '/activity-graduate',
+    '/application-preview',
+    '/submit-check',
+  ];
+
+  const pageProspectiveGraduateRoutes = [
+    '/first',
+    '/second',
+    '/third',
+    '/fourth',
+    '/first-prospective-graduate',
+    '/second-prospective-graduate',
+    '/third-prospective-graduate',
+    '/activity-prospective-graduate',
     '/application-preview',
     '/submit-check',
   ];
@@ -34,17 +51,28 @@ export const AppLayout = () => {
     '/third',
     '/fourth',
     '/ged/score',
+    '/ged/attendance-volunteer',
     '/application-preview',
     '/submit-check',
   ];
 
-  console.log(datas.graduationType);
-  const useGedRoutes = datas.graduationType === '검정고시 (중학교 졸업 학력)';
-  const routes = useGedRoutes ? gedPageRoutes : pageRoutes;
+  const { graduationType } = datas;
+
+  const routes = (() => {
+    if (graduationType === '검정고시 (중학교 졸업 학력)') {
+      return gedPageRoutes;
+    }
+    if (graduationType === '졸업 예정') {
+      return pageProspectiveGraduateRoutes;
+    }
+    if (graduationType === '졸업') {
+      return pageGraduateRoutes;
+    }
+    return [];
+  })();
 
   const currentPath = location.pathname;
   const currentIndex = routes.findIndex((path) => currentPath.includes(path));
-
   const [currentPage, setCurrentPage] = useState(currentIndex + 1 || 1);
 
   useEffect(() => {
@@ -52,10 +80,10 @@ export const AppLayout = () => {
     if (path && !currentPath.includes(path)) {
       navigate(path);
     }
-  }, [currentPage]);
+  }, [currentPage, routes, currentPath, navigate]);
 
   return (
-    <Main>
+    <Main ref={mainRef}>
       <Flex isColumn gap={125} height="calc(100vh - 70px)" width="100%">
         <Flex
           isColumn
@@ -69,6 +97,7 @@ export const AppLayout = () => {
             totalPages={routes.length}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
+            graduationType={graduationType}
           />
         </Flex>
       </Flex>
@@ -79,4 +108,6 @@ export const AppLayout = () => {
 const Main = styled.main`
   width: 100vw;
   padding: 40px 160px;
+  height: 100%;
+  overflow-y: auto;
 `;

@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
-import { PreviousButton } from '@entry/ui';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Flex, Text } from '@entry/design-token';
 import { useCallback, useEffect, useRef } from 'react';
 import { useApplicationData } from '@entry/ui';
@@ -17,6 +16,15 @@ export const ApplicationLayout = () => {
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
@@ -26,14 +34,6 @@ export const ApplicationLayout = () => {
       previousDataRef.current = JSON.stringify(state);
     }
   }, [state]);
-
-  const handleManualSave = async () => {
-    if (isSavingRef.current) {
-      console.log('이미 저장 중입니다.');
-      return;
-    }
-    await performSave(state, saveToStorage);
-  };
 
   const scheduleAutoSave = useCallback(() => {
     if (autoSaveTimerRef.current) {
@@ -80,7 +80,7 @@ export const ApplicationLayout = () => {
 
   return (
     <Flex width="100%" height="fit-content">
-      <Main>
+      <Main ref={mainRef}>
         <Flex isColumn={true} gap={125} height="fit-content" width="100%">
           <Flex
             isColumn={true}
@@ -89,18 +89,9 @@ export const ApplicationLayout = () => {
             alignItems="fit-content"
             height="fit-content"
           >
-            <Flex
-              width="100%"
-              height="fit-content"
-              justifyContent="space-between"
-            >
-              <Text fontSize={32} fontWeight={600}>
-                지원자 전형 구분
-              </Text>
-              <PreviousButton onClick={handleManualSave}>
-                임시 저장
-              </PreviousButton>
-            </Flex>
+            <Text fontSize={32} fontWeight={600}>
+              지원자 전형 구분
+            </Text>
             <Outlet />
           </Flex>
         </Flex>
@@ -110,6 +101,8 @@ export const ApplicationLayout = () => {
 };
 
 const Main = styled.main`
-  margin-top: 70px;
+  padding-top: 70px;
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
 `;

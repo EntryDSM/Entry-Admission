@@ -15,6 +15,7 @@ interface IApplicationNavType {
   totalPages: number;
   currentPage: number;
   setCurrentPage: (page: number) => void;
+  graduationType?: string;
 }
 
 const PAGES_PER_GROUP = 6;
@@ -23,6 +24,7 @@ export const ApplicationNav = ({
   totalPages,
   currentPage,
   setCurrentPage,
+  graduationType,
 }: IApplicationNavType) => {
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
   const [_, setHasUnsavedChanges] = useState(false);
@@ -103,6 +105,10 @@ export const ApplicationNav = ({
     navigate('/submitted');
   };
 
+  const isGraduationTypeSelected = Boolean(
+    graduationType && graduationType.trim()
+  );
+
   return (
     <Flex
       paddingTop="44px"
@@ -126,11 +132,22 @@ export const ApplicationNav = ({
       <Flex gap={12} width="fit-content" height="fit-content">
         {renderPageIndicators(paginationInfo, currentPage, handlePageClick)}
       </Flex>
-      {currentPage < totalPages ? (
-        <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
+      {currentPage === totalPages ? (
+        isGraduationTypeSelected ? (
+          <PreviousButton isBlocked={isSubmitBlocked} onClick={handleSubmit}>
+            제출
+          </PreviousButton>
+        ) : (
+          <PreviousButton isBlocked={true} onClick={() => {}}>
+            다음
+          </PreviousButton>
+        )
       ) : (
-        <PreviousButton isBlocked={isSubmitBlocked} onClick={handleSubmit}>
-          제출
+        <PreviousButton
+          onClick={handleNextPage}
+          isBlocked={!isGraduationTypeSelected} // 졸업유형 없으면 막기
+        >
+          다음
         </PreviousButton>
       )}
     </Flex>

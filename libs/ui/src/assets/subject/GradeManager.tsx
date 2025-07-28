@@ -18,27 +18,45 @@ export const GradeManager = ({
   setGlobalGrade,
   setSubjectGrades,
 }: IGradeManagerProps) => {
+  // 과목명을 영어 키로 매핑
+  const subjectKeyMap: Record<string, string> = {
+    국어: 'kor',
+    사회: 'soc',
+    역사: 'his',
+    수학: 'math',
+    과학: 'sci',
+    '기술 · 가정': 'tech',
+  };
+
   const handleGlobalGradeChange = (grade: string | null) => {
     setGlobalGrade(grade);
     const updatedGrades: Record<string, string | null> = {};
     subjects.forEach((subject) => {
-      updatedGrades[subject] = grade;
+      const key = subjectKeyMap[subject];
+      updatedGrades[key] = grade;
     });
     setSubjectGrades(updatedGrades);
   };
 
   const handleSubjectGradeChange = (subject: string, grade: string | null) => {
+    const key = subjectKeyMap[subject];
     const updatedGrades = {
       ...subjectGrades,
-      [subject]: grade,
+      [key]: grade,
     };
 
     setSubjectGrades(updatedGrades);
 
-    const allSameGrade = subjects.every(
-      (subj) => updatedGrades[subj] === grade
+    // 모든 과목이 같은 성적인지 확인
+    const subjectKeys = subjects.map((subj) => subjectKeyMap[subj]);
+    const allSameGrade = subjectKeys.every(
+      (subjKey) => updatedGrades[subjKey] === grade
     );
-    if (allSameGrade && subjects.every((subj) => subj in updatedGrades)) {
+
+    if (
+      allSameGrade &&
+      subjectKeys.every((subjKey) => subjKey in updatedGrades)
+    ) {
       setGlobalGrade(grade);
     } else if (globalGrade !== null) {
       setGlobalGrade(null);
@@ -51,14 +69,17 @@ export const GradeManager = ({
         selected={globalGrade}
         onSelect={handleGlobalGradeChange}
       />
-      {subjects.map((subject) => (
-        <SubjectSelector
-          key={subject}
-          subjectName={subject}
-          selectedGrade={subjectGrades[subject] ?? null}
-          onSelectGrade={(grade) => handleSubjectGradeChange(subject, grade)}
-        />
-      ))}
+      {subjects.map((subject) => {
+        const key = subjectKeyMap[subject];
+        return (
+          <SubjectSelector
+            key={subject}
+            subjectName={subject}
+            selectedGrade={subjectGrades[key] ?? null}
+            onSelectGrade={(grade) => handleSubjectGradeChange(subject, grade)}
+          />
+        );
+      })}
     </>
   );
 };
