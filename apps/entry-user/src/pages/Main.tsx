@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
+
 import { school } from '@entry/ui';
 import { ApplicationTimeline, FaqSection, InfoSection } from '../components';
+
 
 export const Main = () => {
   return (

@@ -1,8 +1,12 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout, CalculateLayout } from './layout';
+
 import {
   Landing,
   NoticeDetailPage,
+  AdmissionOverviewPage,
+  MyPage,
+  FaqPage,
   ScoreFirst,
   ScoreSecond,
   ScoreThird,
@@ -32,6 +36,18 @@ export const Router = createBrowserRouter([
       {
         path: '/notice/:id',
         element: <NoticeDetailPage />,
+      },
+      {
+        path: '/faq',
+        element: <FaqPage />,
+      },
+      {
+        path: '/admission-overview',
+        element: <AdmissionOverviewPage />,
+      },
+      {
+        path: '/mypage',
+        element: <MyPage />,
       },
       {
         path: '/calculate',

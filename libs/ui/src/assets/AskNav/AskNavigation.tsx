@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { Question } from '@entry/ui';
+import { Question } from '../index';
 import { useEffect, useState } from 'react';
 
 interface INavType {

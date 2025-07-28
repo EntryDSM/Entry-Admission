@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { colors, Text } from '@entry/design-token';
-import { MainButton, DownloadIcon } from '@entry/ui';
+import { colors } from '@entry/design-token';
+import { DownloadIcon } from '@entry/ui';
 
 interface NoticeDetail {
   id: number;
@@ -61,15 +61,15 @@ export const NoticeDetailPage = () => {
   return (
     <PageContainer>
       <ContentWrapper>
-        <CategoryText fontSize={14} color={colors.gray[400]}>
+        <CategoryText>
           {noticeDetail.category}
         </CategoryText>
         
         <TitleSection>
-          <Title fontSize={28} fontWeight={700}>
+          <Title>
             {noticeDetail.title}
           </Title>
-          <DateText fontSize={16} color={colors.gray[400]}>
+          <DateText>
             {noticeDetail.date}
           </DateText>
         </TitleSection>
@@ -131,8 +131,10 @@ const ContentWrapper = styled.div`
   flex-direction: column;
 `;
 
-const CategoryText = styled(Text)`
-  margin-bottom: 8px;
+const CategoryText = styled.p`
+  font-size: 14px;
+  color: ${colors.gray[400]};
+  margin: 0 0 8px 0;
 `;
 
 const TitleSection = styled.div`
@@ -141,11 +143,18 @@ const TitleSection = styled.div`
   border-bottom: 1px solid ${colors.gray[200]};
 `;
 
-const Title = styled(Text)`
-  margin-bottom: 12px;
+const Title = styled.h1`
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: inherit;
 `;
 
-const DateText = styled(Text)``;
+const DateText = styled.p`
+  font-size: 16px;
+  color: ${colors.gray[400]};
+  margin: 0;
+`;
 
 const ContentSection = styled.div`
   margin-bottom: 40px;

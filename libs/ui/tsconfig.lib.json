@@ -8,6 +8,9 @@
       "@nx/react/typings/image.d.ts",
       "vite/client"
     ],
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "jsxImportSource": "@emotion/react",
     "rootDir": "src",
     "jsx": "react-jsx",

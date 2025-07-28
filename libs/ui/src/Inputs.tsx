@@ -1,7 +1,8 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Eye } from '@entry/ui';
+
 import { colors } from '@entry/design-token';
+import { Eye } from './assets';
 
 interface IAuthInputType {
   label: string;

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
-import { Search } from '@entry/ui';
+import { Search } from './assets';
 
 interface ISearchBarType {
   placeholder?: string;
