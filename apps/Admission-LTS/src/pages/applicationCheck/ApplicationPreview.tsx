@@ -42,7 +42,6 @@ const Container = styled.div`
   flex-direction: column;
   gap: 60px;
   width: 100%;
-  margin-top: 114px;
 `;
 
 const ApplicationTitle = styled.div`

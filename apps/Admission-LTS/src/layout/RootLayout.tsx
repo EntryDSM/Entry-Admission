@@ -2,22 +2,30 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NoPathHeader } from '@entry/ui';
 import { ToastContainer } from 'react-toastify';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect } from 'react';
 
 export const RootLayout = () => {
   const location = useLocation();
-  const mainRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
+  useLayoutEffect(() => {
+    // 메인 스크롤 컨테이너를 최상단으로
+    window.scrollTo(0, 0);
+
+    // 내부 스크롤 컨테이너들도 처리
+    const scrollContainers = document.querySelectorAll(
+      '[data-scroll-container]'
+    );
+    scrollContainers.forEach((container) => {
+      if (container instanceof HTMLElement) {
+        container.scrollTop = 0;
+      }
+    });
   }, [location.pathname]);
 
   return (
     <>
       <NoPathHeader />
-      <Main ref={mainRef}>
+      <Main data-scroll-container>
         <Outlet />
       </Main>
       <ToastContainer
@@ -36,7 +44,7 @@ export const RootLayout = () => {
 };
 
 const Main = styled.main`
+  padding-top: 70px;
   width: 100vw;
-  height: 100vh;
-  overflow-y: auto;
+  min-height: 100vh;
 `;

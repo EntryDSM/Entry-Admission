@@ -65,10 +65,12 @@ export const CalculateLayout = () => {
 
   // ScorePageNav용 절대 경로 데이터 생성
   const getScoreNavData = () => {
-    const basePath = CALCULATION_TYPES.find((t) => t.key === activeType)?.basePath;
+    const basePath = CALCULATION_TYPES.find(
+      (t) => t.key === activeType
+    )?.basePath;
     return SCORE_PAGES[activeType].map((data) => ({
       ...data,
-      path: `${basePath}${data.path}`
+      path: `${basePath}${data.path}`,
     }));
   };
 
@@ -138,7 +140,12 @@ export const CalculateLayout = () => {
                   <Text fontSize={32} fontWeight={600}>
                     {currentData ? currentData.name : 'Error'}
                   </Text>
-                  <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
+                  <Text
+                    isOverFlow={true}
+                    fontSize={16}
+                    fontWeight={400}
+                    color={colors.gray[400]}
+                  >
                     관련 항목이 없는 경우 ✕ 로 기입하세요.
                   </Text>
                 </TitleSection>
@@ -240,6 +247,9 @@ const TitleContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   min-height: 80px;
+  flex-wrap: wrap;
+
+  gap: 36px 0;
 
   @media (max-width: 1200px) {
     flex-direction: column;

@@ -1,22 +1,12 @@
 import styled from '@emotion/styled';
 import { ApplicationNav, usePageData } from '@entry/ui';
-import { Flex } from '@entry/design-token';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 export const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { pathname } = location;
   const [datas, _] = usePageData('first');
-
-  const mainRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
-  }, [pathname]);
 
   const pageGraduateRoutes = [
     '/first',
@@ -83,31 +73,22 @@ export const AppLayout = () => {
   }, [currentPage, routes, currentPath, navigate]);
 
   return (
-    <Main ref={mainRef}>
-      <Flex isColumn gap={125} height="calc(100vh - 70px)" width="100%">
-        <Flex
-          isColumn
-          width="100%"
-          alignItems="center"
-          justifyContent="space-between"
-          height="100%"
-        >
-          <Outlet />
-          <ApplicationNav
-            totalPages={routes.length}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            graduationType={graduationType}
-          />
-        </Flex>
-      </Flex>
+    <Main>
+      <Outlet />
+      <ApplicationNav
+        totalPages={routes.length}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        graduationType={graduationType}
+      />
     </Main>
   );
 };
 
-const Main = styled.main`
+const Main = styled.div`
   width: 100vw;
   padding: 40px 160px;
-  height: 100%;
-  overflow-y: auto;
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
 `;

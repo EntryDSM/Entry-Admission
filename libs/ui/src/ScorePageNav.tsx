@@ -67,6 +67,7 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
   );
 };
 const NavLabel = styled.div<{ isActive: boolean }>`
+  white-space: nowrap;
   font-size: 16px;
   font-weight: 400;
   color: ${({ isActive }) => (isActive ? colors.gray[500] : colors.gray[400])};

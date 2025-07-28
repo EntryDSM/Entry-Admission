@@ -22,7 +22,7 @@ export const CertCheckForm: React.FC<ICertCheckFormType> = ({
   onChange,
   width = '100%',
 }) => {
-  const [isFilled, setIsFilled] = useState<boolean>(false);
+  const [_, setIsFilled] = useState<boolean>(false);
 
   useEffect(() => {
     setIsFilled(!!value);

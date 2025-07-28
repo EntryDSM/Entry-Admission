@@ -1,6 +1,5 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { InputContent, useCheckPageData } from '@entry/ui';
-import React, { useState } from 'react';
 
 export const SubmitCheck = () => {
   const [datas, setDatas] = useCheckPageData('check');
@@ -13,7 +12,7 @@ export const SubmitCheck = () => {
   return (
     <Flex
       width="100%"
-      height="100%"
+      height="calc(100vh - 300px)"
       justifyContent="center"
       alignItems="center"
     >

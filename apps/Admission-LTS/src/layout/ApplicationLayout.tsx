@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { Outlet, useLocation } from 'react-router-dom';
-import { Flex, Text } from '@entry/design-token';
+import { Outlet } from 'react-router-dom';
+import { Text } from '@entry/design-token';
 import { useCallback, useEffect, useRef } from 'react';
 import { useApplicationData } from '@entry/ui';
 import {
@@ -15,15 +15,6 @@ import {
 export const ApplicationLayout = () => {
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
-
-  const location = useLocation();
-  const mainRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     loadFromStorage();
@@ -79,30 +70,31 @@ export const ApplicationLayout = () => {
   }, []);
 
   return (
-    <Flex width="100%" height="fit-content">
-      <Main ref={mainRef}>
-        <Flex isColumn={true} gap={125} height="fit-content" width="100%">
-          <Flex
-            isColumn={true}
-            gap={60}
-            width="100%"
-            alignItems="fit-content"
-            height="fit-content"
-          >
-            <Text fontSize={32} fontWeight={600}>
-              지원자 전형 구분
-            </Text>
-            <Outlet />
-          </Flex>
-        </Flex>
-      </Main>
-    </Flex>
+    <Container>
+      <TitleSection>
+        <Text fontSize={32} fontWeight={600}>
+          지원자 전형 구분
+        </Text>
+      </TitleSection>
+      <ContentSection>
+        <Outlet />
+      </ContentSection>
+    </Container>
   );
 };
 
-const Main = styled.main`
-  padding-top: 70px;
+const Container = styled.div`
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+`;
+
+const TitleSection = styled.div`
+  width: 100%;
+`;
+
+const ContentSection = styled.div`
+  width: 100%;
+  flex: 1;
 `;
