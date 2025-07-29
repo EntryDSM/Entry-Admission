@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import { colors } from "@entry/design-token";
+import styled from '@emotion/styled';
+import { colors } from '@entry/design-token';
 
 interface TabOption {
   key: string;
@@ -7,6 +7,7 @@ interface TabOption {
 }
 
 interface TabSectionProps {
+  isAdmin?: boolean;
   options: TabOption[];
   activeType: string;
   onTypeChange: (type: string) => void;
@@ -14,19 +15,24 @@ interface TabSectionProps {
 
 interface TabButtonProps {
   isActive: boolean;
+  isAdmin?: boolean;
 }
 
 const StyledTabSection = styled.div`
   display: flex;
   gap: 24px;
-  margin-top: 0px;
-  margin-bottom: 44px;
 `;
 
 const TabButton = styled.div<TabButtonProps>`
   padding: 8px 16px;
-  background-color: ${({ isActive }: TabButtonProps) => isActive ? colors.orange[300] : "none"};
-  color: ${({ isActive }: TabButtonProps) => isActive ? colors.orange[800] : colors.gray[400]};
+  background-color: ${({ isActive, isAdmin }: TabButtonProps) =>
+    isActive ? (isAdmin ? colors.green[50] : colors.orange[300]) : 'none'};
+  color: ${({ isActive, isAdmin }: TabButtonProps) =>
+    isActive
+      ? isAdmin
+        ? colors.green[300]
+        : colors.orange[800]
+      : colors.gray[400]};
   border: 1px solid none;
   border-bottom: none;
   border-radius: 12px;
@@ -36,15 +42,22 @@ const TabButton = styled.div<TabButtonProps>`
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${({ isActive }: TabButtonProps) => isActive ? "none" : colors.gray[50]};
+    background-color: ${({ isActive }: TabButtonProps) =>
+      isActive ? 'none' : colors.gray[50]};
   }
 `;
 
-export const TabSection = ({ options, activeType, onTypeChange }: TabSectionProps) => {
+export const TabSection = ({
+  options,
+  activeType,
+  onTypeChange,
+  isAdmin = false,
+}: TabSectionProps) => {
   return (
     <StyledTabSection>
       {options.map((option) => (
         <TabButton
+          isAdmin={isAdmin}
           key={option.key}
           isActive={activeType === option.key}
           onClick={() => onTypeChange(option.key)}

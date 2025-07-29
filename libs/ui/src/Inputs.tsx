@@ -5,14 +5,16 @@ import { colors } from '@entry/design-token';
 import { Eye } from './assets';
 
 interface IAuthInputType {
-  label: string;
+  label?: string;
   placeholder: string;
   isEye?: boolean;
   type?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   maxLength?: number;
-  isError: boolean;
+  isError?: boolean;
   errorMessage?: string;
+  height?: string;
+  value?: string;
 }
 
 export const AuthInput = ({
@@ -22,10 +24,12 @@ export const AuthInput = ({
   type = 'text',
   onChange,
   maxLength,
-  isError,
+  isError = false,
   errorMessage,
+  height = '70px',
+  value,
 }: IAuthInputType) => {
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(value || '');
   const [isClose, setIsClose] = useState<boolean>(true);
   const [showEye, setShowEye] = useState<boolean>(false);
 
@@ -79,12 +83,12 @@ export const AuthInput = ({
   };
 
   return (
-    <AuthInputContainer>
+    <AuthInputContainer label={label} height={height}>
       <Label>{label}</Label>
       <InputWrapper>
         <Input
           $isError={isError}
-          value={inputValue}
+          value={value}
           type={changeInputType()}
           placeholder={placeholder}
           maxLength={maxLength}
@@ -125,22 +129,25 @@ const Input = styled.input<{ $isError: boolean }>`
   border: 1px solid
     ${({ $isError }) => ($isError ? colors.extra.error : colors.gray[300])};
   border-radius: 8px;
-  padding: 12px 20px;
+  padding: 15px 20px;
   transition: all 0.3s ease;
 
   ::placeholder {
     color: ${colors.gray[300]};
-    font-weight: 530;
+    font-weight: 400;
   }
 `;
 
 const Label = styled.div`
   font-size: 14px;
   font-weight: 550;
-  margin-bottom: 6px;
+  /* margin-bottom: 6px; */
 `;
 
-const AuthInputContainer = styled.div`
+const AuthInputContainer = styled.div<Pick<IAuthInputType, 'height' | 'label'>>`
   width: 100%;
-  height: 70px;
+  height: ${({ height }) => height};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ label }) => (label ? 6 : 0)}px;
 `;

@@ -221,6 +221,7 @@ const ContentContainer = styled.div`
   height: fit-content;
   display: flex;
   flex-direction: column;
+  gap: 20px;
   flex: 1;
   padding: 40px;
 `;
