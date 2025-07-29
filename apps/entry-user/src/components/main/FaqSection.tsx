@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { colors } from '@entry/design-token';
-import { upArrowIcon, downArrowIcon } from '../../assets';
+import { upArrowIcon, downArrowIcon, MoveRightArrow } from '../../assets';
+import { useNavigate } from 'react-router-dom';
 
 const faqList = [
   {
@@ -32,6 +33,7 @@ const faqList = [
 
 export const FaqSection = () => {
   const [openIndex, setOpenIndex] = useState(0);
+  const navigate = useNavigate();
 
   const toggleIndex = (index: number) => {
     setOpenIndex((prev) => (prev === index ? -1 : index));
@@ -40,7 +42,13 @@ export const FaqSection = () => {
   return (
     <SectionWrapper>
       <QuestionMent>궁금한 점이 있다면?</QuestionMent>
-      <Title>자주 묻는 질문</Title>
+      <TitleWrapper>
+        <Title>자주 묻는 질문</Title>
+        <MoveButton onClick={() => navigate('')}>
+          이동하기
+          <MoveRightArrow />
+        </MoveButton>
+      </TitleWrapper>
       <FaqList>
         {faqList.map((faq, index) => {
           const isOpen = openIndex === index;
@@ -81,11 +89,46 @@ const QuestionMent = styled.div`
   margin-bottom: 18px;
 `;
 
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
 const Title = styled.h2`
   font-size: 32px;
   font-weight: 700;
   color: ${colors.gray[500]};
-  margin-bottom: 32px;
+  margin: 0;
+`;
+
+const MoveButton = styled.button`
+  padding: 8px 16px;
+  color: ${colors.gray[300]};
+  background: none;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  &:hover {
+    color: ${colors.gray[400]};
+
+    svg {
+      fill: ${colors.gray[400]};
+    }
+  }
+
+  svg {
+    fill: ${colors.gray[300]};
+    transition: fill 0.2s ease;
+  }
 `;
 
 const FaqList = styled.div`
