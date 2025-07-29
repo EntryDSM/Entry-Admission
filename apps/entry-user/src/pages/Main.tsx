@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 
-import { school } from '@entry/ui';
+import { School } from '@entry/ui';
 import { ApplicationTimeline, FaqSection, InfoSection } from '../components';
 
 
@@ -9,7 +9,7 @@ export const Main = () => {
   return (
     <>
       <MainContainer>
-        <BackgroundImage src={school} alt="대덕소프트웨어마이스터고등학교" />
+        <BackgroundImage src={School} alt="대덕소프트웨어마이스터고등학교" />
         <Overlay />
 
         <ContentWrapper>

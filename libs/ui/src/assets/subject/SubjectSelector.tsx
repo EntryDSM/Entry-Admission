@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
-import { Check } from '@entry/ui';
+import { Check } from '../icons/Check';
 import { GradeSelector } from './GradeSelector';
 
 interface ISubjectSelector {

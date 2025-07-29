@@ -1,5 +1,5 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { dropdownArrow } from '@entry/ui';
+import dropdownArrow from './assets/icons/dropdownArrow.svg';
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Text } from '@entry/design-token';
 
+import { Check } from './assets/icons/Check';
 import {
-  Check,
   OActivate,
   ONoActivate,
   XActivate,
   XNoActivate,
-} from '@entry/ui';
+} from './assets/icons/OXIcons';
 
 interface ICertCheckFormType {
   title: string;

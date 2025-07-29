@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
+import { resolve } from 'path';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -14,6 +15,12 @@ export default defineConfig(() => ({
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
   ],
+  resolve: {
+    alias: {
+      '@entry/design-token': resolve(__dirname, '../design-token/src'),
+      '@entry/ui': resolve(__dirname, '../ui/src'),
+    },
+  },
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],
@@ -30,7 +37,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: '@entry/hooks',
+      name: 'EntryHooks',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
