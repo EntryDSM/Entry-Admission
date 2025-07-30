@@ -2,15 +2,18 @@ interface ILogoType {
   isAdmin?: boolean;
   width?: number;
   height?: number;
+  onClick?: () => void;
 }
 
 export const EntryLogo = ({
   width = 26,
   height = 30,
   isAdmin = false,
+  onClick,
 }: ILogoType) => {
   return (
     <svg
+      onClick={onClick}
       width={width}
       height={height}
       viewBox="0 0 26 30"

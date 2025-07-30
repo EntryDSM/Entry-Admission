@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { colors } from '@entry/design-token';
+import { colors, Flex } from '@entry/design-token';
+import { Button, CancelModal } from '@entry/ui';
 
 interface QuestionItem {
   id: number;
@@ -9,35 +10,62 @@ interface QuestionItem {
 }
 
 export const MyPage = () => {
+  const [cancelSubmitOpen, setCancelSubmitOpen] = useState<boolean>(false);
+  const [delOpen, setDelOpen] = useState<boolean>(false);
   const [questions] = useState<QuestionItem[]>([
     { id: 1, category: '입학 문의', content: '안녕하세요' },
     { id: 2, category: '기타', content: '안녕하세요' },
-    { id: 3, category: '진로', content: '안녕하세요' }
+    { id: 3, category: '진로', content: '안녕하세요' },
   ]);
+
+  const handleCancelSubmitClick = () => {
+    // 제출 취소 api
+  };
+
+  const handleDelClick = () => {
+    // 회원 탈퇴 api
+  };
 
   return (
     <PageContainer>
       <ContentWrapper>
         <UserName>홍길동님</UserName>
         <PhoneNumber>010-0000-0000</PhoneNumber>
-        
+
         <StatusTitle>지원 상태</StatusTitle>
-        
+
         <StatusCard>
           <StatusRow>
             <StatusLabel>일반 전형</StatusLabel>
           </StatusRow>
           <StatusDivider />
           <StatusRow>
-            <StatusLabel>지원서 상태:</StatusLabel>
+            <StatusSubLabel>지원서 상태:</StatusSubLabel>
             <StatusValue>제출 완료</StatusValue>
           </StatusRow>
         </StatusCard>
 
         <ButtonGroup>
-          <PrimaryButton>원서 다운로드</PrimaryButton>
-          <SecondaryButton>발표 결과 확인</SecondaryButton>
-          <CancelButton>원서 작성 제출 취소</CancelButton>
+          <Flex width="fit-content" height="fit-content" gap={12}>
+            <Button>원서 다운로드</Button>
+            <Button
+              backgroundColor={colors.gray[50]}
+              color={colors.orange[800]}
+              borderColor={colors.orange[800]}
+              hoverBackgroundColor="transparent"
+            >
+              발표 결과 확인
+            </Button>
+          </Flex>
+          <Button
+            backgroundColor={colors.gray[50]}
+            color={colors.extra.error}
+            borderColor={colors.extra.error}
+            hoverBackgroundColor="transparent"
+            onClick={() => setCancelSubmitOpen(true)}
+          >
+            원서 작성 제출 취소
+          </Button>
         </ButtonGroup>
 
         <QuestionsTitle>작성한 질문</QuestionsTitle>
@@ -58,22 +86,60 @@ export const MyPage = () => {
         </QuestionsTable>
 
         <SettingsTitle>설정</SettingsTitle>
-        
+
         <SettingsSection>
           <SettingsRow>
             <SettingsLabel>비밀번호</SettingsLabel>
-            <SettingsButton>비밀번호 변경</SettingsButton>
+            <Button
+              backgroundColor={colors.gray[50]}
+              color={colors.gray[500]}
+              borderColor={colors.gray[500]}
+              hoverBackgroundColor="transparent"
+            >
+              비밀번호 변경
+            </Button>
           </SettingsRow>
-          
+
           <SettingsRow>
             <SettingsLabel>제정</SettingsLabel>
             <SettingsButtonGroup>
-              <SettingsButton>로그아웃</SettingsButton>
-              <DeleteButton>회원 탈퇴</DeleteButton>
+              <Button
+                backgroundColor={colors.gray[50]}
+                color={colors.gray[500]}
+                borderColor={colors.gray[500]}
+                hoverBackgroundColor="transparent"
+              >
+                로그아웃
+              </Button>
+              <Button
+                backgroundColor={colors.gray[50]}
+                color={colors.extra.error}
+                borderColor={colors.extra.error}
+                hoverBackgroundColor="transparent"
+                onClick={() => setDelOpen(true)}
+              >
+                회원 탈퇴
+              </Button>
             </SettingsButtonGroup>
           </SettingsRow>
         </SettingsSection>
       </ContentWrapper>
+      <CancelModal
+        setIsOpen={setCancelSubmitOpen}
+        isOpen={cancelSubmitOpen}
+        title="제출 취소하시겠습니까?"
+        content="제출 취소 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
+        btnText="제출 취소"
+        onClick={handleCancelSubmitClick}
+      />
+      <CancelModal
+        setIsOpen={setDelOpen}
+        isOpen={delOpen}
+        title="탈퇴하시겠습니까?"
+        content="탈퇴 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
+        btnText="탈퇴하기"
+        onClick={handleDelClick}
+      />
     </PageContainer>
   );
 };
@@ -139,13 +205,20 @@ const StatusDivider = styled.div`
 
 const StatusLabel = styled.span`
   font-size: 20px;
-  color: ${colors.gray[600]};
+  font-weight: 400;
+  color: ${colors.gray[500]};
+`;
+
+const StatusSubLabel = styled.span`
+  font-size: 24px;
+  font-weight: 500;
+  color: ${colors.gray[500]};
 `;
 
 const StatusValue = styled.span`
   font-size: 24px;
   color: ${colors.orange[800]};
-  font-weight: 600;
+  font-weight: 500;
 `;
 
 const ButtonGroup = styled.div`
@@ -165,7 +238,7 @@ const PrimaryButton = styled.button`
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  
+
   &:hover {
     background-color: ${colors.orange[900]};
   }
@@ -180,7 +253,7 @@ const SecondaryButton = styled.button`
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  
+
   &:hover {
     background-color: ${colors.orange[50]};
   }
@@ -196,7 +269,7 @@ const CancelButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   margin-left: auto;
-  
+
   &:hover {
     background-color: ${colors.orange[50]};
   }
@@ -289,7 +362,7 @@ const SettingsButton = styled.button`
   padding: 8px 16px;
   font-size: 20px;
   cursor: pointer;
-  
+
   &:hover {
     background-color: ${colors.gray[50]};
   }
@@ -308,7 +381,7 @@ const DeleteButton = styled.button`
   padding: 8px 16px;
   font-size: 20px;
   cursor: pointer;
-  
+
   &:hover {
     background-color: ${colors.orange[50]};
   }

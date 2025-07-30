@@ -71,6 +71,7 @@ export const AdminHeader = () => {
         alignItems="center"
         height="fit-content"
         width="fit-content"
+        onClick={() => navigate('/')}
       >
         <EntryLogo isAdmin={true} />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
@@ -124,9 +125,9 @@ export const CommonHeader = () => {
 
   const navData = [
     { name: '공지사항', path: '/notice' },
-    { name: '자주 묻는 질문', path: '/d' },
+    { name: '자주 묻는 질문', path: '/faq' },
     { name: '성적 산출', path: '/calculate' },
-    { name: '전형 요강', path: '/d' },
+    { name: '전형 요강', path: '/admission-overview' },
   ];
 
   const navClick = (path: string) => {
@@ -141,6 +142,7 @@ export const CommonHeader = () => {
         alignItems="center"
         height="fit-content"
         width="fit-content"
+        onClick={() => navigate('/')}
       >
         <EntryLogo />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
