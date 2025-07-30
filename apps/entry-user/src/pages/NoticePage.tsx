@@ -13,21 +13,23 @@ interface NoticeItem {
 
 const TAB_OPTIONS = [
   { key: 'admission', label: '입학 공지사항' },
-  { key: 'orientation', label: '예비 신입생 안내' }
+  { key: 'orientation', label: '예비 신입생 안내' },
 ];
 
 export const NoticePage = () => {
-  const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>('admission');
+  const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>(
+    'admission'
+  );
   const navigate = useNavigate();
-  
+
   const handleNoticeClick = (id: number) => {
     navigate(`/notice/${id}`);
   };
-  
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as 'admission' | 'orientation');
   };
-  
+
   const noticeItems: NoticeItem[] = [
     { id: 1, title: '안녕하세요', date: '2024-10-31', isNew: true },
     { id: 2, title: '안녕하세요', date: '2024-10-31', isNew: true },
@@ -46,9 +48,7 @@ export const NoticePage = () => {
       <ContentWrapper>
         <TitleSection>
           <Title>공지 사항</Title>
-          <SubTitle>
-            학교에서 게시한 입학 공지사항을 확인하세요
-          </SubTitle>
+          <SubTitle>학교에서 게시한 입학 공지사항을 확인하세요</SubTitle>
         </TitleSection>
 
         <TabSection
@@ -63,13 +63,20 @@ export const NoticePage = () => {
             <ColumnTitle>제목</ColumnTitle>
             <ColumnDate>작성일</ColumnDate>
           </TableHeader>
-          
+
           <TableBody>
             {noticeItems.map((item) => (
-              <TableRow key={item.id} onClick={() => handleNoticeClick(item.id)}>
+              <TableRow
+                key={item.id}
+                onClick={() => handleNoticeClick(item.id)}
+              >
                 <ColumnNum>{item.id}</ColumnNum>
                 <ColumnTitle>
-                  {item.isNew && <NewIconWrapper><NoticePinIcon /></NewIconWrapper>}
+                  {item.isNew && (
+                    <NewIconWrapper>
+                      <NoticePinIcon />
+                    </NewIconWrapper>
+                  )}
                   {item.title}
                 </ColumnTitle>
                 <ColumnDate>{item.date}</ColumnDate>

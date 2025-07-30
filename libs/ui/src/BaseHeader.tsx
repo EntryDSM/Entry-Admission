@@ -3,6 +3,7 @@ import { EntryLogo, SideBarBtnIcon } from './assets';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Button } from './Button';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
@@ -53,9 +54,9 @@ export const AdminHeader = () => {
 
   const navData = [
     { name: '공지사항', path: '/a' },
-    { name: '자주 묻는 질문', path: '/b' },
-    { name: '성적 산출', path: '/c' },
-    { name: '전형 요강', path: '/d' },
+    { name: '지원자 조회', path: '/b' },
+    { name: '통계', path: '/c' },
+    { name: '수식', path: '/formula-calculator' },
   ];
 
   const navClick = (path: string) => {
@@ -71,7 +72,7 @@ export const AdminHeader = () => {
         height="fit-content"
         width="fit-content"
       >
-        <EntryLogo isAdmin />
+        <EntryLogo isAdmin={true} />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
           EntryDSM
         </Text>
@@ -98,27 +99,7 @@ export const AdminHeader = () => {
             </NavContent>
           ))}
         </Flex>
-        <Flex
-          gap={20}
-          alignItems="center"
-          width="fit-content"
-          height="fit-content"
-        >
-          <NavContent onClick={() => navClick('/mypage')}>
-            마이페이지
-          </NavContent>
-          <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
-            {datas.name}
-            <Text
-              isSpan
-              fontSize={18}
-              fontWeight={400}
-              color={colors.gray[500]}
-            >
-              님
-            </Text>
-          </Text>
-        </Flex>
+        <Btn>로그아웃</Btn>
         <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
       </Flex>
       {isSideClick && (
@@ -242,7 +223,22 @@ export const AuthHeader = () => {
   );
 };
 
-// ================== styled components ==================
+const Btn = styled.button`
+  padding: 8px 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${colors.green[400]};
+  font-size: 16px;
+  font-weight: 400;
+  color: ${colors.extra.realWhite};
+  cursor: pointer;
+  &:hover {
+    background-color: ${colors.green[500]};
+    transition: 0.35s ease-in-out;
+  }
+`;
 
 const LogoContainer = styled.div`
   display: flex;
