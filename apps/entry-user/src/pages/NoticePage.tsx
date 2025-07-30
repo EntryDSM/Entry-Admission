@@ -51,39 +51,41 @@ export const NoticePage = () => {
           <SubTitle>학교에서 게시한 입학 공지사항을 확인하세요</SubTitle>
         </TitleSection>
 
-        <TabSection
-          options={TAB_OPTIONS}
-          activeType={activeTab}
-          onTypeChange={handleTabChange}
-        />
+        <Flex gap={40} isColumn={true} width="100%" height="auto">
+          <TabSection
+            options={TAB_OPTIONS}
+            activeType={activeTab}
+            onTypeChange={handleTabChange}
+          />
 
-        <TableContainer>
-          <TableHeader>
-            <ColumnNum>구분</ColumnNum>
-            <ColumnTitle>제목</ColumnTitle>
-            <ColumnDate>작성일</ColumnDate>
-          </TableHeader>
+          <TableContainer>
+            <TableHeader>
+              <ColumnNum>구분</ColumnNum>
+              <ColumnTitle>제목</ColumnTitle>
+              <ColumnDate>작성일</ColumnDate>
+            </TableHeader>
 
-          <TableBody>
-            {noticeItems.map((item) => (
-              <TableRow
-                key={item.id}
-                onClick={() => handleNoticeClick(item.id)}
-              >
-                <ColumnNum>{item.id}</ColumnNum>
-                <ColumnTitle>
-                  {item.isNew && (
-                    <NewIconWrapper>
-                      <NoticePinIcon />
-                    </NewIconWrapper>
-                  )}
-                  {item.title}
-                </ColumnTitle>
-                <ColumnDate>{item.date}</ColumnDate>
-              </TableRow>
-            ))}
-          </TableBody>
-        </TableContainer>
+            <TableBody>
+              {noticeItems.map((item) => (
+                <TableRow
+                  key={item.id}
+                  onClick={() => handleNoticeClick(item.id)}
+                >
+                  <ColumnNum>{item.id}</ColumnNum>
+                  <ColumnTitle>
+                    {item.isNew && (
+                      <NewIconWrapper>
+                        <NoticePinIcon />
+                      </NewIconWrapper>
+                    )}
+                    {item.title}
+                  </ColumnTitle>
+                  <ColumnDate>{item.date}</ColumnDate>
+                </TableRow>
+              ))}
+            </TableBody>
+          </TableContainer>
+        </Flex>
       </ContentWrapper>
     </PageContainer>
   );

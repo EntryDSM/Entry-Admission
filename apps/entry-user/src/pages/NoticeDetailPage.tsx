@@ -18,9 +18,9 @@ export const NoticeDetailPage = () => {
 
   const noticeDetail: NoticeDetail = {
     id: Number(id),
-    category: "입학 공지사항",
-    title: "2025학년도 신입생 오리엔테이션 안내",
-    date: "2025-10-31",
+    category: '입학 공지사항',
+    title: '2025학년도 신입생 오리엔테이션 안내',
+    date: '2025-10-31',
     content: `안녕하세요?
 
 2025학년도 신입생 오리엔테이션를 다음과 같이 실시합니다.
@@ -49,9 +49,9 @@ export const NoticeDetailPage = () => {
 
 문의: 행정실 042-866-888`,
     attachments: [
-      { name: "2025학년도 신입생 전형 요강.pdf", url: "#" },
-      { name: "2025학년도 신입생 전형 요강.pdf", url: "#" }
-    ]
+      { name: '2025학년도 신입생 전형 요강.pdf', url: '#' },
+      { name: '2025학년도 신입생 전형 요강.pdf', url: '#' },
+    ],
   };
 
   const handleBackToList = () => {
@@ -61,17 +61,11 @@ export const NoticeDetailPage = () => {
   return (
     <PageContainer>
       <ContentWrapper>
-        <CategoryText>
-          {noticeDetail.category}
-        </CategoryText>
-        
+        <CategoryText>{noticeDetail.category}</CategoryText>
+
         <TitleSection>
-          <Title>
-            {noticeDetail.title}
-          </Title>
-          <DateText>
-            {noticeDetail.date}
-          </DateText>
+          <Title>{noticeDetail.title}</Title>
+          <DateText>{noticeDetail.date}</DateText>
         </TitleSection>
 
         <ContentSection>
@@ -106,9 +100,7 @@ export const NoticeDetailPage = () => {
         )}
 
         <ButtonSection>
-          <BackButton onClick={handleBackToList}>
-            목록으로
-          </BackButton>
+          <BackButton onClick={handleBackToList}>목록으로</BackButton>
         </ButtonSection>
       </ContentWrapper>
     </PageContainer>
@@ -168,7 +160,7 @@ const ContentText = styled.div`
 
 const Paragraph = styled.div`
   margin-bottom: 16px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -213,7 +205,7 @@ const DownloadButton = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -221,7 +213,7 @@ const DownloadButton = styled.div`
 
 const BackButton = styled.button`
   padding: 12px 24px;
-  background-color: ${colors.orange[500]};
+  background-color: ${colors.orange[800]};
   color: white;
   border: none;
   border-radius: 8px;
@@ -230,7 +222,7 @@ const BackButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  
+
   &:hover {
     background-color: ${colors.orange[600]};
   }
