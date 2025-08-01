@@ -24,3 +24,4 @@ export * from './hooks';
 export * from './TabSection';
 export * from './utils';
 export * from './CancelModal';
+export * from './modal';
