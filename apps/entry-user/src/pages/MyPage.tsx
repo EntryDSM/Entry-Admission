@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { Button, CancelModal } from '@entry/ui';
+import { Button, CancelModal, ShowResultModal, useModal } from '@entry/ui';
 
 interface QuestionItem {
   id: number;
@@ -18,12 +18,19 @@ export const MyPage = () => {
     { id: 3, category: '진로', content: '안녕하세요' },
   ]);
 
+  const resultModal = useModal();
+
   const handleCancelSubmitClick = () => {
     // 제출 취소 api
   };
 
   const handleDelClick = () => {
     // 회원 탈퇴 api
+  };
+
+  const handleCheckResult = () => {
+    // 결과 확인 api 호출 후 모달 열기
+    resultModal.open();
   };
 
   return (
@@ -53,6 +60,7 @@ export const MyPage = () => {
               color={colors.orange[800]}
               borderColor={colors.orange[800]}
               hoverBackgroundColor="transparent"
+              onClick={handleCheckResult}
             >
               발표 결과 확인
             </Button>
@@ -139,6 +147,13 @@ export const MyPage = () => {
         content="탈퇴 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
         btnText="탈퇴하기"
         onClick={handleDelClick}
+      />
+
+      <ShowResultModal
+        isOpen={resultModal.isOpen}
+        onClose={resultModal.close}
+        isPass={true}
+        step={1}
       />
     </PageContainer>
   );
@@ -229,52 +244,6 @@ const ButtonGroup = styled.div`
   align-items: center;
 `;
 
-const PrimaryButton = styled.button`
-  background-color: ${colors.orange[800]};
-  color: white;
-  border: 2px solid ${colors.orange[800]};
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${colors.orange[900]};
-  }
-`;
-
-const SecondaryButton = styled.button`
-  background-color: white;
-  color: ${colors.orange[800]};
-  border: 2px solid ${colors.orange[800]};
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${colors.orange[50]};
-  }
-`;
-
-const CancelButton = styled.button`
-  background-color: white;
-  color: ${colors.orange[800]};
-  border: 2px solid ${colors.orange[800]};
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-left: auto;
-
-  &:hover {
-    background-color: ${colors.orange[50]};
-  }
-`;
-
 const QuestionsTitle = styled.h2`
   font-size: 24px;
   font-weight: 600;
@@ -354,35 +323,7 @@ const SettingsLabel = styled.span`
   color: inherit;
 `;
 
-const SettingsButton = styled.button`
-  background-color: white;
-  color: ${colors.gray[700]};
-  border: 2px solid black;
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-size: 20px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${colors.gray[50]};
-  }
-`;
-
 const SettingsButtonGroup = styled.div`
   display: flex;
   gap: 12px;
-`;
-
-const DeleteButton = styled.button`
-  background-color: white;
-  color: ${colors.orange[800]};
-  border: 2px solid ${colors.orange[800]};
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-size: 20px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${colors.orange[50]};
-  }
 `;
