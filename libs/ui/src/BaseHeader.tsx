@@ -3,7 +3,6 @@ import { EntryLogo, SideBarBtnIcon } from './assets';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Button } from './Button';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
