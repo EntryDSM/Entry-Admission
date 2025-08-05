@@ -5,8 +5,7 @@ export const Submitted = () => {
   return (
     <Flex
       width="100%"
-      height="100vh"
-      paddingTop="100px"
+      height="calc(100vh - 70px)"
       justifyContent="center"
       alignItems="center"
     >
