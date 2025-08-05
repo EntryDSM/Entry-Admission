@@ -24,7 +24,7 @@ To create a production bundle:
 ```sh
 npx nx build entry
 ```
-
+ 
 To see all available targets to run for a project, run:
 
 ```sh
