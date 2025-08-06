@@ -44,6 +44,10 @@ export const Second = () => {
     {
       data: ['국가 유공자', '특례 입학 대상'],
     },
+    {
+      name: '성별',
+      data: ['남성', '여성'],
+    },
   ];
 
   const handleNameChange = (
@@ -67,6 +71,10 @@ export const Second = () => {
     }
   };
 
+  const handleGenderSelection = (value: string) => {
+    setDatas({ ...datas, gender: value });
+  };
+
   return (
     <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
       <FormElement
@@ -83,6 +91,13 @@ export const Second = () => {
         inputType="text"
         onInputChange={handleNameChange}
         value={datas.applicantName}
+      />
+      <FormElement
+        label={formRadioData[1].name}
+        type="radio"
+        radioDatas={formRadioData[1].data}
+        selectedRadio={datas.gender}
+        setSelectedRadio={handleGenderSelection}
       />
       <FormElement
         type="dropDown"

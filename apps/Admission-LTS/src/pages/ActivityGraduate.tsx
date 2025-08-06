@@ -1,5 +1,5 @@
-import { Flex, Text } from '@entry/design-token';
-import { AttendanceForm, CertCheckForm, usePageData } from '@entry/ui';
+import { colors, Flex, Text } from '@entry/design-token';
+import { AttendanceForm, Caution, CertCheckForm, usePageData } from '@entry/ui';
 
 export const ActivityGraduate = () => {
   const [datas, setDatas] = usePageData('activityGraduate');
@@ -13,20 +13,24 @@ export const ActivityGraduate = () => {
     setDatas({ ...safeData, certificate: value });
   };
 
-  const unexcusedEarlyLeaveChange = (value: string) => {
-    setDatas({ ...safeData, unexcusedEarlyLeave: value });
+  const earlyLeaveChange = (value: string) => {
+    setDatas({ ...safeData, earlyLeave: value });
   };
 
-  const unexcusedTardinessChange = (value: string) => {
-    setDatas({ ...safeData, unexcusedTardiness: value });
+  const tardinessChange = (value: string) => {
+    setDatas({ ...safeData, tardiness: value });
   };
 
-  const unexcusedResultChange = (value: string) => {
-    setDatas({ ...safeData, unexcusedResult: value });
+  const classExitChange = (value: string) => {
+    setDatas({ ...safeData, classExit: value });
   };
 
-  const unexcusedAbsenceChange = (value: string) => {
-    setDatas({ ...safeData, unexcusedAbsence: value });
+  const absenceChange = (value: string) => {
+    setDatas({ ...safeData, absence: value });
+  };
+
+  const unexcusedChange = (value: string) => {
+    setDatas({ ...safeData, unexcused: value });
   };
 
   const volunteerChange = (value: string) => {
@@ -35,10 +39,18 @@ export const ActivityGraduate = () => {
 
   return (
     <Flex isColumn={true} gap={40} width="100%" height="100%">
-      <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
-        <Text fontSize={24} fontWeight={600}>
-          출석
-        </Text>
+      <Flex isColumn={true} gap={24} width="100%" height="fit-content">
+        <Flex flexWrap='wrap' width='fit-content' height='fit-content' alignItems='center' gap={20}>
+          <Text fontSize={24} fontWeight={600}>
+            출석
+          </Text>
+          <Flex width='fit-content' height='fit-content' gap={8} alignItems='center'>
+            <Caution/>
+            <Text fontSize={16} fontWeight={300} color={colors.orange[700]}>
+              출석은 1,2,3학년 전체 합산하되, 졸업 예정은 3학년 1학기까지, 미인정 지각·조퇴·결과는 3회당 결석 1일로 환산하여 전체 합산합니다.
+            </Text>
+          </Flex>
+        </Flex>
         <Flex
           height="fit-content"
           flexWrap="wrap"
@@ -47,48 +59,64 @@ export const ActivityGraduate = () => {
           gapY={24}
         >
           <AttendanceForm
-            width={'748px'}
-            title="미인정 결석"
+            width={'48%'}
+            title="결석"
             defaultCount={10}
-            onChange={unexcusedAbsenceChange}
-            value={datas.unexcusedAbsence}
+            onChange={absenceChange}
+            value={datas.absence}
             suffix="회"
           />
           <AttendanceForm
-            width={'748px'}
-            title="미인정 조퇴"
+            width={'48%'}
+            title="조퇴"
             defaultCount={10}
-            onChange={unexcusedEarlyLeaveChange}
-            value={datas.unexcusedEarlyLeave}
+            onChange={earlyLeaveChange}
+            value={datas.earlyLeave}
             suffix="회"
           />
           <AttendanceForm
-            width={'748px'}
-            title="미인정 지각"
+            width={'48%'}
+            title="지각"
             defaultCount={10}
-            onChange={unexcusedTardinessChange}
-            value={datas.unexcusedTardiness}
+            onChange={tardinessChange}
+            value={datas.tardiness}
             suffix="회"
           />
           <AttendanceForm
-            width={'748px'}
-            title="미인정 결과"
+            width={'48%'}
+            title="결과"
             defaultCount={10}
-            value={datas.unexcusedResult}
+            value={datas.classExit}
             suffix="회"
-            onChange={unexcusedResultChange}
+            onChange={classExitChange}
+          />
+          <AttendanceForm
+            width={'48%'}
+            title="미인정"
+            defaultCount={10}
+            value={datas.unexcused}
+            suffix="회"
+            onChange={unexcusedChange}
           />
         </Flex>
       </Flex>
       <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
-        <Text fontSize={24} fontWeight={600}>
-          봉사
-        </Text>
+        <Flex flexWrap='wrap' width='fit-content' height='fit-content' alignItems='center' gap={20}>
+          <Text fontSize={24} fontWeight={600}>
+            봉사
+          </Text>
+          <Flex width='fit-content' height='fit-content' gap={8} alignItems='center'>
+            <Caution/>
+            <Text fontSize={16} fontWeight={300} color={colors.orange[700]}>
+              봉사는 1,2,3학년 전체 합산합니다.
+            </Text>
+          </Flex>
+        </Flex>
         <AttendanceForm
           onChange={volunteerChange}
           value={datas.volunteer}
           suffix="시간"
-          width={'748px'}
+          width={'400px'}
           title="봉사시간"
           defaultCount={10}
         />

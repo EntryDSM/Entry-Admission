@@ -42,11 +42,11 @@ export const GedScoreLayout = () => {
 
 export const GraduateScoreLayout = () => {
   const datas = [
-    { path: '/first-graduate', name: '3학년 2학기' },
-    { path: '/second-graduate', name: '3학년 1학기' },
-    { path: '/third-graduate', name: '2학년 2학기' },
-    { path: '/fourth-graduate', name: '2학년 1학기' },
-    { path: '/activity-graduate', name: '출석 및 봉사' },
+    { path: '/first-graduate', name: '3학년 2학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.' },
+    { path: '/second-graduate', name: '3학년 1학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.' },
+    { path: '/third-graduate', name: '2학년 2학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.' },
+    { path: '/fourth-graduate', name: '2학년 1학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.' },
+    { path: '/activity-graduate', name: '출석 및 봉사', explanation : '결석, 지각, 조퇴 등이 없는 경우에는 0을 입력해 주세요.' },
   ];
 
   const location = useLocation();
@@ -62,7 +62,7 @@ export const GraduateScoreLayout = () => {
             {currentData ? currentData.name : 'Error'}
           </Text>
           <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
-            관련 항목이 없는 경우 ✕ 로 기입하세요.
+            {currentData ? currentData.explanation : 'Error'}
           </Text>
         </TitleContainer>
         <ScorePageNav datas={datas} />
@@ -76,10 +76,10 @@ export const GraduateScoreLayout = () => {
 
 export const ProspectiveGraduateScoreLayout = () => {
   const datas = [
-    { path: '/first-prospective-graduate', name: '3학년 1학기' },
-    { path: '/second-prospective-graduate', name: '직전 학기' },
-    { path: '/third-prospective-graduate', name: '직직전 학기' },
-    { path: '/activity-prospective-graduate', name: '출석 및 봉사' },
+    { path: '/first-prospective-graduate', name: '3학년 1학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.'  },
+    { path: '/second-prospective-graduate', name: '직전 학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.'  },
+    { path: '/third-prospective-graduate', name: '직직전 학기', explanation : '관련 항목이 없는 경우 ✕ 로 기입하세요.'  },
+    { path: '/activity-prospective-graduate', name: '출석 및 봉사' , explanation : '결석, 지각, 조퇴 등이 없는 경우에는 0을 입력해 주세요.'},
   ];
 
   const location = useLocation();
@@ -95,7 +95,7 @@ export const ProspectiveGraduateScoreLayout = () => {
             {currentData ? currentData.name : 'Error'}
           </Text>
           <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
-            관련 항목이 없는 경우 ✕ 로 기입하세요.
+           {currentData ? currentData.explanation : 'Error'}
           </Text>
         </TitleContainer>
         <ScorePageNav datas={datas} />
