@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { colors, Flex } from '@entry/design-token';
+import { colors } from '@entry/design-token';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
 
@@ -23,80 +23,91 @@ export const ScorePageNav = ({ datas }: IScorePageNav) => {
     navigate(path);
   };
 
-  // 단계 수에 따른 Line width 계산
-  const getLineWidth = () => {
-    if (datas.length === 2) return '928px';
-    if (datas.length === 4) return '196px';
-    if (datas.length === 5) return '140px'; // 졸업자용
-    return '150px'; // 기본값
-  };
-
   return (
-    <Flex
-      width="fit-content"
-      height="fit-content"
-      gap={20}
-      alignItems="center"
-      flexWrap="nowrap"
-    >
+    <Container>
       {datas.map((data, index) => (
-        <Flex
-          width="fit-content"
-          height="fit-content"
-          gap={16}
-          alignItems="center"
-          key={index}
-        >
+        <NavItem isFirst={index === 0} key={index} flex={1}>
           {index !== 0 && (
-            <Line width={getLineWidth()} isActive={index <= activeIndex} />
+            <Line isActive={index <= activeIndex} />
           )}
-          <Flex
+          <NavButton
             onClick={() => navClick(index, data.path)}
-            width="fit-content"
-            height="fit-content"
-            isColumn={true}
-            gap={4}
-            alignItems="center"
+            isActive={index <= activeIndex}
           >
-            <Nav isActive={index <= activeIndex} />
+            <NavCircle isActive={index <= activeIndex} />
             <NavLabel isActive={index <= activeIndex}>{data.name}</NavLabel>
-          </Flex>
-        </Flex>
+          </NavButton>
+        </NavItem>
       ))}
-    </Flex>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 20px;
+  height: fit-content;
+`;
+
+const NavItem = styled.div<{ isFirst: boolean; flex: number }>`
+  display: flex;
+  flex: ${({ isFirst, flex }) => (isFirst ? '0 0 auto' : `${flex} 1 0`)};
+  align-items: center;
+  gap: 16px;
+  min-width: 0; 
+`;
+
+const Line = styled.div<{ isActive: boolean }>`
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 100px;
+  min-width: 20px;
+  background-color: ${({ isActive }) =>
+    isActive ? colors.orange[800] : colors.gray[100]};
+  transition: background-color 0.4s ease-in-out;
+`;
+
+const NavButton = styled.button<{ isActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  min-width: 0;
+
+  &:focus-visible {
+    outline: 2px solid ${colors.orange[800]};
+    outline-offset: 2px;
+  }
+`;
+
+const NavCircle = styled.div<{ isActive: boolean }>`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: ${({ isActive }) =>
+    isActive ? colors.orange[800] : colors.gray[100]};
+  transition: background-color 0.35s ease-in-out;
+
+  &:hover {
+    background-color: ${({ isActive }) =>
+      isActive ? colors.orange[800] : colors.gray[200]};
+  }
+`;
+
 const NavLabel = styled.div<{ isActive: boolean }>`
   white-space: nowrap;
   font-size: 16px;
   font-weight: 400;
-  color: ${({ isActive }) => (isActive ? colors.gray[500] : colors.gray[400])};
-`;
-
-const Line = styled.div<{ isActive: boolean; width: string }>`
-  width: ${({ width }) => width};
-  height: 4px;
-  background-color: ${({ isActive }) =>
-    isActive ? colors.orange[800] : colors.gray[100]};
-  border-radius: 100px;
-  background-size: 200% 100%;
-  background-position: ${({ isActive }) => (isActive ? '100% 0' : '0 0')};
-  transition: background-position 0.4s ease-in-out,
-    background-color 0.4s ease-in-out;
-`;
-
-const Nav = styled.button<{ isActive: boolean }>`
-  cursor: pointer;
-  outline: none;
-  border: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 16px;
-  background-color: ${({ isActive }) =>
-    isActive ? colors.orange[800] : colors.gray[100]};
-  &:hover {
-    background-color: ${({ isActive }) =>
-      isActive ? colors.orange[800] : colors.gray[200]};
-    transition: 0.35s ease-in-out;
-  }
+  color: ${({ isActive }) =>
+    isActive ? colors.gray[500] : colors.gray[400]};
+  user-select: none;
+  text-align: center;
+  min-width: 0;
 `;

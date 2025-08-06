@@ -4,39 +4,63 @@ import { FormElement, usePageData } from '@entry/ui';
 export const Fourth = () => {
   const [datas, setDatas] = usePageData('fourth');
 
-  const handlePersonalStmtChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = e.target.value;
-    setDatas({ ...datas, personalStmt: value });
-  };
-
-  const handleStudyPlanChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = e.target.value;
-    setDatas({ ...datas, studyPlan: value });
-  };
-
   console.log(datas);
+
+  const handleSchoolPhoneChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setDatas({ ...datas, schoolPhone: value });
+  };
+
+  const handleStudentIdChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setDatas({ ...datas, studentId: value });
+  };
+
+  const handleTeacherNameChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setDatas({ ...datas, teacherName: value });
+  };
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content">
       <FormElement
-        width="300px"
-        type="textArea"
-        label="자기소개서"
-        placeholder="내용을 입력하세요."
-        onTextAreaChange={handlePersonalStmtChange}
-        textAreaValue={datas.personalStmt}
-      />{' '}
+        selectedValue={datas.schoolName}
+        setSelectedValue={(value) => setDatas({ ...datas, schoolName: value })}
+        type="search"
+        label="중학교 이름"
+      />
       <FormElement
         width="300px"
-        type="textArea"
-        label="학업계획서"
-        placeholder="내용을 입력하세요."
-        onTextAreaChange={handleStudyPlanChange}
-        textAreaValue={datas.studyPlan}
+        type="input"
+        label="중학교 학번"
+        inputType="number"
+        placeholder="중학교 학번을 입력해주세요."
+        onInputChange={handleStudentIdChange}
+        value={datas.studentId}
+      />
+      <FormElement
+        width="300px"
+        type="input"
+        inputType="phone"
+        label="중학교 전화번호"
+        placeholder="중학교 전화번호를 입력해주세요."
+        onInputChange={handleSchoolPhoneChange}
+        value={datas.schoolPhone}
+      />
+      <FormElement
+        width="300px"
+        type="input"
+        label="중학교 교사 성명"
+        inputType="text"
+        placeholder="중학교 교사 성명을 입력해주세요."
+        onInputChange={handleTeacherNameChange}
+        value={datas.teacherName}
       />
     </Flex>
   );

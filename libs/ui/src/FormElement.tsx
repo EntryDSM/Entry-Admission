@@ -8,16 +8,18 @@ import { RadioContent } from './RadioContent';
 import { SearchContent } from './SearchContent';
 import { TextAreaContent } from './TextAreaContent';
 import React, { useEffect, useState } from 'react';
+import { AddressContent } from './AddressContent';
 
 interface IFormElementType
   extends Partial<IInputType>,
     Partial<ITextAreaType>,
     Partial<IImgType>,
-    Partial<ISearchType> {
+    Partial<ISearchType>,
+     Partial<IAddressType> {
   label?: string;
   explanation?: string;
   warning?: string;
-  type?: 'radio' | 'dropDown' | 'imgSelector' | 'input' | 'textArea' | 'search';
+  type?: 'radio' | 'dropDown' | 'imgSelector' | 'input' | 'textArea' | 'search' | 'address';
   radioDatas?: string[];
   dropDownDatas?: { label: string; content: (string | number)[] }[];
   selectedRadio?: string;
@@ -26,6 +28,16 @@ interface IFormElementType
   onDropDownChange?: (values: (string | number)[]) => void;
   inputType?: 'phone' | 'number' | 'text';
 }
+
+type IAddressType = {
+  addressDetailValue: string,
+  addressValue : string,
+  postalCodeValue: string,
+  handleCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDetailChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
 
 type IInputType = {
   value?: string | number | null;
@@ -75,6 +87,12 @@ export const FormElement = ({
   selectedValue,
   setSelectedValue,
   inputType,
+  handleAddressChange,
+  handleCodeChange,
+  handleDetailChange,
+  addressDetailValue,
+  addressValue,
+  postalCodeValue,
 }: IFormElementType) => {
   const [isHover, setIsHover] = useState(false);
   const [localSelectedRadio, setLocalSelectedRadio] = useState<string>('');
@@ -93,14 +111,18 @@ export const FormElement = ({
     dropDownValues.length > 0 ? dropDownValues : localDropDownValues;
 
   useEffect(() => {
-    if (dropDownDatas.length > 0 && dropDownValues.length === 0) {
-      setLocalDropDownValues(
-        dropDownDatas.map((data) =>
-          Array.isArray(data.content) ? data.content[0] : data.content
-        )
+    if (dropDownValues.length > 0) {
+      setLocalDropDownValues(dropDownValues);
+    } else if (dropDownDatas.length > 0) {
+      const defaults = dropDownDatas.map((data) =>
+        Array.isArray(data.content) ? data.content[0] : data.content
       );
+      setLocalDropDownValues(defaults);
+      if (onDropDownChange) {
+        onDropDownChange(defaults);
+      }
     }
-  }, [dropDownDatas]);
+  }, [dropDownValues, dropDownDatas, onDropDownChange]);
 
   const handleDropDownChange = (index: number, value: string | number) => {
     const newValues = [...currentDropDownValues];
@@ -135,6 +157,8 @@ export const FormElement = ({
         return currentDropDownValues.length > 0;
       case 'search':
         return selectedValue !== null && selectedValue !== undefined;
+      case 'address':
+        return true;
       default:
         return false;
     }
@@ -194,6 +218,20 @@ export const FormElement = ({
             />
           )}
 
+          {type === 'address' &&
+              handleCodeChange &&
+              handleAddressChange &&
+              handleDetailChange && (
+                <AddressContent
+                  postalCodeValue={postalCodeValue ?? ''}
+                  addressValue={addressValue ?? ''}
+                  addressDetailValue={addressDetailValue ?? ''}
+                  handleCodeChange={handleCodeChange}
+                  handleAddressChange={handleAddressChange}
+                  handleDetailChange={handleDetailChange}
+                />
+            )
+          }
           {type === 'dropDown' && dropDownDatas.length > 0 && (
             <Flex width="fit-content" height="fit-content" gap={16}>
               {dropDownDatas.map((data, index) => (

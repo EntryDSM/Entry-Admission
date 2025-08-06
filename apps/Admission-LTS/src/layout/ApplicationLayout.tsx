@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Text } from '@entry/design-token';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApplicationData } from '@entry/ui';
 import {
   skipNextAutoSave,
@@ -13,6 +13,8 @@ import {
 } from '@entry/ui';
 
 export const ApplicationLayout = () => {
+  const {pathname} = useLocation()
+  const [title, setTitle] = useState<string>('지원자 전형 구분')
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
@@ -69,11 +71,25 @@ export const ApplicationLayout = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if(pathname.includes('second')) {
+      setTitle('지원자 인적사항')
+    } else if(pathname.includes('third')) {
+      setTitle('보호자 인적사항')
+    } else if(pathname.includes('fourth')) {
+      setTitle('중학교 정보 입력')
+    } else if(pathname.includes('fifth')) {
+      setTitle('자기소개서 & 학업계획서 ')
+    } else {
+      setTitle('지원자 전형 구분')
+    }
+  },[pathname])
+
   return (
     <Container>
       <TitleSection>
         <Text fontSize={32} fontWeight={600}>
-          지원자 전형 구분
+          {title}
         </Text>
       </TitleSection>
       <ContentSection>

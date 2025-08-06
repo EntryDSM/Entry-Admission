@@ -27,6 +27,10 @@ export const GedScore = () => {
     setDatas({ ...datas, math: value });
   };
 
+  const handleEnglishChange = (value: string) => {
+    setDatas({ ...datas, english: value });
+  }; 
+
   return (
     <div>
       <Flex
@@ -81,6 +85,14 @@ export const GedScore = () => {
           value={datas.math}
           width={'498px'}
           title="수학"
+          defaultCount={10}
+          suffix="점"
+        />
+        <AttendanceForm
+          onChange={handleEnglishChange}
+          value={datas.english}
+          width={'498px'}
+          title="영어"
           defaultCount={10}
           suffix="점"
         />

@@ -30,7 +30,10 @@ export async function performSave(
     try {
       await saveToStorage();
       previousDataRef.current = JSON.stringify(state);
+      console.log('performSave - toast 호출 직전');
       toast.success('임시저장이 완료되었습니다.');
+      console.log('toast.success 호출 완료');
+
     } catch (err) {
       toast.error('저장에 실패했습니다.');
       console.error(err);

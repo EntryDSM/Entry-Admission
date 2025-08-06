@@ -3,6 +3,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { NoPathHeader } from '@entry/ui';
 import { ToastContainer } from 'react-toastify';
 import { useLayoutEffect } from 'react';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export const RootLayout = () => {
   const location = useLocation();
