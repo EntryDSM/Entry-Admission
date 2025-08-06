@@ -17,6 +17,7 @@ interface ISecondPageType {
   applicantName: string;
   dateOfBirth: (string | number)[];
   specialNotes: string;
+  gender: string,
 }
 
 interface IThirdPageType {
@@ -69,13 +70,14 @@ interface IScoreType {
 }
 
 interface IActivityType {
-  unexcusedEarlyLeave: string; //미인정 조퇴
-  unexcusedTardiness: string; //미인정 지각
-  unexcusedResult: string; //미인정 결과
-  unexcusedAbsence: string; //미인정 결석
+  earlyLeave: string; //조퇴
+  tardiness: string; //지각
+  classExit: string; //결과
+  absence: string; //결석
   dsmAlgorithm: 'O' | 'X' | null;
   certificate: 'O' | 'X' | null;
   volunteer: string; //봉사시간
+  unexcused : string,//미인정
 }
 
 interface ApplicationState {
@@ -117,6 +119,7 @@ const initialState: ApplicationState = {
     applicantName: '',
     dateOfBirth: [],
     specialNotes: '',
+    gender: ''
   },
   third: {
     guardianName: '',
@@ -188,13 +191,14 @@ const initialState: ApplicationState = {
     eng: null, //영어
   },
   activityGraduate: {
-    unexcusedEarlyLeave: '', //미인정 조퇴
-    unexcusedTardiness: '', //미인정 지각
-    unexcusedResult: '', //미인정 결과
-    unexcusedAbsence: '', //미인정 결석
+    earlyLeave: '', //조퇴
+    tardiness: '', //지각
+    classExit: '', //결과
+    absence: '', //결석
     dsmAlgorithm: null,
     certificate: null,
     volunteer: '', //봉사시간
+    unexcused : '',//미인정
   },
   firstGraduateProspective: {
     kor: null, // 국어
@@ -224,13 +228,14 @@ const initialState: ApplicationState = {
     eng: null, //영어
   },
   activityGraduateProspective: {
-    unexcusedEarlyLeave: '', //미인정 조퇴
-    unexcusedTardiness: '', //미인정 지각
-    unexcusedResult: '', //미인정 결과
-    unexcusedAbsence: '', //미인정 결석
+    earlyLeave: '', //조퇴
+    tardiness: '', //지각
+    classExit: '', //결과
+    absence: '', //결석
     dsmAlgorithm: null,
     certificate: null,
     volunteer: '', //봉사시간
+    unexcused : '',//미인정
   },
 };
 
