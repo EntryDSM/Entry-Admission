@@ -4,8 +4,22 @@ export const previousDataRef = { current: null as string | null };
 export const isSavingRef = { current: false };
 export const skipNextAutoSave = { current: false };
 
+// 수동 저장 타임스탬프 추가
+export const lastManualSaveRef = { current: 0 };
+
+// 페이지 네비게이션 추적을 위한 ref 추가
+export const lastSavedPageRef = { current: null as string | null };
+
 // 토스트 함수 타입 정의
 export type ToastFunction = (message: string, type: 'success' | 'error') => void;
+
+// 전역 토스트 함수 참조
+export let globalShowToast: ToastFunction | null = null;
+
+// 전역 토스트 함수 설정
+export const setGlobalShowToast = (toastFn: ToastFunction) => {
+  globalShowToast = toastFn;
+};
 
 // 임계영역 - 전역 저장 상태 관리
 let savingPromise: Promise<void> | null = null;
@@ -13,40 +27,67 @@ let savingPromise: Promise<void> | null = null;
 export async function performSave(
   state: any,
   saveToStorage: () => Promise<void>,
-  showToast?: ToastFunction
+  isManual: boolean = false,
+  currentPage?: string
 ): Promise<boolean> {
-  // 이미 저장 중이면 해당 Promise를 대기
+  // console.log(`[PERFORM SAVE] 시작 - ${isManual ? '수동' : '자동'} 저장`);
+  // console.log({ currentPage, lastSavedPage: lastSavedPageRef.current, skipNext: skipNextAutoSave.current });
+
   if (savingPromise) {
     await savingPromise;
-    return false; // 중복 저장 방지
+    return false;
   }
 
-  // 변경사항이 없으면 저장하지 않음
+  if (!isManual && !shouldAllowAutoSave()) {
+    return false;
+  }
+
   if (!hasChanged(state)) {
     return false;
   }
 
-  // 임계영역 시작
+  if (currentPage && lastSavedPageRef.current === currentPage) {
+    const currentStateStr = JSON.stringify(state);
+    if (previousDataRef.current === currentStateStr) {
+      return false;
+    }
+  }
+
+  if (isManual) {
+    lastManualSaveRef.current = Date.now();
+    skipNextAutoSave.current = true;
+
+    if (currentPage) {
+      lastSavedPageRef.current = currentPage;
+    }
+
+    setTimeout(() => {
+      skipNextAutoSave.current = false;
+    }, AUTO_SAVE_DELAY + 500);
+  }
+
   isSavingRef.current = true;
   savingPromise = (async () => {
     try {
       await saveToStorage();
       previousDataRef.current = JSON.stringify(state);
-      console.log('performSave - 저장 완료');
-      
-      if (showToast) {
-        showToast('임시저장이 완료되었습니다.', 'success');
+
+      if (currentPage) {
+        lastSavedPageRef.current = currentPage;
       }
 
-    } catch (err) {
-      if (showToast) {
-        showToast('저장에 실패했습니다.', 'error');
+      if (globalShowToast) {
+        const message = `임시저장이 완료되었습니다.${currentPage ? ` (${currentPage})` : ''}`;
+        globalShowToast(message, 'success');
       }
-      console.error(err);
+    } catch (err) {
+      if (globalShowToast) {
+        globalShowToast('저장에 실패했습니다.', 'error');
+      }
       throw err;
     } finally {
       isSavingRef.current = false;
-      savingPromise = null; // 임계영역 종료
+      savingPromise = null;
     }
   })();
 
@@ -55,6 +96,33 @@ export async function performSave(
 }
 
 export function hasChanged(state: any): boolean {
-  if (!state || !previousDataRef.current) return false;
+  if (!state) return false;
+  if (!previousDataRef.current) return true;
   return JSON.stringify(state) !== previousDataRef.current;
+}
+
+export function shouldAllowAutoSave(): boolean {
+  if (skipNextAutoSave.current) {
+    return false;
+  }
+
+  const timeSinceManualSave = Date.now() - lastManualSaveRef.current;
+  if (timeSinceManualSave < AUTO_SAVE_DELAY) {
+    return false;
+  }
+
+  return true;
+}
+
+export function onPageChange(newPage: string) {
+  if (lastSavedPageRef.current !== newPage) {
+    const timeSinceManualSave = Date.now() - lastManualSaveRef.current;
+    if (timeSinceManualSave >= 1000) {
+      skipNextAutoSave.current = false;
+    }
+  }
+}
+
+export function confirmManualSaveComplete() {
+  // 수동 저장 완료 후 필요한 추가 작업이 있다면 여기에 작성
 }

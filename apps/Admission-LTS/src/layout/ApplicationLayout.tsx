@@ -9,6 +9,8 @@ import {
   isSavingRef,
   performSave,
   hasChanged,
+  shouldAllowAutoSave,
+  setGlobalShowToast,
   AUTO_SAVE_DELAY,
   type ToastFunction,
 } from '@entry/ui';
@@ -20,14 +22,19 @@ export const ApplicationLayout = () => {
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
 
-  // 토스트 함수 정의
+  // 전역 토스트 함수 정의 및 등록
   const showToast = useCallback<ToastFunction>((message, type) => {
     if (type === 'success') {
       toast.success(message);
     } else {
       toast.error(message);
     }
-}, []);
+  }, []);
+
+  // 전역 토스트 함수 등록
+  useEffect(() => {
+    setGlobalShowToast(showToast);
+  }, [showToast]);
 
   useEffect(() => {
     loadFromStorage();
@@ -45,14 +52,20 @@ export const ApplicationLayout = () => {
     }
 
     autoSaveTimerRef.current = setTimeout(async () => {
+      // 자동 저장 허용 여부 체크
+      if (!shouldAllowAutoSave()) {
+        return;
+      }
+
       if (!isSavingRef.current && hasChanged(state)) {
-        await performSave(state, saveToStorage, showToast);
-        previousDataRef.current = JSON.stringify(state);
+        // isManual = false로 설정하여 자동 저장임을 표시
+        await performSave(state, saveToStorage, false);
+        if (state) {
+          previousDataRef.current = JSON.stringify(state);
+        }
       }
     }, AUTO_SAVE_DELAY);
-  }, [state, saveToStorage, showToast]);
-
-  const hasLoggedSkip = useRef(false);
+  }, [state, saveToStorage]);
 
   useEffect(() => {
     if (!state || !previousDataRef.current || isSavingRef.current) return;
@@ -60,29 +73,10 @@ export const ApplicationLayout = () => {
     const currentDataString = JSON.stringify(state);
     const hasDataChanged = currentDataString !== previousDataRef.current;
 
-    if (skipNextAutoSave.current) {
-      if (!hasLoggedSkip.current) {
-        console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
-        showToast("임시 저장이 완료되었습니다.", "success");
-        hasLoggedSkip.current = true;
-      }
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          skipNextAutoSave.current = false;
-          hasLoggedSkip.current = false;
-        });
-      });
-      previousDataRef.current = currentDataString;
-      return;
-    }
-
     if (hasDataChanged) {
-      console.log('[AUTO SAVE TRIGGER]');
       scheduleAutoSave();
     }
   }, [state, scheduleAutoSave]);
-
 
   useEffect(() => {
     if (pathname.includes('second')) {

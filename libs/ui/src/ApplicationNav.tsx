@@ -5,13 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useApplicationData, useCheckPageData } from './contexts';
 import { useEffect, useState, useRef } from 'react';
 import {
-  skipNextAutoSave,
   previousDataRef,
   performSave,
   hasChanged,
-  type ToastFunction,
 } from './utils/skipNextAutoSave';
-import { toast } from 'react-toastify';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -37,15 +34,6 @@ export const ApplicationNav = ({
   const navigate = useNavigate();
 
   const paginationInfo = calculatePaginationInfo(currentPage, totalPages);
-
-  // 토스트 함수 정의
-  const showToast: ToastFunction = (message: string, type: 'success' | 'error') => {
-    if (type === 'success') {
-      toast.success(message);
-    } else {
-      toast.error(message);
-    }
-  };
 
   useEffect(() => {
     if (state && previousDataRef.current === null) {
@@ -75,23 +63,25 @@ export const ApplicationNav = ({
   };
 
   const saveBeforeNavigation = async () => {
+    
     if (!hasChanged(state)) {
       return;
     }
 
-    if (isNavigationSavingRef.current) return;
+    if (isNavigationSavingRef.current) {
+      return;
+    }
 
     isNavigationSavingRef.current = true;
 
     try {
-      skipNextAutoSave.current = true;
-      const wasSaved = await performSave(state, saveToStorage, showToast);
+      // isManual = true로 설정하여 수동 저장임을 표시
+      const wasSaved = await performSave(state, saveToStorage, true);
+      
       if (wasSaved) {
         updateAfterSave();
       }
     } catch (error) {
-      console.error('저장 실패:', error);
-      showToast('저장에 실패했습니다.', 'error');
     } finally {
       isNavigationSavingRef.current = false;
     }
