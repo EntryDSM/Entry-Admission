@@ -10,13 +10,24 @@ import {
   performSave,
   hasChanged,
   AUTO_SAVE_DELAY,
+  type ToastFunction,
 } from '@entry/ui';
+import { toast } from 'react-toastify';
 
 export const ApplicationLayout = () => {
-  const {pathname} = useLocation()
-  const [title, setTitle] = useState<string>('지원자 전형 구분')
+  const { pathname } = useLocation();
+  const [title, setTitle] = useState<string>('지원자 전형 구분');
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
+
+  // 토스트 함수 정의
+  const showToast = useCallback<ToastFunction>((message, type) => {
+    if (type === 'success') {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+}, []);
 
   useEffect(() => {
     loadFromStorage();
@@ -35,10 +46,13 @@ export const ApplicationLayout = () => {
 
     autoSaveTimerRef.current = setTimeout(async () => {
       if (!isSavingRef.current && hasChanged(state)) {
-        await performSave(state, saveToStorage);
+        await performSave(state, saveToStorage, showToast);
+        previousDataRef.current = JSON.stringify(state);
       }
     }, AUTO_SAVE_DELAY);
-  }, [state, saveToStorage]);
+  }, [state, saveToStorage, showToast]);
+
+  const hasLoggedSkip = useRef(false);
 
   useEffect(() => {
     if (!state || !previousDataRef.current || isSavingRef.current) return;
@@ -47,10 +61,16 @@ export const ApplicationLayout = () => {
     const hasDataChanged = currentDataString !== previousDataRef.current;
 
     if (skipNextAutoSave.current) {
-      console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
+      if (!hasLoggedSkip.current) {
+        console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
+        showToast("임시 저장이 완료되었습니다.", "success");
+        hasLoggedSkip.current = true;
+      }
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           skipNextAutoSave.current = false;
+          hasLoggedSkip.current = false;
         });
       });
       previousDataRef.current = currentDataString;
@@ -63,27 +83,20 @@ export const ApplicationLayout = () => {
     }
   }, [state, scheduleAutoSave]);
 
-  useEffect(() => {
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
-    if(pathname.includes('second')) {
-      setTitle('지원자 인적사항')
-    } else if(pathname.includes('third')) {
-      setTitle('보호자 인적사항')
-    } else if(pathname.includes('fourth')) {
-      setTitle('중학교 정보 입력')
-    } else if(pathname.includes('fifth')) {
-      setTitle('자기소개서 & 학업계획서 ')
+    if (pathname.includes('second')) {
+      setTitle('지원자 인적사항');
+    } else if (pathname.includes('third')) {
+      setTitle('보호자 인적사항');
+    } else if (pathname.includes('fourth')) {
+      setTitle('중학교 정보 입력');
+    } else if (pathname.includes('fifth')) {
+      setTitle('자기소개서 & 학업계획서 ');
     } else {
-      setTitle('지원자 전형 구분')
+      setTitle('지원자 전형 구분');
     }
-  },[pathname])
+  }, [pathname]);
 
   return (
     <Container>

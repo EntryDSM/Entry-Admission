@@ -1,17 +1,19 @@
-import { toast } from 'react-toastify';
-
 export const AUTO_SAVE_DELAY = 3000;
 
 export const previousDataRef = { current: null as string | null };
 export const isSavingRef = { current: false };
 export const skipNextAutoSave = { current: false };
 
+// 토스트 함수 타입 정의
+export type ToastFunction = (message: string, type: 'success' | 'error') => void;
+
 // 임계영역 - 전역 저장 상태 관리
 let savingPromise: Promise<void> | null = null;
 
 export async function performSave(
   state: any,
-  saveToStorage: () => Promise<void>
+  saveToStorage: () => Promise<void>,
+  showToast?: ToastFunction
 ): Promise<boolean> {
   // 이미 저장 중이면 해당 Promise를 대기
   if (savingPromise) {
@@ -30,12 +32,16 @@ export async function performSave(
     try {
       await saveToStorage();
       previousDataRef.current = JSON.stringify(state);
-      console.log('performSave - toast 호출 직전');
-      toast.success('임시저장이 완료되었습니다.');
-      console.log('toast.success 호출 완료');
+      console.log('performSave - 저장 완료');
+      
+      if (showToast) {
+        showToast('임시저장이 완료되었습니다.', 'success');
+      }
 
     } catch (err) {
-      toast.error('저장에 실패했습니다.');
+      if (showToast) {
+        showToast('저장에 실패했습니다.', 'error');
+      }
       console.error(err);
       throw err;
     } finally {

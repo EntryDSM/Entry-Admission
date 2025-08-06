@@ -9,7 +9,9 @@ import {
   previousDataRef,
   performSave,
   hasChanged,
+  type ToastFunction,
 } from './utils/skipNextAutoSave';
+import { toast } from 'react-toastify';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -35,6 +37,15 @@ export const ApplicationNav = ({
   const navigate = useNavigate();
 
   const paginationInfo = calculatePaginationInfo(currentPage, totalPages);
+
+  // 토스트 함수 정의
+  const showToast: ToastFunction = (message: string, type: 'success' | 'error') => {
+    if (type === 'success') {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  };
 
   useEffect(() => {
     if (state && previousDataRef.current === null) {
@@ -74,12 +85,13 @@ export const ApplicationNav = ({
 
     try {
       skipNextAutoSave.current = true;
-      const wasSaved = await performSave(state, saveToStorage);
+      const wasSaved = await performSave(state, saveToStorage, showToast);
       if (wasSaved) {
         updateAfterSave();
       }
     } catch (error) {
       console.error('저장 실패:', error);
+      showToast('저장에 실패했습니다.', 'error');
     } finally {
       isNavigationSavingRef.current = false;
     }
