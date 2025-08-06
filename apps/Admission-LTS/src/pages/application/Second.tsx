@@ -5,7 +5,6 @@ import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 
 export const Second = () => {
-  const [imgUrlValue, setImgUrlValue] = useState<string | File | null>(null);
   const [datas, setDatas] = usePageData('second');
 
   // 1990~2025년 배열
@@ -62,17 +61,19 @@ export const Second = () => {
     setDatas({ ...datas, specialNotes: value });
   };
 
-  useEffect(() => {
-    setDatas({ ...datas, idPhoto: imgUrlValue });
-  }, [imgUrlValue]);
+  const handleImgChange = (file: File | null) => {
+    if (file) {
+      setDatas({ ...datas, idPhoto: file });
+    }
+  };
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
       <FormElement
         type="imgSelector"
         label="증명 사진"
-        setImgUrl={setImgUrlValue}
-        imgUrl={imgUrlValue}
+        onFileChange={handleImgChange}
+        imgUrl={datas.idPhoto}
       />
       <FormElement
         width="300px"

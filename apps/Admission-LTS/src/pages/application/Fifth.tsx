@@ -18,7 +18,6 @@ export const Fifth = () => {
     setDatas({ ...datas, studyPlan: value });
   };
 
-  console.log(datas);
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content">

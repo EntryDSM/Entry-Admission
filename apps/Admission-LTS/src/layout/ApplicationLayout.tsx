@@ -11,6 +11,7 @@ import {
   hasChanged,
   shouldAllowAutoSave,
   setGlobalShowToast,
+  serializeStateWithFiles,
   AUTO_SAVE_DELAY,
   type ToastFunction,
 } from '@entry/ui';
@@ -42,7 +43,7 @@ export const ApplicationLayout = () => {
 
   useEffect(() => {
     if (state && previousDataRef.current === null) {
-      previousDataRef.current = JSON.stringify(state);
+      previousDataRef.current = serializeStateWithFiles(state);
     }
   }, [state]);
 
@@ -61,7 +62,7 @@ export const ApplicationLayout = () => {
         // isManual = false로 설정하여 자동 저장임을 표시
         await performSave(state, saveToStorage, false);
         if (state) {
-          previousDataRef.current = JSON.stringify(state);
+          previousDataRef.current = serializeStateWithFiles(state);
         }
       }
     }, AUTO_SAVE_DELAY);
@@ -70,7 +71,7 @@ export const ApplicationLayout = () => {
   useEffect(() => {
     if (!state || !previousDataRef.current || isSavingRef.current) return;
 
-    const currentDataString = JSON.stringify(state);
+    const currentDataString = serializeStateWithFiles(state);
     const hasDataChanged = currentDataString !== previousDataRef.current;
 
     if (hasDataChanged) {

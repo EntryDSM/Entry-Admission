@@ -21,6 +21,26 @@ export const setGlobalShowToast = (toastFn: ToastFunction) => {
   globalShowToast = toastFn;
 };
 
+// File 객체를 포함한 상태를 직렬화하는 함수 - export 추가
+export function serializeStateWithFiles(state: any): string {
+  const replacer = (key: string, value: any) => {
+    if (value instanceof File) {
+      return {
+        __isFile: true,
+        name: value.name,
+        size: value.size,
+        type: value.type,
+        lastModified: value.lastModified,
+        // File 객체의 고유 식별을 위한 해시 생성
+        __fileHash: `${value.name}_${value.size}_${value.lastModified}_${value.type}`
+      };
+    }
+    return value;
+  };
+  
+  return JSON.stringify(state, replacer);
+}
+
 // 임계영역 - 전역 저장 상태 관리
 let savingPromise: Promise<void> | null = null;
 
@@ -47,7 +67,7 @@ export async function performSave(
   }
 
   if (currentPage && lastSavedPageRef.current === currentPage) {
-    const currentStateStr = JSON.stringify(state);
+    const currentStateStr = serializeStateWithFiles(state);
     if (previousDataRef.current === currentStateStr) {
       return false;
     }
@@ -70,7 +90,7 @@ export async function performSave(
   savingPromise = (async () => {
     try {
       await saveToStorage();
-      previousDataRef.current = JSON.stringify(state);
+      previousDataRef.current = serializeStateWithFiles(state);
 
       if (currentPage) {
         lastSavedPageRef.current = currentPage;
@@ -98,7 +118,9 @@ export async function performSave(
 export function hasChanged(state: any): boolean {
   if (!state) return false;
   if (!previousDataRef.current) return true;
-  return JSON.stringify(state) !== previousDataRef.current;
+  
+  const currentStateStr = serializeStateWithFiles(state);
+  return currentStateStr !== previousDataRef.current;
 }
 
 export function shouldAllowAutoSave(): boolean {

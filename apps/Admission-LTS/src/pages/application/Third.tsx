@@ -46,7 +46,6 @@ export const Third = () => {
     setDatas({ addressDetail: e.target.value });
   };
 
-  console.log(datas)
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content">
