@@ -2,49 +2,67 @@ import { colors, Flex, Text } from '@entry/design-token';
 import { ImageChange, Photo } from './assets';
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
-import { usePageData } from './contexts';
 
 interface IImgType {
-  imgUrl?: string | null | File;
-  setImgUrl: React.Dispatch<React.SetStateAction<string | null | File>>;
   onFileChange?: (file: File | null) => void;
+  initialImgUrl?: string | File | null;
 }
 
-export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
+export const ImageContent = ({ onFileChange, initialImgUrl = null }: IImgType) => {
   const imgRef = useRef<HTMLInputElement>(null);
   const [isHover, setIsHover] = useState(false);
-  const [{ idPhoto }] = usePageData('second');
-  const lastIdPhotoRef = useRef<string | File | null>(null);
-
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [fileObj, setFileObj] = useState<File | null>(null);
 
   useEffect(() => {
-    if (idPhoto !== null && idPhoto !== lastIdPhotoRef.current) {
-      lastIdPhotoRef.current = idPhoto;
-      setImgUrl(idPhoto);
-    }
-  }, [idPhoto, setImgUrl]);
-
-  // imgUrl 처리 로직 개선
-  useEffect(() => {
-    if (imgUrl) {
-      if (typeof imgUrl === 'string') {
-        setBlobUrl(imgUrl);
-      } else if (imgUrl instanceof File) {
-        const url = URL.createObjectURL(imgUrl);
-        setBlobUrl(url);
-      }
+    // 초기 이미지 URL 혹은 File이 바뀌면 업데이트
+    if (typeof initialImgUrl === 'string') {
+      setImgUrl(initialImgUrl);
+      setFileObj(null);
+    } else if (initialImgUrl instanceof File) {
+      setFileObj(initialImgUrl);
     } else {
-      setBlobUrl(null);
+      setImgUrl(null);
+      setFileObj(null);
     }
-  }, [imgUrl]);
+  }, [initialImgUrl]);
+
+  useEffect(() => {
+    if (!fileObj) return;
+
+    const url = URL.createObjectURL(fileObj);
+    setImgUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [fileObj]);
 
   const handleChange = () => {
-    const file = imgRef.current?.files?.[0];
-    if (file) {
-      setImgUrl(file);
-      onFileChange?.(file);
+    const file = imgRef.current?.files?.[0] ?? null;
+
+    if (!file) {
+      onFileChange?.(null);
+      setFileObj(null);
+      setImgUrl(null);
+      return;
     }
+
+    const validTypes = ['image/jpeg', 'image/png'];
+    const maxSizeMB = 5;
+
+    if (!validTypes.includes(file.type)) {
+      alert('JPG 또는 PNG 형식의 이미지 파일만 업로드할 수 있어요.');
+      return;
+    }
+
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      alert('파일 크기는 5MB 이하로 업로드해주세요.');
+      return;
+    }
+
+    setFileObj(file);
+    onFileChange?.(file);
   };
 
   return (
@@ -52,9 +70,9 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
       onClick={() => imgRef.current?.click()}
-      imgUrl={blobUrl}
+      imgUrl={imgUrl}
     >
-      {isHover && blobUrl && (
+      {isHover && imgUrl && (
         <HoverSelector>
           <ImageChange />
           <Text fontSize={12} color={colors.gray[200]}>
@@ -62,9 +80,9 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
           </Text>
         </HoverSelector>
       )}
-      <FileInput type="file" ref={imgRef} onChange={handleChange} />
-      {blobUrl ? (
-        <ImgContentStyled src={blobUrl} alt="img" />
+      <FileInput type="file" ref={imgRef} onChange={handleChange} accept="image/jpeg, image/png" />
+      {imgUrl ? (
+        <ImgContentStyled src={imgUrl} alt="img" />
       ) : (
         <Flex
           isColumn={true}
@@ -83,7 +101,7 @@ export const ImageContent = ({ imgUrl, setImgUrl, onFileChange }: IImgType) => {
   );
 };
 
-const ImgSelector = styled.div<{ imgUrl?: string | File | null }>`
+const ImgSelector = styled.div<{ imgUrl?: string | null }>`
   position: relative;
   width: 150px;
   height: 190px;

@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo, useState } from 'react';
 import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { Caution, Check } from './assets';
@@ -7,164 +8,218 @@ import { InputContent } from './InputContent';
 import { RadioContent } from './RadioContent';
 import { SearchContent } from './SearchContent';
 import { TextAreaContent } from './TextAreaContent';
-import React, { useEffect, useState } from 'react';
 import { AddressContent } from './AddressContent';
 
-interface IFormElementType
-  extends Partial<IInputType>,
-    Partial<ITextAreaType>,
-    Partial<IImgType>,
-    Partial<ISearchType>,
-     Partial<IAddressType> {
+interface BaseFormElementProps {
   label?: string;
   explanation?: string;
   warning?: string;
-  type?: 'radio' | 'dropDown' | 'imgSelector' | 'input' | 'textArea' | 'search' | 'address';
-  radioDatas?: string[];
-  dropDownDatas?: { label: string; content: (string | number)[] }[];
-  selectedRadio?: string;
-  setSelectedRadio?: (value: string) => void;
-  dropDownValues?: (string | number)[];
-  onDropDownChange?: (values: (string | number)[]) => void;
-  inputType?: 'phone' | 'number' | 'text';
+  width?: string;
 }
 
-type IAddressType = {
-  addressDetailValue: string,
-  addressValue : string,
-  postalCodeValue: string,
+interface InputProps {
+  type: 'input';
+  value?: string | number | null;
+  onInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  inputType?: 'phone' | 'number' | 'text';
+  readonly?: boolean;
+}
+
+interface TextAreaProps {
+  type: 'textArea';
+  textAreaValue?: string;
+  onTextAreaChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+}
+
+interface RadioProps {
+  type: 'radio';
+  radioDatas: string[];
+  selectedRadio?: string;
+  setSelectedRadio?: (value: string) => void;
+}
+
+interface DropDownProps {
+  type: 'dropDown';
+  dropDownDatas: { label: string; content: (string | number)[] }[];
+  dropDownValues?: (string | number)[];
+  onDropDownChange?: (values: (string | number)[]) => void;
+}
+
+interface ImageProps {
+  type: 'imgSelector';
+  imgUrl?: string | File | null;
+  onFileChange?: (file: File | null) => void;
+}
+
+interface SearchProps {
+  type: 'search';
+  selectedValue?: string | null;
+  setSelectedValue?: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+interface AddressProps {
+  type: 'address';
+  addressDetailValue: string;
+  addressValue: string;
+  postalCodeValue: string;
   handleCodeChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleDetailChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+}
 
+type FormElementProps = BaseFormElementProps & (
+  | InputProps
+  | TextAreaProps
+  | RadioProps
+  | DropDownProps
+  | ImageProps
+  | SearchProps
+  | AddressProps
+);
 
-type IInputType = {
-  value?: string | number | null;
-  onInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  width?: string;
-  readonly?: boolean;
-  placeholder?: string;
-};
+// 메모이제이션 components
+const MemoizedCheck = React.memo(Check);
+const MemoizedCaution = React.memo(Caution);
 
-type ITextAreaType = {
-  placeholder?: string;
-  textAreaValue?: string;
-  onTextAreaChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-};
-
-type IImgType = {
-  imgUrl?: string | File | null;
-  setImgUrl?: React.Dispatch<React.SetStateAction<string | File | null>>;
-  onFileChange?: (file: File | null) => void;
-};
-
-type ISearchType = {
-  setSelectedValue?: React.Dispatch<React.SetStateAction<string | null>>;
-  selectedValue?: string | null;
-};
-
-export const FormElement = ({
-  label,
-  explanation,
-  warning,
-  type,
-  radioDatas,
-  dropDownDatas = [],
-  width,
-  placeholder,
-  value,
-  onInputChange,
-  textAreaValue,
-  onTextAreaChange,
-  imgUrl,
-  setImgUrl,
-  onFileChange,
-  selectedRadio,
-  setSelectedRadio,
-  dropDownValues = [],
-  onDropDownChange,
-  selectedValue,
-  setSelectedValue,
-  inputType,
-  handleAddressChange,
-  handleCodeChange,
-  handleDetailChange,
-  addressDetailValue,
-  addressValue,
-  postalCodeValue,
-}: IFormElementType) => {
+const WarningTooltip = React.memo(({ warning }: { warning: string }) => {
   const [isHover, setIsHover] = useState(false);
-  const [localSelectedRadio, setLocalSelectedRadio] = useState<string>('');
-  const [localDropDownValues, setLocalDropDownValues] = useState<
-    (string | number)[]
-  >(() =>
-    dropDownDatas.map((data) =>
-      Array.isArray(data.content) ? data.content[0] : data.content
-    )
+
+  const handleMouseEnter = useCallback(() => setIsHover(true), []);
+  const handleMouseLeave = useCallback(() => setIsHover(false), []);
+
+  return (
+    <SpeechBubbleContainer>
+      {isHover && <SpeechBubble>{warning}</SpeechBubble>}
+      <div
+        style={{ width: '20px', height: '20px' }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <MemoizedCaution />
+      </div>
+    </SpeechBubbleContainer>
   );
+});
 
-  const currentSelectedRadio = selectedRadio ?? localSelectedRadio;
-  const handleSetSelectedRadio = setSelectedRadio ?? setLocalSelectedRadio;
+const CheckIcon = React.memo(({ isFilled }: { isFilled: boolean }) => (
+  <CheckWrapper>
+    <MemoizedCheck color={isFilled ? colors.orange[800] : colors.gray[200]} />
+  </CheckWrapper>
+));
 
-  const currentDropDownValues =
-    dropDownValues.length > 0 ? dropDownValues : localDropDownValues;
+export const FormElement = React.memo<FormElementProps>((props) => {
+  const { label, explanation, warning, type, width } = props;
 
-  useEffect(() => {
-    if (dropDownValues.length > 0) {
-      setLocalDropDownValues(dropDownValues);
-    } else if (dropDownDatas.length > 0) {
-      const defaults = dropDownDatas.map((data) =>
-        Array.isArray(data.content) ? data.content[0] : data.content
-      );
-      setLocalDropDownValues(defaults);
-      if (onDropDownChange) {
-        onDropDownChange(defaults);
-      }
-    }
-  }, [dropDownValues, dropDownDatas, onDropDownChange]);
-
-  const handleDropDownChange = (index: number, value: string | number) => {
-    const newValues = [...currentDropDownValues];
-    newValues[index] = value;
-
-    if (onDropDownChange) {
-      onDropDownChange(newValues);
-    } else {
-      setLocalDropDownValues(newValues);
-    }
-  };
-
-  const handleRadioSelect = (radioLabel: string) => {
-    if (currentSelectedRadio === radioLabel) {
-      handleSetSelectedRadio('');
-    } else {
-      handleSetSelectedRadio(radioLabel);
-    }
-  };
-
-  const hasValue = () => {
+  // useMemo를 사용한 최적화
+  const hasValue = useMemo(() => {
     switch (type) {
       case 'input':
-        return value !== null && value !== undefined && value !== '';
+        return props.value !== null && props.value !== undefined && props.value !== '';
       case 'textArea':
-        return typeof textAreaValue === 'string' && textAreaValue.trim() !== '';
+        return typeof props.textAreaValue === 'string' && props.textAreaValue.trim() !== '';
       case 'imgSelector':
-        return !!imgUrl;
+        return !!props.imgUrl;
       case 'radio':
-        return !!currentSelectedRadio;
+        return !!props.selectedRadio;
       case 'dropDown':
-        return currentDropDownValues.length > 0;
+        return (props.dropDownValues?.length ?? 0) > 0;
       case 'search':
-        return selectedValue !== null && selectedValue !== undefined;
+        return props.selectedValue !== null && props.selectedValue !== undefined;
       case 'address':
         return true;
       default:
         return false;
     }
-  };
+  }, [type, props]);
 
-  const isFilled = hasValue();
+  // content 렌더링 로직 - null check 추가
+  const renderContent = useCallback(() => {
+    switch (type) {
+      case 'input':
+        return (
+          <InputContent
+            width={width}
+            placeholder={props.placeholder}
+            value={props.value ?? ''}
+            onChange={props.onInputChange}
+            type={props.inputType}
+          />
+        );
+
+      case 'textArea':
+        return (
+          <TextAreaContent
+            value={props.textAreaValue ?? ''}
+            placeholder={props.placeholder}
+            onChange={props.onTextAreaChange}
+          />
+        );
+
+      case 'radio':
+        return (
+          <Flex width="fit-content" height="fit-content" gap={32}>
+            {props.radioDatas?.map((data, index) => (
+              <RadioContent
+                key={`${data}-${index}`}
+                label={data}
+                isSelected={props.selectedRadio === data}
+                onSelect={() => {
+                  if (props.selectedRadio === data) {
+                    props.setSelectedRadio?.('');
+                  } else {
+                    props.setSelectedRadio?.(data);
+                  }
+                }}
+              />
+            ))}
+          </Flex>
+        );
+
+      case 'dropDown':
+        return (
+          <DropDownSection
+            dropDownDatas={props.dropDownDatas}
+            dropDownValues={props.dropDownValues}
+            onDropDownChange={props.onDropDownChange}
+          />
+        );
+
+      case 'imgSelector':
+        return (
+          <ImageContent
+            initialImgUrl={props.imgUrl}
+            onFileChange={props.onFileChange}
+          />
+        );
+
+      case 'search':
+        // setSelectedValue가 있을 때만 렌더링
+        return props.setSelectedValue ? (
+          <SearchContent
+            selectedValue={props.selectedValue}
+            setSelectedValue={props.setSelectedValue}
+          />
+        ) : null;
+
+      case 'address':
+        // 모든 핸들러가 있을 때만 렌더링
+        return props.handleCodeChange && props.handleAddressChange && props.handleDetailChange ? (
+          <AddressContent
+            postalCodeValue={props.postalCodeValue ?? ''}
+            addressValue={props.addressValue ?? ''}
+            addressDetailValue={props.addressDetailValue ?? ''}
+            handleCodeChange={props.handleCodeChange}
+            handleAddressChange={props.handleAddressChange}
+            handleDetailChange={props.handleDetailChange}
+          />
+        ) : null;
+
+      default:
+        return null;
+    }
+  }, [type, props, width]);
 
   return (
     <FormContainer>
@@ -182,109 +237,17 @@ export const FormElement = ({
           height="fit-content"
           alignItems={type === 'textArea' ? 'flex-start' : 'center'}
         >
-          <Flex
-            gap={12}
-            alignItems="center"
-            width="fit-content"
-            height="fit-content"
-          >
+          <Flex gap={12} alignItems="center" width="fit-content" height="fit-content">
             <CheckContainer>
-              <CheckWrapper>
-                <Check
-                  color={isFilled ? colors.orange[800] : colors.gray[200]}
-                />
-              </CheckWrapper>
+              <CheckIcon isFilled={hasValue} />
               <Label>{label}</Label>
             </CheckContainer>
-            {warning && (
-              <SpeechBubbleContainer>
-                {isHover && <SpeechBubble>{warning}</SpeechBubble>}
-                <div
-                  style={{ width: '20px', height: '20px' }}
-                  onMouseEnter={() => setIsHover(true)}
-                  onMouseLeave={() => setIsHover(false)}
-                >
-                  <Caution />
-                </div>
-              </SpeechBubbleContainer>
-            )}
+            {warning && <WarningTooltip warning={warning} />}
           </Flex>
 
-          {type === 'imgSelector' && setImgUrl && (
-            <ImageContent
-              imgUrl={imgUrl}
-              setImgUrl={setImgUrl}
-              onFileChange={onFileChange}
-            />
-          )}
-
-          {type === 'address' &&
-              handleCodeChange &&
-              handleAddressChange &&
-              handleDetailChange && (
-                <AddressContent
-                  postalCodeValue={postalCodeValue ?? ''}
-                  addressValue={addressValue ?? ''}
-                  addressDetailValue={addressDetailValue ?? ''}
-                  handleCodeChange={handleCodeChange}
-                  handleAddressChange={handleAddressChange}
-                  handleDetailChange={handleDetailChange}
-                />
-            )
-          }
-          {type === 'dropDown' && dropDownDatas.length > 0 && (
-            <Flex width="fit-content" height="fit-content" gap={16}>
-              {dropDownDatas.map((data, index) => (
-                <DropDownContent
-                  key={index}
-                  datas={
-                    Array.isArray(data.content) ? data.content : [data.content]
-                  }
-                  label={data.label}
-                  value={currentDropDownValues[index]}
-                  onChange={(value) => handleDropDownChange(index, value)}
-                />
-              ))}
-            </Flex>
-          )}
-
-          {type === 'input' && (
-            <InputContent
-              width={width}
-              placeholder={placeholder}
-              value={value ?? ''}
-              onChange={onInputChange}
-              type={inputType}
-            />
-          )}
-
-          <Flex width="fit-content" height="fit-content" gap={32}>
-            {type === 'radio' &&
-              radioDatas?.map((data, index) => (
-                <RadioContent
-                  key={index}
-                  label={data}
-                  isSelected={currentSelectedRadio === data}
-                  onSelect={() => handleRadioSelect(data)}
-                />
-              ))}
-          </Flex>
-
-          {type === 'textArea' && (
-            <TextAreaContent
-              value={textAreaValue ?? ''}
-              placeholder={placeholder}
-              onChange={onTextAreaChange}
-            />
-          )}
-
-          {type === 'search' && setSelectedValue && (
-            <SearchContent
-              selectedValue={selectedValue}
-              setSelectedValue={setSelectedValue}
-            />
-          )}
+          {renderContent()}
         </Flex>
+        
         {explanation && (
           <Text fontSize={16} fontWeight={300} color={colors.gray[400]}>
             {explanation}
@@ -293,7 +256,54 @@ export const FormElement = ({
       </Flex>
     </FormContainer>
   );
-};
+});
+
+// DropDown 섹션을 별도 컴포넌트로 분리하여 최적화
+const DropDownSection = React.memo<{
+  dropDownDatas: { label: string; content: (string | number)[] }[];
+  dropDownValues?: (string | number)[];
+  onDropDownChange?: (values: (string | number)[]) => void;
+}>(({ dropDownDatas, dropDownValues = [], onDropDownChange }) => {
+  // 기본값 계산을 useMemo로 최적화
+  const defaultValues = useMemo(() => 
+    dropDownDatas.map((data) =>
+      Array.isArray(data.content) ? data.content[0] : data.content
+    ), [dropDownDatas]
+  );
+
+  const currentValues = dropDownValues.length > 0 ? dropDownValues : defaultValues;
+
+  React.useEffect(() => {
+    if ((dropDownValues?.length ?? 0) === 0 && onDropDownChange) {
+      onDropDownChange(defaultValues);
+    }
+  }, [dropDownValues, defaultValues, onDropDownChange]);
+
+  const handleDropDownChange = useCallback((index: number, value: string | number) => {
+    const newValues = [...currentValues];
+    newValues[index] = value;
+    onDropDownChange?.(newValues);
+  }, [currentValues, onDropDownChange]);
+
+  return (
+    <Flex width="fit-content" height="fit-content" gap={16}>
+      {dropDownDatas.map((data, index) => (
+        <DropDownContent
+          key={`${data.label}-${index}`}
+          datas={Array.isArray(data.content) ? data.content : [data.content]}
+          label={data.label}
+          value={currentValues[index]}
+          onChange={(value) => handleDropDownChange(index, value)}
+        />
+      ))}
+    </Flex>
+  );
+});
+
+FormElement.displayName = 'FormElement';
+WarningTooltip.displayName = 'WarningTooltip';
+CheckIcon.displayName = 'CheckIcon';
+DropDownSection.displayName = 'DropDownSection';
 
 const Label = styled.div`
   white-space: nowrap;

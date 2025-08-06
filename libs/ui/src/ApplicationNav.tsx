@@ -8,6 +8,7 @@ import {
   previousDataRef,
   performSave,
   hasChanged,
+  serializeStateWithFiles,
 } from './utils/skipNextAutoSave';
 
 interface IApplicationNavType {
@@ -37,7 +38,7 @@ export const ApplicationNav = ({
 
   useEffect(() => {
     if (state && previousDataRef.current === null) {
-      previousDataRef.current = JSON.stringify(state);
+      previousDataRef.current = serializeStateWithFiles(state);
       setHasUnsavedChanges(false);
     }
   }, [state]);
@@ -45,7 +46,7 @@ export const ApplicationNav = ({
   useEffect(() => {
     if (!state || !previousDataRef.current) return;
 
-    const currentDataString = JSON.stringify(state);
+    const currentDataString = serializeStateWithFiles(state);
     const hasDataChanged = currentDataString !== previousDataRef.current;
     setHasUnsavedChanges(hasDataChanged);
   }, [state]);
@@ -57,7 +58,7 @@ export const ApplicationNav = ({
 
   const updateAfterSave = () => {
     if (state) {
-      previousDataRef.current = JSON.stringify(state);
+      previousDataRef.current = serializeStateWithFiles(state);
       setHasUnsavedChanges(false);
     }
   };
