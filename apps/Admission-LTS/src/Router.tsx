@@ -12,6 +12,7 @@ import {
   ActivityProspectiveGraduate,
   First,
   Fourth,
+  Fifth,
   Landing,
   ScoreFirst,
   ScoreFirstProspectiveGraduate,
@@ -118,11 +119,15 @@ export const Router = createBrowserRouter([
               },
               {
                 path: 'third',
-                element: <Third />,
+                element: <Third/>,
               },
               {
                 path: 'fourth',
                 element: <Fourth />,
+              },
+              {
+                path: 'fifth',
+                element: <Fifth />,
               },
             ],
           },

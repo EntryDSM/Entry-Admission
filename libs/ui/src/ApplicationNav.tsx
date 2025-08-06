@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useApplicationData, useCheckPageData } from './contexts';
 import { useEffect, useState, useRef } from 'react';
 import {
-  skipNextAutoSave,
   previousDataRef,
   performSave,
   hasChanged,
@@ -64,22 +63,25 @@ export const ApplicationNav = ({
   };
 
   const saveBeforeNavigation = async () => {
+    
     if (!hasChanged(state)) {
       return;
     }
 
-    if (isNavigationSavingRef.current) return;
+    if (isNavigationSavingRef.current) {
+      return;
+    }
 
     isNavigationSavingRef.current = true;
 
     try {
-      skipNextAutoSave.current = true;
-      const wasSaved = await performSave(state, saveToStorage);
+      // isManual = true로 설정하여 수동 저장임을 표시
+      const wasSaved = await performSave(state, saveToStorage, true);
+      
       if (wasSaved) {
         updateAfterSave();
       }
     } catch (error) {
-      console.error('저장 실패:', error);
     } finally {
       isNavigationSavingRef.current = false;
     }

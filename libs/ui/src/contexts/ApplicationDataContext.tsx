@@ -20,13 +20,24 @@ interface ISecondPageType {
 }
 
 interface IThirdPageType {
+  guardianName: string;
+  applicantNumber: string;
+  guardianNumber: string;
+  gender: string;
+  relationship: string[];
+  postalCode: string,//우편번호
+  address: string, //기본주소
+  addressDetail: string,//상세주소
+}
+
+interface IFourthPageType {
   schoolName: string;
   studentId: number | null;
   schoolPhone: string;
   teacherName: string;
 }
 
-interface IFourthPageType {
+interface IFifthPageType {
   personalStmt: string;
   studyPlan: string;
 }
@@ -38,6 +49,7 @@ interface IGedScoreType {
   science: number | null;
   techAndHomeEconomics: number | null;
   math: number | null;
+  english: number | null;
 }
 
 interface IGedAttendanceVolunteerType {
@@ -52,6 +64,7 @@ interface IScoreType {
   math: string | null; // 수학
   sci: string | null; // 과학
   tech: string | null; // 기술 · 가정
+  eng: string | null;//영어
   [key: string]: string | null;
 }
 
@@ -70,6 +83,7 @@ interface ApplicationState {
   second: ISecondPageType;
   third: IThirdPageType;
   fourth: IFourthPageType;
+  fifth: IFifthPageType;
   gedScore: IGedScoreType;
   attendanceVolunteer: IGedAttendanceVolunteerType;
   firstGraduate: IScoreType;
@@ -96,7 +110,7 @@ const initialState: ApplicationState = {
     typeSelection: '',
     regionSelection: '',
     graduationType: '',
-    graduationDate: [2023, 1],
+    graduationDate: [],
   },
   second: {
     idPhoto: null,
@@ -105,12 +119,22 @@ const initialState: ApplicationState = {
     specialNotes: '',
   },
   third: {
+    guardianName: '',
+    applicantNumber: '',
+    guardianNumber: '',
+    gender: '',
+    relationship: [],
+    postalCode: '',
+    address: '',
+    addressDetail: '',
+  },
+  fourth: {
     schoolName: '',
     studentId: null,
     schoolPhone: '',
     teacherName: '',
   },
-  fourth: {
+  fifth: {
     personalStmt: '',
     studyPlan: '',
   },
@@ -121,6 +145,7 @@ const initialState: ApplicationState = {
     science: null,
     techAndHomeEconomics: null,
     math: null,
+    english: null,
   },
   attendanceVolunteer: {
     dsmAlgorithm: null,
@@ -133,6 +158,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   secondGraduate: {
     kor: null, // 국어
@@ -141,6 +167,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   thirdGraduate: {
     kor: null, // 국어
@@ -149,6 +176,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   fourthGraduate: {
     kor: null, // 국어
@@ -157,6 +185,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   activityGraduate: {
     unexcusedEarlyLeave: '', //미인정 조퇴
@@ -174,6 +203,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   secondGraduateProspective: {
     kor: null, // 국어
@@ -182,6 +212,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   thirdGraduateProspective: {
     kor: null, // 국어
@@ -190,6 +221,7 @@ const initialState: ApplicationState = {
     math: null, // 수학
     sci: null, // 과학
     tech: null, // 기술 · 가정
+    eng: null, //영어
   },
   activityGraduateProspective: {
     unexcusedEarlyLeave: '', //미인정 조퇴

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Text } from '@entry/design-token';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApplicationData } from '@entry/ui';
 import {
   skipNextAutoSave,
@@ -9,12 +9,32 @@ import {
   isSavingRef,
   performSave,
   hasChanged,
+  shouldAllowAutoSave,
+  setGlobalShowToast,
   AUTO_SAVE_DELAY,
+  type ToastFunction,
 } from '@entry/ui';
+import { toast } from 'react-toastify';
 
 export const ApplicationLayout = () => {
+  const { pathname } = useLocation();
+  const [title, setTitle] = useState<string>('지원자 전형 구분');
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { saveToStorage, loadFromStorage, state } = useApplicationData();
+
+  // 전역 토스트 함수 정의 및 등록
+  const showToast = useCallback<ToastFunction>((message, type) => {
+    if (type === 'success') {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  }, []);
+
+  // 전역 토스트 함수 등록
+  useEffect(() => {
+    setGlobalShowToast(showToast);
+  }, [showToast]);
 
   useEffect(() => {
     loadFromStorage();
@@ -32,8 +52,17 @@ export const ApplicationLayout = () => {
     }
 
     autoSaveTimerRef.current = setTimeout(async () => {
+      // 자동 저장 허용 여부 체크
+      if (!shouldAllowAutoSave()) {
+        return;
+      }
+
       if (!isSavingRef.current && hasChanged(state)) {
-        await performSave(state, saveToStorage);
+        // isManual = false로 설정하여 자동 저장임을 표시
+        await performSave(state, saveToStorage, false);
+        if (state) {
+          previousDataRef.current = JSON.stringify(state);
+        }
       }
     }, AUTO_SAVE_DELAY);
   }, [state, saveToStorage]);
@@ -44,36 +73,30 @@ export const ApplicationLayout = () => {
     const currentDataString = JSON.stringify(state);
     const hasDataChanged = currentDataString !== previousDataRef.current;
 
-    if (skipNextAutoSave.current) {
-      console.log('[SKIP] 이전 수동 저장 직후. skipNextAutoSave = true');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          skipNextAutoSave.current = false;
-        });
-      });
-      previousDataRef.current = currentDataString;
-      return;
-    }
-
     if (hasDataChanged) {
-      console.log('[AUTO SAVE TRIGGER]');
       scheduleAutoSave();
     }
   }, [state, scheduleAutoSave]);
 
   useEffect(() => {
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, []);
+    if (pathname.includes('second')) {
+      setTitle('지원자 인적사항');
+    } else if (pathname.includes('third')) {
+      setTitle('보호자 인적사항');
+    } else if (pathname.includes('fourth')) {
+      setTitle('중학교 정보 입력');
+    } else if (pathname.includes('fifth')) {
+      setTitle('자기소개서 & 학업계획서 ');
+    } else {
+      setTitle('지원자 전형 구분');
+    }
+  }, [pathname]);
 
   return (
     <Container>
       <TitleSection>
         <Text fontSize={32} fontWeight={600}>
-          지원자 전형 구분
+          {title}
         </Text>
       </TitleSection>
       <ContentSection>
