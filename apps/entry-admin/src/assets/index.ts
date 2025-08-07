@@ -1,1 +1,1 @@
-export { default as SearchIcon } from './search.svg';
+export { default as search } from './search.svg';

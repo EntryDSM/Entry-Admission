@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import { SearchIcon } from '../assets';
+import { search } from '../assets';
 import { colors } from '@entry/design-token';
 
 export const FindApplicantInput = () => {
   return (
     <InputContainer>
-      <img src={SearchIcon} alt="" />
+      <img src={search} alt="" />
       <input type="text" placeholder="지원자 검색" />
     </InputContainer>
   );
