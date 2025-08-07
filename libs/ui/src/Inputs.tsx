@@ -141,7 +141,6 @@ const Input = styled.input<{ $isError: boolean }>`
 const Label = styled.div`
   font-size: 14px;
   font-weight: 550;
-  /* margin-bottom: 6px; */
 `;
 
 const AuthInputContainer = styled.div<Pick<IAuthInputType, 'height' | 'label'>>`
