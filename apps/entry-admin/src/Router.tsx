@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
-import { FormulaCalculator } from './pages';
+import { ApplicantsList, FormulaCalculator } from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -14,6 +14,10 @@ export const Router = createBrowserRouter([
       {
         path: 'formula-calculator',
         element: <FormulaCalculator />,
+      },
+      {
+        path: 'applicants-list',
+        element: <ApplicantsList />,
       },
     ],
   },
