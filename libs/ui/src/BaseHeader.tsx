@@ -209,13 +209,18 @@ export const CommonHeader = () => {
   );
 };
 
-export const AuthHeader = () => {
+interface IAuthHeaderType {
+  isAdmin: boolean;
+}
+
+export const AuthHeader = ({ isAdmin }: IAuthHeaderType) => {
+  console.log('AuthHeader 렌더링, isAdmin:', isAdmin);
   const navigate = useNavigate();
 
   return (
     <AuthHeaderContainer>
       <LogoContainer onClick={() => navigate('/')}>
-        <EntryLogo />
+        <EntryLogo isAdmin={isAdmin} />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
           EntryDSM
         </Text>

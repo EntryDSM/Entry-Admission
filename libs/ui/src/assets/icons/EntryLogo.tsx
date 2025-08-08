@@ -11,6 +11,8 @@ export const EntryLogo = ({
   isAdmin = false,
   onClick,
 }: ILogoType) => {
+  console.log('EntryLogo 렌더링, isAdmin:', isAdmin);
+
   return (
     <svg
       onClick={onClick}

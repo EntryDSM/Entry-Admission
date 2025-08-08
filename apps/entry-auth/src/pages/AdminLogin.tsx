@@ -5,13 +5,14 @@ import { colors } from '@entry/design-token';
 import { AuthInput } from '@entry/ui';
 import { EntryAuthTitle } from '../components';
 
-export const LoginPage = () => {
+export const AdminLogin = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<boolean>(false);
   const navigate = useNavigate();
+  console.log('AdminLogin 렌더링됨');
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -47,7 +48,7 @@ export const LoginPage = () => {
   return (
     <BackGroundWrapper>
       <LoginPageContainer>
-        <EntryAuthTitle children="EntryDSM 로그인" isAdmin={false} />
+        <EntryAuthTitle children="EntryDSM 로그인" isAdmin={true} />
         <InputWrapper>
           <AuthInput
             type="phone"
@@ -80,11 +81,8 @@ export const LoginPage = () => {
           <AuthLink onClick={() => navigate('/find-password')}>
             비밀번호 찾기
           </AuthLink>
-          <div
-            style={{ cursor: 'pointer' }}
-            onClick={() => navigate('/admin-login')}
-          >
-            관리자 로그인
+          <div style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+            유저 로그인
           </div>
         </LoginKindContainer>
       </LoginPageContainer>
@@ -116,7 +114,7 @@ const LoginKindContainer = styled.div`
 const LoginButton = styled.button<{ $disabled: boolean }>`
   width: 360px;
   height: 48px;
-  background-color: ${colors.orange[800]};
+  background-color: ${colors.green[800]};
   opacity: ${(props) => (props.$disabled ? '0.4' : '1')};
   color: ${colors.extra.realWhite};
   margin-top: 20%;
@@ -127,7 +125,7 @@ const LoginButton = styled.button<{ $disabled: boolean }>`
   transition: all 0.4s ease;
 
   &:hover {
-    background-color: ${colors.orange[850]};
+    background-color: ${colors.green[800]};
     color: ${colors.gray[100]};
   }
 `;
