@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
 import {
+  AdminLogin,
   ChangePasswordPage,
   FindPasswordPage,
   LoginPage,
@@ -27,6 +28,10 @@ export const Router = createBrowserRouter([
       {
         path: '/find-password',
         element: <FindPasswordPage />,
+      },
+      {
+        path: '/admin-login',
+        element: <AdminLogin />,
       },
     ],
   },
