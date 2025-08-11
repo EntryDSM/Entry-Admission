@@ -1,4 +1,4 @@
-export * from './authTitle';
-export * from './card';
+export * from './AuthTitle';
+export * from './Card';
 export * from "./signup"
 export * from "./findPassword"
