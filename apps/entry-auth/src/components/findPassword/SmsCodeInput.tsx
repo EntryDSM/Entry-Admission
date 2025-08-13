@@ -15,9 +15,14 @@ export const SmsCodeInput = ({ onNext }: IPhoneInputType) => {
     if (code === '12345678') {
       console.log('인증 성공');
       setErrorMessage('');
-      onNext();
     } else {
       setErrorMessage('인증 번호가 올바르지 않습니다.');
+    }
+  };
+
+  const handleNext = () => {
+    if (!errorMessage) {
+      onNext();
     }
   };
 
@@ -30,7 +35,7 @@ export const SmsCodeInput = ({ onNext }: IPhoneInputType) => {
         onErrorClear={() => setErrorMessage('')}
         error={errorMessage}
       />
-      <NextButton>다음</NextButton>
+      <NextButton onClick={handleNext}>다음</NextButton>
     </SmsCodeInputContainer>
   );
 };

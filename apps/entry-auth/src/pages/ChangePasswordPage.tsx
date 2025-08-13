@@ -38,7 +38,7 @@ export const ChangePasswordPage = () => {
   return (
     <BackGroundWrapper>
       <ChangePasswordContainer>
-        <EntryAuthTitle children="EntryDSM 비밀번호 변경" />
+        <EntryAuthTitle isAdmin={false} children="EntryDSM 비밀번호 변경" />
         <InputsWrapper>
           <AuthInput
             type="password"

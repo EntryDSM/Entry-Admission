@@ -67,7 +67,7 @@ export const FindPasswordPage = () => {
         $width={containerWidth()}
         $height={containerHeight()}
       >
-        <EntryAuthTitle children="EntryDSM 비밀번호 찾기" />
+        <EntryAuthTitle isAdmin={false} children="EntryDSM 비밀번호 찾기" />
         {renderContent()}
         <ProgressIndicatorWrapper>
           <ProgressIndicator

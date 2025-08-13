@@ -51,7 +51,7 @@ export const SignUpPage = () => {
   return (
     <BackGroundWrapper>
       <SignUpPageContainer $width={containerWidth()}>
-        <EntryAuthTitle children="EntryDSM 회원가입" />
+        <EntryAuthTitle isAdmin={false} children="EntryDSM 회원가입" />
         {renderContent()}
         <ProgressIndicatorWrapper>
           <ProgressIndicator
