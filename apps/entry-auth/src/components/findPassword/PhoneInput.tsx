@@ -11,13 +11,30 @@ export const PhoneInput = ({ onNext }: IPhoneInputType) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(true);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPhoneNumber(value);
 
+    // 숫자만 추출
     const onlyNumber = value.replace(/[^\d]/g, '');
+
+    // 000-0000-0000 포뱃팅
+    let formattedNumber = '';
+
+    if (onlyNumber.length < 4) {
+      formattedNumber = onlyNumber;
+    } else if (onlyNumber.length < 8) {
+      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(3)}`;
+    } else {
+      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(
+        3,
+        7
+      )}-${onlyNumber.slice(7, 11)}`;
+    }
+
+    setPhoneNumber(formattedNumber);
+
     setPhoneError(onlyNumber.length < 10);
   };
 
@@ -26,23 +43,15 @@ export const PhoneInput = ({ onNext }: IPhoneInputType) => {
     setIsFormValid(isPhoneValid);
   }, [phoneNumber]);
 
-  const sendSMS = () => {
-    // 성공적으로 코드 발송했다고 가정
-    setIsSending(true);
-  };
+  // const sendSMS = () => {
+  //   // 성공적으로 코드 발송했다고 가정
+  //   setIsSending(true);
+  // };
 
   const handleNext = () => {
-    /* 
-    원래 코드
     if (isFormValid && isSending) {
-      sendSMS();
-      onNext(); 
+      onNext();
     }
-    */
-
-    // 두 조건 모두 만족이라 가정
-    sendSMS();
-    onNext();
   };
 
   return (
@@ -52,6 +61,7 @@ export const PhoneInput = ({ onNext }: IPhoneInputType) => {
         type="phone"
         label="전화번호"
         placeholder="인증번호를 받을 전화번호를 입력해주세요."
+        value={phoneNumber}
         isError={!!phoneError}
         errorMessage="올바른 형식이 아닙니다."
       />

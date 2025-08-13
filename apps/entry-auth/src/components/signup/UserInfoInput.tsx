@@ -26,9 +26,26 @@ export const UserInfoInput = () => {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPhoneNumber(value);
 
+    // 숫자만 추출
     const onlyNumber = value.replace(/[^\d]/g, '');
+
+    // 000-0000-0000 포뱃팅
+    let formattedNumber = '';
+
+    if (onlyNumber.length < 4) {
+      formattedNumber = onlyNumber;
+    } else if (onlyNumber.length < 8) {
+      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(3)}`;
+    } else {
+      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(
+        3,
+        7
+      )}-${onlyNumber.slice(7, 11)}`;
+    }
+
+    setPhoneNumber(formattedNumber);
+
     setPhoneError(onlyNumber.length < 10);
   };
 
@@ -110,6 +127,7 @@ export const UserInfoInput = () => {
           <AuthInput
             label="전화번호"
             placeholder="010-XXXX-XXXX"
+            value={phoneNumber}
             type="phone"
             onChange={handlePhoneChange}
             isError={!!phoneError}
@@ -186,7 +204,7 @@ const SignUpContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
+  gap: 40px;
   margin-top: 50px;
   width: 100%;
 

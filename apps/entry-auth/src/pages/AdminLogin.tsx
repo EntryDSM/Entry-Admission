@@ -70,7 +70,7 @@ export const AdminLogin = () => {
             type="phone"
             label="전화번호"
             placeholder="010-XXXX-XXXX"
-            value={phoneNumber} // <--- 추가
+            value={phoneNumber}
             onChange={handlePhoneChange}
             isError={!!phoneError}
             errorMessage="올바른 형식이 아닙니다."

@@ -75,7 +75,7 @@ const InputsWrapper = styled.div`
   align-items: center;
   width: 50%;
   margin-top: 58px;
-  gap: 22px;
+  gap: 40px;
 
   @media (max-width: 1065px) {
     width: 70%;
