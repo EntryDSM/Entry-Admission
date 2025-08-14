@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
-import { Button, ApplicationDataProvider } from '@entry/ui';
+import { Button } from '@entry/ui';
 import { PrimaryCalculationPage } from './PrimaryCalculationPage';
 import { GraduatedCalculationPage } from './GraduatedCalculationPage';
 import { QECalculationPage } from './QECalculationPage';
@@ -30,8 +30,7 @@ export const MainCalculationPage = () => {
   };
 
   return (
-    <ApplicationDataProvider>
-      <Flex isColumn={true} width="100%" height="100vh">
+    <Flex isColumn={true} width="100%" height="100vh">
         <Flex 
           padding="24px 40px" 
           borderBottom="1px solid #E5E5E5"
@@ -56,7 +55,6 @@ export const MainCalculationPage = () => {
         <Flex flex={1}>
           {renderCalculationPage()}
         </Flex>
-      </Flex>
-    </ApplicationDataProvider>
+    </Flex>
   );
 };

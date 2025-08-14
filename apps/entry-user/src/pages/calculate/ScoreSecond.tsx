@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Flex } from '@entry/design-token';
-import { GradeManager, usePageData } from '@entry/ui';
+import { GradeManager } from '@entry/ui';
+import { useCalculationPageData } from '../../contexts';
 
 export const ScoreSecond = () => {
   const location = useLocation();
@@ -9,17 +10,16 @@ export const ScoreSecond = () => {
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
   
   // 경로에 따라 다른 키 사용
-  const getDataKey = () => {
-    if (location.pathname.includes('second2')) return 'secondGraduate2';
-    if (location.pathname.includes('second1')) return 'secondGraduate1';
-    return 'secondGraduate'; // 기본값 (primary 플로우용)
+  const getDataKey = (): 'graduatedSecond2' | 'graduatedSecond1' | 'primarySecond' => {
+    if (location.pathname.includes('second2')) return 'graduatedSecond2';
+    if (location.pathname.includes('second1')) return 'graduatedSecond1';
+    return 'primarySecond';
   };
   
-  const [subjectGrades, setSubjectGrades] = usePageData(getDataKey());
+  const [subjectGrades, setSubjectGrades] = useCalculationPageData(getDataKey());
   
-  // 초기값이 없으면 빈 객체로 설정
   const safeSubjectGrades = subjectGrades || {};
-  const safeSetSubjectGrades = (grades: any) => {
+  const safeSetSubjectGrades = (grades: typeof subjectGrades) => {
     setSubjectGrades(grades || {});
   };
 

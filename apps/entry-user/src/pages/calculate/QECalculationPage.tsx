@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
-import { QEDScore, Activity } from '../';
+import { QEDScore, Activity } from './';
 
 const STEPS = [
   { key: 'qeScore', label: '검정고시 점수' },

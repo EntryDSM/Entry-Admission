@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Text } from '@entry/design-token';
-import { AttendanceForm, CertCheckForm, usePageData } from '@entry/ui';
+import { AttendanceForm, CertCheckForm } from '@entry/ui';
+import { useCalculationPageData } from '../../contexts';
 
 const Container = styled.div`
   display: flex;
@@ -29,17 +30,17 @@ const GridContainer = styled.div`
 export const Activity = () => {
   const location = useLocation();
   
-  const getDataKey = () => {
-    if (location.pathname.includes('primary/activity')) return 'primaryActivity';
-    if (location.pathname.includes('graduated/activity')) return 'graduatedActivity';
-    if (location.pathname.includes('qe/activity')) return 'qeActivity';
-    return 'activity';
+  const getDataKey = (): 'primaryActivity' | 'graduatedActivity' | 'qeActivity' => {
+    if (location.pathname.includes('primary')) return 'primaryActivity';
+    if (location.pathname.includes('graduated')) return 'graduatedActivity';
+    if (location.pathname.includes('qe')) return 'qeActivity';
+    return 'primaryActivity';
   };
   
-  const [activityData, setActivityData] = usePageData(getDataKey());
+  const [activityData, setActivityData] = useCalculationPageData(getDataKey());
   
   const safeActivityData = activityData || {};
-  const safeSetActivityData = (data: any) => {
+  const safeSetActivityData = (data: typeof activityData) => {
     setActivityData(data || {});
   };
   
