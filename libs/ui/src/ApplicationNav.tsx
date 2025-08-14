@@ -10,6 +10,8 @@ import {
   hasChanged,
   serializeStateWithFiles,
 } from './utils/skipNextAutoSave';
+import { BeatLoader } from 'react-spinners';
+
 
 interface IApplicationNavType {
   totalPages: number;
@@ -29,6 +31,7 @@ export const ApplicationNav = ({
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
   const [_, setHasUnsavedChanges] = useState(false);
   const isNavigationSavingRef = useRef<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { saveToStorage, state } = useApplicationData();
   const [checkData] = useCheckPageData('check');
@@ -104,8 +107,18 @@ export const ApplicationNav = ({
     setCurrentPage(targetPage);
   };
 
-  const handleSubmit = () => {
-    navigate('/submitted');
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      // 제출 API 호출
+      await new Promise(resolve => setTimeout(resolve, 4000)); //예시 api -> 연동 시 삭제
+      await performSave(state, saveToStorage, true); 
+      navigate('/submitted');
+    } catch (error) {
+      console.error('제출 중 오류 발생', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isGraduationTypeSelected = Boolean(
@@ -153,6 +166,11 @@ export const ApplicationNav = ({
           다음
         </PreviousButton>
       )}
+      {isLoading && (
+        <LoadingModal>
+          <BeatLoader color={colors.orange[800]}/>
+        </LoadingModal>
+      )}
     </Flex>
   );
 };
@@ -183,6 +201,19 @@ function renderPageIndicators(
     );
   });
 }
+
+const LoadingModal = styled.div `
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(0, 0, 0, 0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+`
 
 const PageIndicator = styled.nav<{ isActive: boolean }>`
   cursor: pointer;
