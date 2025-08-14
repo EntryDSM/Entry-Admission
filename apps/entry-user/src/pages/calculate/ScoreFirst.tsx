@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Flex } from '@entry/design-token';
-import { GradeManager, usePageData } from '@entry/ui';
+import { GradeManager } from '@entry/ui';
+import { useCalculationPageData } from '../../contexts';
 
 export const ScoreFirst = () => {
   const location = useLocation();
   const subjects = ['국어', '사회', '역사', '수학', '과학', '기술 · 가정'];
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
   
-  // 경로에 따라 다른 키 사용
-  const getDataKey = () => {
-    if (location.pathname.includes('qe/score')) return 'qeScore';
-    return 'firstGraduate'; // 기본값 (primary 플로우용)
+  const getDataKey = (): 'primaryFirst' => {
+    return 'primaryFirst';
   };
   
-  const [subjectGrades, setSubjectGrades] = usePageData(getDataKey());
+  const [subjectGrades, setSubjectGrades] = useCalculationPageData(getDataKey());
   
-  // 초기값이 없으면 빈 객체로 설정
   const safeSubjectGrades = subjectGrades || {};
-  const safeSetSubjectGrades = (grades: any) => {
+  const safeSetSubjectGrades = (grades: typeof subjectGrades) => {
     setSubjectGrades(grades || {});
   };
 

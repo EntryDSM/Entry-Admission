@@ -165,7 +165,7 @@ const PageContainer = styled.div`
   background-color: white;
   display: flex;
   justify-content: center;
-  padding: 40px 0;
+  padding: 40px 0 200px 0;
 `;
 
 const ContentWrapper = styled.div`

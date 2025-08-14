@@ -5,9 +5,9 @@ import { colors, Flex, Text } from '@entry/design-token';
 import {
   ScorePageNav,
   Button,
-  ApplicationDataProvider,
   TabSection,
 } from '@entry/ui';
+import { CalculationDataProvider } from '../contexts';
 import { ScoreResultModal } from '../components';
 
 type CalculationType = 'primary' | 'graduated' | 'qe';
@@ -124,7 +124,7 @@ export const CalculateLayout = () => {
   };
 
   return (
-    <ApplicationDataProvider>
+    <CalculationDataProvider>
       <PageContainer>
         <ContentWrapper>
           <MainContainer>
@@ -189,17 +189,18 @@ export const CalculateLayout = () => {
           </MainContainer>
         </ContentWrapper>
       </PageContainer>
-    </ApplicationDataProvider>
+    </CalculationDataProvider>
   );
 };
 
 const PageContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 70px);
   background-color: white;
   display: flex;
   justify-content: center;
   padding: 0;
+  padding-bottom: 200px;
 `;
 
 const ContentWrapper = styled.div`
@@ -211,7 +212,7 @@ const ContentWrapper = styled.div`
 
 const MainContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  min-height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
 `;

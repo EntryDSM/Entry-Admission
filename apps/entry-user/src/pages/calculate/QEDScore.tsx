@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Flex, Text } from '@entry/design-token';
-import { AttendanceForm, usePageData } from '@entry/ui';
+import { AttendanceForm } from '@entry/ui';
+import { useCalculationPageData } from '../../contexts';
 
 const Container = styled.div`
   display: flex;
@@ -22,14 +23,10 @@ const Column = styled.div`
 export const QEDScore = () => {
   const location = useLocation();
   
-  const getDataKey = () => {
-    return 'qeScore';
-  };
-  
-  const [scoreData, setScoreData] = usePageData(getDataKey());
+  const [scoreData, setScoreData] = useCalculationPageData('qeScore');
   
   const safeScoreData = scoreData || {};
-  const safeSetScoreData = (data: any) => {
+  const safeSetScoreData = (data: typeof scoreData) => {
     setScoreData(data || {});
   };
   

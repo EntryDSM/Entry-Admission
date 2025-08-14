@@ -30,9 +30,10 @@ export const AdmissionOverviewPage = () => {
 
 const PageContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh + 200px);
   background-color: white;
   position: relative;
+  padding-bottom: 150px;
 `;
 
 const Title = styled.h1`
