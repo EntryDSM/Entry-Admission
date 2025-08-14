@@ -38,6 +38,7 @@ export const Button = ({
 };
 
 const BtnContainer = styled.button<Omit<IBtnType, 'onClick' | 'children'>>`
+  width: ${({width}) => width};
   height: 48px;
   min-width: 83px;
   opacity: ${({ isBlocked }) => (isBlocked ? 0.5 : 1)};
