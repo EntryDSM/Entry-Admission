@@ -4,23 +4,23 @@ import { AttendanceForm, usePageData } from '@entry/ui';
 export const GedScore = () => {
   const [datas, setDatas] = usePageData('gedScore');
   const handleKoreanChange = (value: string) => {
-    setDatas({ ...datas, korean: value });
+    setDatas({ ...datas, kor: value });
   };
 
   const handleSocialStudiesChange = (value: string) => {
-    setDatas({ ...datas, socialStudies: value });
+    setDatas({ ...datas, soc: value });
   };
 
   const handleHistoryChange = (value: string) => {
-    setDatas({ ...datas, history: value });
+    setDatas({ ...datas, his: value });
   };
 
   const handleScienceChange = (value: string) => {
-    setDatas({ ...datas, science: value });
+    setDatas({ ...datas, sci: value });
   };
 
   const handleTechAndHomeEconomicsChange = (value: string) => {
-    setDatas({ ...datas, techAndHomeEconomics: value });
+    setDatas({ ...datas, tech: value });
   };
 
   const handleMathChange = (value: string) => {
@@ -28,7 +28,7 @@ export const GedScore = () => {
   };
 
   const handleEnglishChange = (value: string) => {
-    setDatas({ ...datas, english: value });
+    setDatas({ ...datas, eng: value });
   }; 
 
   return (
@@ -46,7 +46,7 @@ export const GedScore = () => {
           title="국어"
           defaultCount={10}
           suffix="점"
-          value={datas.korean}
+          value={datas.kor}
         />
         <AttendanceForm
           onChange={handleSocialStudiesChange}
@@ -54,7 +54,7 @@ export const GedScore = () => {
           title="사회"
           defaultCount={10}
           suffix="점"
-          value={datas.socialStudies}
+          value={datas.soc}
         />
         <AttendanceForm
           onChange={handleHistoryChange}
@@ -62,7 +62,7 @@ export const GedScore = () => {
           title="역사"
           defaultCount={10}
           suffix="점"
-          value={datas.history}
+          value={datas.his}
         />
         <AttendanceForm
           onChange={handleScienceChange}
@@ -70,7 +70,7 @@ export const GedScore = () => {
           title="과학"
           defaultCount={10}
           suffix="점"
-          value={datas.science}
+          value={datas.sci}
         />
         <AttendanceForm
           onChange={handleTechAndHomeEconomicsChange}
@@ -78,7 +78,7 @@ export const GedScore = () => {
           title="기술 · 가정"
           defaultCount={10}
           suffix="점"
-          value={datas.techAndHomeEconomics}
+          value={datas.tech}
         />
         <AttendanceForm
           onChange={handleMathChange}
@@ -90,7 +90,7 @@ export const GedScore = () => {
         />
         <AttendanceForm
           onChange={handleEnglishChange}
-          value={datas.english}
+          value={datas.eng}
           width={'498px'}
           title="영어"
           defaultCount={10}

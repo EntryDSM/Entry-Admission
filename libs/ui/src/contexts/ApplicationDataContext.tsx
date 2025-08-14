@@ -44,13 +44,13 @@ interface IFifthPageType {
 }
 
 interface IGedScoreType {
-  korean: number | null;
-  socialStudies: number | null;
-  history: number | null;
-  science: number | null;
-  techAndHomeEconomics: number | null;
+  kor: number | null;
+  soc: number | null;
+  his: number | null;
+  sci: number | null;
+  tech: number | null;
   math: number | null;
-  english: number | null;
+  eng: number | null;
 }
 
 interface IGedAttendanceVolunteerType {
@@ -80,7 +80,7 @@ interface IActivityType {
   unexcused : string,//미인정
 }
 
-interface ApplicationState {
+export interface ApplicationState {
   first: IFirstPageType;
   second: ISecondPageType;
   third: IThirdPageType;
@@ -142,13 +142,13 @@ const initialState: ApplicationState = {
     studyPlan: '',
   },
   gedScore: {
-    korean: null,
-    socialStudies: null,
-    history: null,
-    science: null,
-    techAndHomeEconomics: null,
+    kor: null,
+    soc: null,
+    his: null,
+    sci: null,
+    tech: null,
     math: null,
-    english: null,
+    eng: null,
   },
   attendanceVolunteer: {
     dsmAlgorithm: null,

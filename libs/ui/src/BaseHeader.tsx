@@ -214,7 +214,6 @@ interface IAuthHeaderType {
 }
 
 export const AuthHeader = ({ isAdmin }: IAuthHeaderType) => {
-  console.log('AuthHeader 렌더링, isAdmin:', isAdmin);
   const navigate = useNavigate();
 
   return (
