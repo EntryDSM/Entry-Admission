@@ -86,16 +86,17 @@ export const Landing = () => {
           </ContentContainer>
           <ContentContainer>
             <Text fontSize={18} fontWeight={500}>
-              현재 ‘
+              현재 
               <Text
                 isSpan={true}
                 fontSize={18}
                 fontWeight={500}
                 color={colors.orange[800]}
               >
+                {" "}
                 {name}
               </Text>
-              ’ 지원자님 계정으로 로그인되어 있습니다.
+              {" "}지원자님 계정으로 로그인되어 있습니다.
             </Text>
           </ContentContainer>
         </Flex>
