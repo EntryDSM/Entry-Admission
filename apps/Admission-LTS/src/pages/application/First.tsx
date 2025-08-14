@@ -85,7 +85,6 @@ export const First = () => {
 
       <FormElement
         explanation="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
-        warning="졸업 예정자의 경우 졸업 예정월만 선택해주세요."
         label="졸업 연월"
         type="dropDown"
         dropDownDatas={formDropDownData[0].data}
