@@ -52,9 +52,9 @@ export const AdminHeader = () => {
   const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
   const navData = [
-    { name: '공지사항', path: '/a' },
-    { name: '지원자 조회', path: '/b' },
-    { name: '통계', path: '/c' },
+    { name: '공지사항', path: '/notice' },
+    { name: '지원자 조회', path: '/applicants-list' },
+    { name: '통계', path: '/' },
     { name: '수식', path: '/formula-calculator' },
   ];
 
