@@ -26,7 +26,8 @@ export const Router = createBrowserRouter([
       {
         path: 'admissions-quota',
         element: <AdmissionsQuota/>
-      }
+      },
+      {
         path: 'notice',
         element: <NoticeList />,
       },
