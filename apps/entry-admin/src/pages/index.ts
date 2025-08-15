@@ -1,5 +1,7 @@
 export * from './FormulaCalculator';
 export * from './ApplicantsList';
+export * from './AdmissionsQuota'
+export * from './AdmissionsSchedule'
 export * from './NoticeList';
 export * from './NoticeCreate';
 export * from './NoticeEdit';

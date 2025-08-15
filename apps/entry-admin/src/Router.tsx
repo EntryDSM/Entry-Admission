@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
-import { ApplicantsList, FormulaCalculator, NoticeList, NoticeCreate, NoticeEdit, ApplicantsList, FormulaCalculator, StatisticsLandingPage } from './pages';
+import { AdmissionsQuota, AdmissionsSchedule, ApplicantsList, FormulaCalculator, NoticeList, NoticeCreate, NoticeEdit, StatisticsLandingPage } from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -18,6 +18,14 @@ export const Router = createBrowserRouter([
       {
         path: 'applicants-list',
         element: <ApplicantsList />,
+      },
+      {
+        path: 'admissions-schedule',
+        element : <AdmissionsSchedule/>
+      },
+      {
+        path: 'admissions-quota',
+        element: <AdmissionsQuota/>
       },
       {
         path: 'notice',
