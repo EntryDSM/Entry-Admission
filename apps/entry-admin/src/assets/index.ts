@@ -1,1 +1,11 @@
 export { default as search } from './search.svg';
+export { ApplicationPeriodIcon } from './01ApplicationPeriodIcon';
+export { AdmissionRateIcon } from './02AdmissionRateIcon';
+export { CompetitionRateIcon } from './03CompetitionRateIcon';
+export { FirstRoundDeadlineIcon } from './04FirstRoundDeadlineIcon';
+export { OneIcon } from './OneIcon';
+export { TwoIcon } from './TwoIcon';
+export { ThreeIcon } from './ThreeIcon';
+export { FourIcon } from './FourIcon';
+export { NationalMapMarker } from './NationalMapMarker';
+export { ArrowIcon } from './ArrowIcon';
