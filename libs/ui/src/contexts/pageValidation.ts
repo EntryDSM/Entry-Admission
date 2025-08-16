@@ -6,9 +6,31 @@ const isEmpty = (value: any) => value === null || value === undefined || (typeof
 // 필드 값 가져오기
 const getFieldValue = (obj: any, field: string) => obj && typeof obj === 'object' ? obj[field] : undefined;
 
+// /first 페이지 특별 검증 함수
+const validateFirstPage = (data: any) => {
+  const missingFields = [];
+  
+  // 기본 필수 필드들
+  ['typeSelection', 'regionSelection', 'graduationType'].forEach(field => {
+    if (isEmpty(getFieldValue(data, field))) {
+      missingFields.push(field);
+    }
+  });
+  
+  // graduationType에 따른 graduationDate 검증
+  const graduationType = getFieldValue(data, 'graduationType');
+  if (graduationType && graduationType !== '검정고시 (중학교 졸업 학력)') {
+    if (isEmpty(getFieldValue(data, 'graduationDate'))) {
+      missingFields.push('graduationDate');
+    }
+  }
+  
+  return missingFields;
+};
+
 // 페이지별 필수 필드 검증
 const pageValidations: Record<string, (data: any) => string[]> = {
-  '/first': d => ['typeSelection','regionSelection','graduationType','graduationDate'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/first': validateFirstPage,
   '/second': d => ['idPhoto','applicantName','dateOfBirth','gender'].filter(f => isEmpty(getFieldValue(d,f))),
   '/third': d => ['guardianName','applicantNumber','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
   '/fourth': d => ['schoolName', 'studentId', 'schoolPhone','teacherName'].filter(f => isEmpty(getFieldValue(d,f))),
