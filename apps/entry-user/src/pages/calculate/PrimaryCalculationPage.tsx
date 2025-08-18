@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
-import { ScoreThird, Activity } from '../';
+import { ScoreThird, Activity } from './';
 
 const STEPS = [
   { key: 'current', label: '3학년 1학기' },

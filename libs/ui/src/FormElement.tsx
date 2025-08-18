@@ -126,9 +126,9 @@ export const FormElement = React.memo<FormElementProps>((props) => {
       case 'dropDown':
         return (props.dropDownValues?.length ?? 0) > 0;
       case 'search':
-        return props.selectedValue !== null && props.selectedValue !== undefined;
+        return props.selectedValue !== null && props.selectedValue !== undefined && props.selectedValue !== '';
       case 'address':
-        return true;
+        return props.addressDetailValue !== null && props.addressValue !== null && props.postalCodeValue !== null && props.addressDetailValue !== "" && props.addressValue !== "" && props.postalCodeValue !== "" ;
       default:
         return false;
     }

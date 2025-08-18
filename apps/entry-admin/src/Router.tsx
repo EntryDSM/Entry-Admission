@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
-import { ApplicantsList, FormulaCalculator } from './pages';
+import { AdmissionsQuota, AdmissionsSchedule, ApplicantsList, FormulaCalculator, NoticeList, NoticeCreate, NoticeEdit, StatisticsLandingPage } from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -9,7 +9,7 @@ export const Router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <div>dd</div>,
+        element: <StatisticsLandingPage />,
       },
       {
         path: 'formula-calculator',
@@ -18,6 +18,26 @@ export const Router = createBrowserRouter([
       {
         path: 'applicants-list',
         element: <ApplicantsList />,
+      },
+      {
+        path: 'admissions-schedule',
+        element : <AdmissionsSchedule/>
+      },
+      {
+        path: 'admissions-quota',
+        element: <AdmissionsQuota/>
+      },
+      {
+        path: 'notice',
+        element: <NoticeList />,
+      },
+      {
+        path: 'notice/create',
+        element: <NoticeCreate />,
+      },
+      {
+        path: 'notice/edit/:id',
+        element: <NoticeEdit />,
       },
     ],
   },

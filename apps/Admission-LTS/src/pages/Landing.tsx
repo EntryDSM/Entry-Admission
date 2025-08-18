@@ -1,5 +1,5 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { EntryLogo } from '@entry/ui';
+import { Button, EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -86,38 +86,25 @@ export const Landing = () => {
           </ContentContainer>
           <ContentContainer>
             <Text fontSize={18} fontWeight={500}>
-              현재 ‘
+              현재 
               <Text
                 isSpan={true}
                 fontSize={18}
                 fontWeight={500}
                 color={colors.orange[800]}
               >
+                {" "}
                 {name}
               </Text>
-              ’ 지원자님 계정으로 로그인되어 있습니다.
+              {" "}지원자님 계정으로 로그인되어 있습니다.
             </Text>
           </ContentContainer>
         </Flex>
+        <Button width='100%' onClick={handleStartClick}>원서 접수 시작</Button>
       </Flex>
-      <Btn onClick={handleStartClick}>원서 접수 시작</Btn>
     </Flex>
   );
 };
-
-const Btn = styled.button`
-  cursor: pointer;
-  width: 426px;
-  height: 51px;
-  border-radius: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: ${colors.extra.realWhite};
-  background-color: ${colors.orange[800]};
-`;
 
 const ContentContainer = styled.div`
   width: 100%;
