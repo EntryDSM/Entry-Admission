@@ -16,6 +16,7 @@ export const AppLayout = () => {
     '/application-preview','/submit-check',
   ];
 
+  
   const pageProspectiveGraduateRoutes = [
     '/application-classification','/applicant-info','/guardian-info','/middle-school-info','/personal-statements',
     '/first-prospective-graduate','/second-prospective-graduate','/third-prospective-graduate','/activity-prospective-graduate',
