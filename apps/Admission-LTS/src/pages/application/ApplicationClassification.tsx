@@ -3,8 +3,8 @@ import { FormElement } from '@entry/ui';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 
-export const First = () => {
-  const [datas, setDatas] = usePageData('first');
+export const ApplicationClassification = () => {
+  const [datas, setDatas] = usePageData('applicationClassification');
 
   // 1990 ~ 2025년 생성
   const yearDates = eachYearOfInterval({

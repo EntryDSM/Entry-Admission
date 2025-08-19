@@ -10,9 +10,9 @@ import {
 import {
   ActivityGraduate,
   ActivityProspectiveGraduate,
-  First,
-  Fourth,
-  Fifth,
+  ApplicationClassification,
+  MiddleSchoolInfo,
+  PersonalStatements,
   Landing,
   ScoreFirst,
   ScoreFirstProspectiveGraduate,
@@ -21,10 +21,10 @@ import {
   ScoreSecondProspectiveGraduate,
   ScoreThird,
   ScoreThirdProspectiveGraduate,
-  Second,
+  ApplicantInfo,
   SubmitCheck,
   Submitted,
-  Third,
+  GuardianInfo,
 } from './pages';
 import { ApplicationPreview } from './pages/applicationCheck';
 import { Page404 } from '@entry/ui';
@@ -110,24 +110,24 @@ export const Router = createBrowserRouter([
                 ],
               },
               {
-                path: 'first',
-                element: <First />,
+                path: 'application-classification',
+                element: <ApplicationClassification />,
               },
               {
-                path: 'second',
-                element: <Second />,
+                path: 'applicant-info',
+                element: <ApplicantInfo />,
               },
               {
-                path: 'third',
-                element: <Third/>,
+                path: 'guardian-info',
+                element: <GuardianInfo />,
               },
               {
-                path: 'fourth',
-                element: <Fourth />,
+                path: 'middle-school-info',
+                element: <MiddleSchoolInfo />,
               },
               {
-                path: 'fifth',
-                element: <Fifth />,
+                path: 'personal-statements',
+                element: <PersonalStatements />,
               },
             ],
           },
