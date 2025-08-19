@@ -80,14 +80,14 @@ export const ApplicationLayout = () => {
   }, [state, scheduleAutoSave]);
 
   useEffect(() => {
-    if (pathname.includes('second')) {
+    if (pathname.includes('applicant-info')) {
       setTitle('지원자 인적사항');
-    } else if (pathname.includes('third')) {
+    } else if (pathname.includes('guardian-info')) {
       setTitle('보호자 인적사항');
-    } else if (pathname.includes('fourth')) {
+    } else if (pathname.includes('middle-school-info')) {
       setTitle('중학교 정보 입력');
-    } else if (pathname.includes('fifth')) {
-      setTitle('자기소개서 & 학업계획서 ');
+    } else if (pathname.includes('personal-statements')) {
+      setTitle('자기소개서 & 학업계획서');
     } else {
       setTitle('지원자 전형 구분');
     }

@@ -7,27 +7,27 @@ import { toast } from 'react-toastify'
 export const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [datas] = usePageData('first');
+  const [datas] = usePageData('applicationClassification');
   const { state } = useApplicationData(); // 전체 상태 가져오기
 
   const pageGraduateRoutes = [
-    '/first','/second','/third','/fourth','/fifth',
+    '/application-classification','/applicant-info','/guardian-info','/middle-school-info','/personal-statements',
     '/first-graduate','/second-graduate','/third-graduate','/fourth-graduate','/activity-graduate',
     '/application-preview','/submit-check',
   ];
 
   const pageProspectiveGraduateRoutes = [
-    '/first','/second','/third','/fourth','/fifth',
+    '/application-classification','/applicant-info','/guardian-info','/middle-school-info','/personal-statements',
     '/first-prospective-graduate','/second-prospective-graduate','/third-prospective-graduate','/activity-prospective-graduate',
     '/application-preview','/submit-check',
   ];
 
   const gedPageRoutes = [
-    '/first','/second','/third','/fourth','/fifth',
+    '/application-classification','/applicant-info','/guardian-info','/personal-statements',
     '/ged/score','/ged/attendance-volunteer','/application-preview','/submit-check',
   ];
 
-  const { graduationType } = datas;
+  const graduationType = datas?.graduationType;
 
   const routes = (() => {
     if (graduationType === '검정고시 (중학교 졸업 학력)') return gedPageRoutes;

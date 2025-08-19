@@ -1,8 +1,8 @@
 import { Flex } from '@entry/design-token';
 import { FormElement, usePageData } from '@entry/ui';
 
-export const Fifth = () => {
-  const [datas, setDatas] = usePageData('fifth');
+export const PersonalStatements = () => {
+  const [datas, setDatas] = usePageData('personalStatements');
 
   const handlePersonalStmtChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

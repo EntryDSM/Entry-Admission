@@ -1,8 +1,8 @@
 import { Flex } from "@entry/design-token"
 import { FormElement, usePageData } from "@entry/ui"
 
-export const Third = () => {
-  const [datas, setDatas] = usePageData('third')
+export const GuardianInfo = () => {
+  const [datas, setDatas] = usePageData('guardianInfo')
   const formRadioData = [
     {
       name: '성별',

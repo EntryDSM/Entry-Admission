@@ -5,40 +5,40 @@ import React, {
   useCallback,
 } from 'react';
 
-interface IFirstPageType {
+interface IApplicationClassificationType {
   typeSelection: string;
   regionSelection: string;
   graduationType: string;
   graduationDate: (string | number)[];
 }
 
-interface ISecondPageType {
+interface IApplicantInfoType {
   idPhoto: string | null;
   applicantName: string;
   dateOfBirth: (string | number)[];
   specialNotes: string;
-  gender: string,
+  gender: string;
 }
 
-interface IThirdPageType {
+interface IGuardianInfoType {
   guardianName: string;
   applicantNumber: string;
   guardianNumber: string;
   gender: string;
   relationship: string[];
-  postalCode: string,//우편번호
-  address: string, //기본주소
-  addressDetail: string,//상세주소
+  postalCode: string; //우편번호
+  address: string; //기본주소
+  addressDetail: string; //상세주소
 }
 
-interface IFourthPageType {
+interface IMiddleSchoolInfoType {
   schoolName: string;
   studentId: number | null;
   schoolPhone: string;
   teacherName: string;
 }
 
-interface IFifthPageType {
+interface IPersonalStatementsType {
   personalStmt: string;
   studyPlan: string;
 }
@@ -65,7 +65,7 @@ interface IScoreType {
   math: string | null; // 수학
   sci: string | null; // 과학
   tech: string | null; // 기술 · 가정
-  eng: string | null;//영어
+  eng: string | null; //영어
   [key: string]: string | null;
 }
 
@@ -77,15 +77,15 @@ interface IActivityType {
   dsmAlgorithm: 'O' | 'X' | null;
   certificate: 'O' | 'X' | null;
   volunteer: string; //봉사시간
-  unexcused : string,//미인정
+  unexcused: string; //미인정
 }
 
 export interface ApplicationState {
-  first: IFirstPageType;
-  second: ISecondPageType;
-  third: IThirdPageType;
-  fourth: IFourthPageType;
-  fifth: IFifthPageType;
+  applicationClassification: IApplicationClassificationType;
+  applicantInfo: IApplicantInfoType;
+  guardianInfo: IGuardianInfoType;
+  middleSchoolInfo: IMiddleSchoolInfoType;
+  personalStatements: IPersonalStatementsType;
   gedScore: IGedScoreType;
   attendanceVolunteer: IGedAttendanceVolunteerType;
   firstGraduate: IScoreType;
@@ -108,20 +108,20 @@ type ApplicationAction =
   | { type: 'CLEAR_ALL_DATA' };
 
 const initialState: ApplicationState = {
-  first: {
+  applicationClassification: {
     typeSelection: '',
     regionSelection: '',
     graduationType: '',
     graduationDate: [],
   },
-  second: {
+  applicantInfo: {
     idPhoto: null,
     applicantName: '',
     dateOfBirth: [],
     specialNotes: '',
-    gender: ''
+    gender: '',
   },
-  third: {
+  guardianInfo: {
     guardianName: '',
     applicantNumber: '',
     guardianNumber: '',
@@ -131,13 +131,13 @@ const initialState: ApplicationState = {
     address: '',
     addressDetail: '',
   },
-  fourth: {
+  middleSchoolInfo: {
     schoolName: '',
     studentId: null,
     schoolPhone: '',
     teacherName: '',
   },
-  fifth: {
+  personalStatements: {
     personalStmt: '',
     studyPlan: '',
   },
@@ -198,7 +198,7 @@ const initialState: ApplicationState = {
     dsmAlgorithm: null,
     certificate: null,
     volunteer: '', //봉사시간
-    unexcused : '',//미인정
+    unexcused: '', //미인정
   },
   firstGraduateProspective: {
     kor: null, // 국어
@@ -235,7 +235,7 @@ const initialState: ApplicationState = {
     dsmAlgorithm: null,
     certificate: null,
     volunteer: '', //봉사시간
-    unexcused : '',//미인정
+    unexcused: '', //미인정
   },
 };
 

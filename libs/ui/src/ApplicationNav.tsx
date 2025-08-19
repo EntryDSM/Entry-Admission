@@ -26,7 +26,7 @@ export const ApplicationNav = ({
   validateCurrentPage,
   toast = (msg: string) => window.alert(msg),
 }: IApplicationNavType) => {
-  const [datas] = usePageData('first');
+  const [datas] = usePageData('applicationClassification');
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
   const [_, setHasUnsavedChanges] = useState(false);
   const isNavigationSavingRef = useRef<boolean>(false);

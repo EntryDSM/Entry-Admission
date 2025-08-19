@@ -6,8 +6,8 @@ const isEmpty = (value: any) => value === null || value === undefined || (typeof
 // 필드 값 가져오기
 const getFieldValue = (obj: any, field: string) => obj && typeof obj === 'object' ? obj[field] : undefined;
 
-// /first 페이지 특별 검증 함수
-const validateFirstPage = (data: any) => {
+// /application-classification 페이지 특별 검증 함수
+const validateApplicationClassificationPage = (data: any) => {
   const missingFields = [];
   
   // 기본 필수 필드들
@@ -30,11 +30,11 @@ const validateFirstPage = (data: any) => {
 
 // 페이지별 필수 필드 검증
 const pageValidations: Record<string, (data: any) => string[]> = {
-  '/first': validateFirstPage,
-  '/second': d => ['idPhoto','applicantName','dateOfBirth','gender'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/third': d => ['guardianName','applicantNumber','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/fourth': d => ['schoolName', 'studentId', 'schoolPhone','teacherName'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/fifth': d => ['personalStmt','studyPlan'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/application-classification': validateApplicationClassificationPage,
+  '/applicant-info': d => ['idPhoto','applicantName','dateOfBirth','gender'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/guardian-info': d => ['guardianName','applicantNumber','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/middle-school-info': d => ['schoolName', 'studentId', 'schoolPhone','teacherName'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/personal-statements': d => ['personalStmt','studyPlan'].filter(f => isEmpty(getFieldValue(d,f))),
   '/first-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/second-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/third-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
@@ -95,11 +95,11 @@ export const validatePageData = (state: ApplicationState, route: string) => {
 
   let data: any = {};
   switch(route){
-    case '/first': data = state.first || {}; break;
-    case '/second': data = state.second || {}; break;
-    case '/third': data = state.third || {}; break;
-    case '/fourth': data = state.fourth || {}; break;
-    case '/fifth': data = state.fifth || {}; break;
+    case '/application-classification': data = state.applicationClassification || {}; break;
+    case '/applicant-info': data = state.applicantInfo || {}; break;
+    case '/guardian-info': data = state.guardianInfo || {}; break;
+    case '/middle-school-info': data = state.middleSchoolInfo || {}; break;
+    case '/personal-statements': data = state.personalStatements || {}; break;
     case '/first-graduate': data = state.firstGraduate || {}; break;
     case '/second-graduate': data = state.secondGraduate || {}; break;
     case '/third-graduate': data = state.thirdGraduate || {}; break;

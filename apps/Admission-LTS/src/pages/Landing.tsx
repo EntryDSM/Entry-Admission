@@ -9,7 +9,7 @@ export const Landing = () => {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
-    navigate('/first');
+    navigate('/application-classification');
   };
   return (
     <Flex

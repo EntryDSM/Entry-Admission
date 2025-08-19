@@ -4,8 +4,8 @@ import { FormElement } from '@entry/ui';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 
-export const Second = () => {
-  const [datas, setDatas] = usePageData('second');
+export const ApplicantInfo = () => {
+  const [datas, setDatas] = usePageData('applicantInfo');
 
   // 1990~2025년 배열
   const years = eachYearOfInterval({
