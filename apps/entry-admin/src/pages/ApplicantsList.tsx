@@ -2,11 +2,23 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import {
   Applicant,
+  ApplicantDetailModal,
   ApplicantExortBtn,
   CheckBox,
   FindApplicantInput,
+  PagiNation,
 } from '../components';
 import { colors } from '@entry/design-token';
+import { useModal } from '@entry/ui';
+
+interface IApplicantType {
+  number: number;
+  name: string;
+  region: string;
+  admission: string;
+  received: boolean;
+  submitted: boolean;
+}
 
 const ApplicantsListMock = [
   {
@@ -18,19 +30,115 @@ const ApplicantsListMock = [
     submitted: false,
   },
   {
-    number: 1,
-    name: '홍길동',
+    number: 2,
+    name: '김철수',
+    region: '전국',
+    admission: '일반 전형',
+    received: true,
+    submitted: true,
+  },
+  {
+    number: 3,
+    name: '박영희',
+    region: '대전',
+    admission: '사회통합 전형',
+    received: false,
+    submitted: false,
+  },
+  {
+    number: 4,
+    name: '이민수',
+    region: '전국',
+    admission: '마이스터 인재 전형',
+    received: true,
+    submitted: false,
+  },
+  {
+    number: 5,
+    name: '정수진',
+    region: '대전',
+    admission: '일반 전형',
+    received: true,
+    submitted: true,
+  },
+  {
+    number: 6,
+    name: '최영준',
+    region: '전국',
+    admission: '사회통합 전형',
+    received: false,
+    submitted: false,
+  },
+  {
+    number: 7,
+    name: '강민지',
     region: '대전',
     admission: '마이스터 인재 전형',
     received: true,
     submitted: false,
   },
   {
-    number: 1,
-    name: '홍길동',
+    number: 8,
+    name: '윤서준',
+    region: '전국',
+    admission: '일반 전형',
+    received: true,
+    submitted: true,
+  },
+  {
+    number: 9,
+    name: '임하은',
+    region: '대전',
+    admission: '사회통합 전형',
+    received: false,
+    submitted: false,
+  },
+  {
+    number: 10,
+    name: '장도현',
+    region: '전국',
+    admission: '마이스터 인재 전형',
+    received: true,
+    submitted: false,
+  },
+  {
+    number: 11,
+    name: '조예린',
+    region: '대전',
+    admission: '일반 전형',
+    received: true,
+    submitted: true,
+  },
+  {
+    number: 12,
+    name: '신우혁',
+    region: '전국',
+    admission: '사회통합 전형',
+    received: false,
+    submitted: false,
+  },
+  {
+    number: 13,
+    name: '김나영',
     region: '대전',
     admission: '마이스터 인재 전형',
     received: true,
+    submitted: false,
+  },
+  {
+    number: 14,
+    name: '이준호',
+    region: '전국',
+    admission: '일반 전형',
+    received: true,
+    submitted: true,
+  },
+  {
+    number: 15,
+    name: '박서연',
+    region: '대전',
+    admission: '사회통합 전형',
+    received: false,
     submitted: false,
   },
 ];
@@ -84,6 +192,11 @@ export const ApplicantsList = () => {
       submitted: false,
     },
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemPerPage = 10;
+  const [selectedApplicant, setSelectedApplicant] =
+    useState<IApplicantType | null>(null);
+  const { isOpen, open, close } = useModal();
 
   const handleCheckBoxChange = <
     G extends FilterGroupType,
@@ -99,10 +212,27 @@ export const ApplicantsList = () => {
         [key]: !prev[group][key],
       },
     }));
+
+    setCurrentPage(1);
   };
 
   const handleButtonClick = () => {
     // 버튼 클릭했을 때의 로직
+  };
+
+  const handleApplicantClick = (applicant: IApplicantType) => {
+    setSelectedApplicant(applicant);
+    open();
+  };
+
+  // 페이지네이션 계산 로직 (아직은 더미값임)
+  const totalPage = Math.ceil(ApplicantsListMock.length / itemPerPage);
+  const startIndex = (currentPage - 1) * itemPerPage;
+  const endIndex = startIndex + itemPerPage;
+  const currentApplicants = ApplicantsListMock.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -171,7 +301,7 @@ export const ApplicantsList = () => {
       </ApplicantsTitle>
 
       <ApplicantsAllList>
-        {ApplicantsListMock.map((applicant) => (
+        {currentApplicants.map((applicant) => (
           <Applicant
             key={applicant.number}
             number={applicant.number}
@@ -180,9 +310,25 @@ export const ApplicantsList = () => {
             admission={applicant.admission}
             received={applicant.received}
             submitted={applicant.submitted}
+            onClick={() => handleApplicantClick(applicant)}
           />
         ))}
       </ApplicantsAllList>
+      {selectedApplicant && (
+        <ApplicantDetailModal
+          applicant={selectedApplicant}
+          isOpen={isOpen}
+          onClose={close}
+        />
+      )}
+
+      {/* 페이지네이션 */}
+
+      <PagiNation
+        currentPage={currentPage}
+        totalPage={totalPage}
+        onPageChange={handlePageChange}
+      />
     </Container>
   );
 };
@@ -279,7 +425,6 @@ const ApplicantsTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-block: 30px;
-  border-bottom: 1px solid ${colors.gray[300]};
 
   @media (max-width: 768px) {
     overflow-x: auto;

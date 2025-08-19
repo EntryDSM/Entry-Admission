@@ -1,4 +1,7 @@
 export { default as search } from './search.svg';
+export { default as left } from './left.svg';
+export { default as right } from './right.svg';
+export { default as cancel } from './cancel.svg';
 export { ApplicationPeriodIcon } from './01ApplicationPeriodIcon';
 export { AdmissionRateIcon } from './02AdmissionRateIcon';
 export { CompetitionRateIcon } from './03CompetitionRateIcon';

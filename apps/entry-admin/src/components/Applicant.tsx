@@ -8,6 +8,7 @@ interface IApplicantType {
   admission: string;
   received: boolean;
   submitted: boolean;
+  onClick?: () => void;
 }
 
 export const Applicant = ({
@@ -17,9 +18,10 @@ export const Applicant = ({
   admission,
   received,
   submitted,
+  onClick,
 }: IApplicantType) => {
   return (
-    <Container>
+    <Container onClick={onClick}>
       <LeftContent>
         <Content>{number}</Content>
         <Content>{name}</Content>
@@ -37,10 +39,11 @@ export const Applicant = ({
 const Container = styled.div`
   width: 100%;
   height: object-fit;
-  border-bottom: 1px solid ${colors.gray[300]};
+  border-top: 1px solid ${colors.gray[300]};
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: pointer;
 
   @media (max-width: 768px) {
     overflow-x: auto;
