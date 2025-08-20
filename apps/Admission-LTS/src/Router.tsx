@@ -25,10 +25,11 @@ import {
   SubmitCheck,
   Submitted,
   GuardianInfo,
+  Page404,
 } from './pages';
 import { ApplicationPreview } from './pages/applicationCheck';
-import { Page404 } from '@entry/ui';
 import { AttendanceVolunteer, GedScore } from './pages/ged';
+
 
 export const Router = createBrowserRouter([
   {
@@ -145,10 +146,10 @@ export const Router = createBrowserRouter([
         path: 'submitted',
         element: <Submitted />,
       },
-      {
-        path: '*',
-        element: <Page404 />,
-      },
     ],
+  },
+  {
+    path: '*',
+    element: <Page404/>,
   },
 ]);

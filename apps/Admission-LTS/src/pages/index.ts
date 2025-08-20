@@ -6,3 +6,4 @@ export * from './ActivityGraduate';
 export * from './ActivityProspectiveGraduate'
 export * from './applicationCheck';
 export * from './Landing';
+export * from './Page404'

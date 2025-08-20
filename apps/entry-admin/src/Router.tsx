@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from './layout';
-import { AdmissionsQuota, AdmissionsSchedule, ApplicantsList, FormulaCalculator, NoticeList, NoticeCreate, NoticeEdit, StatisticsLandingPage } from './pages';
+import { AdmissionsQuota, AdmissionsSchedule, ApplicantsList, FormulaCalculator, NoticeList, NoticeCreate, NoticeEdit, StatisticsLandingPage, Page404 } from './pages';
 
 export const Router = createBrowserRouter([
   {
@@ -40,5 +40,9 @@ export const Router = createBrowserRouter([
         element: <NoticeEdit />,
       },
     ],
+  },
+  {
+    path: '*',
+    element: <Page404/>,
   },
 ]);
