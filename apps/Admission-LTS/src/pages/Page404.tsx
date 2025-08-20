@@ -1,7 +1,9 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { Button } from './Button';
+import { Button } from '@entry/ui';
+import { useNavigate } from 'react-router';
 
 export const Page404 = () => {
+  const navigate = useNavigate()
   return (
     <Flex justifyContent="center" alignItems="center">
       <Flex
@@ -25,7 +27,7 @@ export const Page404 = () => {
             예기치 못한 오류가 발생했습니다.
           </Text>
         </Flex>
-        <Button>이전 페이지로 나가기</Button>
+        <Button onClick={() => navigate(-1)}>이전 페이지로 나가기</Button>
       </Flex>
     </Flex>
   );

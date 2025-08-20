@@ -14,6 +14,7 @@ import {
   QEDScore,
   Main,
   NoticePage,
+  Page404,
 } from './pages';
 
 export const Router = createBrowserRouter([
@@ -113,6 +114,6 @@ export const Router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <div>404</div>,
+    element: <Page404 />,
   },
 ]);

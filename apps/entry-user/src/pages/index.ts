@@ -6,3 +6,4 @@ export * from './MyPage';
 export * from './calculate';
 export * from './Main';
 export * from "./NoticePage"
+export * from './Page404'
