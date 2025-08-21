@@ -89,8 +89,8 @@ const CloseButton = styled.button`
   padding: 0;
 
   img {
-    width: 80%;
-    height: 80%;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
   }
 `;
