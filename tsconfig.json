@@ -23,6 +23,9 @@
     },
     {
       "path": "./apps/Admission-LTS"
+    },
+    {
+      "path": "./libs/util-config"
     }
   ]
 }
