@@ -166,6 +166,7 @@ const BackGroundWrapper = styled.div`
   display: flex;
   justify-content: center;
   overflow-x: hidden;
+  height: 90vh;
 `;
 
 const LoginPageContainer = styled.div`
