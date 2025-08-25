@@ -34,6 +34,19 @@ export const SignUpPage = () => {
     }
   };
 
+  const containerHeight = (): string => {
+    switch (currentStep) {
+      case 1:
+        return 'auto';
+      case 2:
+        return 'auto';
+      case 3:
+        return '120%';
+      default:
+        return '';
+    }
+  };
+
   // 회원가입 완료 시 해당 컴포넌트 호출
   const renderContent = () => {
     switch (currentStep) {
@@ -50,7 +63,10 @@ export const SignUpPage = () => {
 
   return (
     <BackGroundWrapper>
-      <SignUpPageContainer $width={containerWidth()}>
+      <SignUpPageContainer
+        $width={containerWidth()}
+        $height={containerHeight()}
+      >
         <EntryAuthTitle isAdmin={false} children="EntryDSM 회원가입" />
         {renderContent()}
         <ProgressIndicatorWrapper>
@@ -72,8 +88,9 @@ const ProgressIndicatorWrapper = styled.div`
   }
 `;
 
-const SignUpPageContainer = styled.div<{ $width?: string }>`
+const SignUpPageContainer = styled.div<{ $width?: string; $height?: string }>`
   width: ${({ $width }) => $width || '70%'};
+  height: ${({ $height }) => $height || 'auto'};
   min-width: 400px;
   background-color: ${colors.extra.realWhite};
   border-radius: 32px;
