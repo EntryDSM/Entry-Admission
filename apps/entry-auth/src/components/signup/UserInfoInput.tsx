@@ -204,8 +204,8 @@ const SignUpContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  margin-top: 50px;
+  gap: 35px;
+  margin-top: 30px;
   width: 100%;
 
   @media (max-width: 768px) {

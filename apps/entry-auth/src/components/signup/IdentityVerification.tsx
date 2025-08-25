@@ -72,5 +72,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  margin-top: 130px;
+  margin-top: 60px;
+  overflow: hidden;
 `;

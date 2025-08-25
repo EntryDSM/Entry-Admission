@@ -19,6 +19,7 @@ export const EntryAuthTitle = ({ children, isAdmin }: IEntryAuthTitleType) => {
 const LogoTitle = styled.div<{ $isAdmin: boolean }>`
   width: fit-content;
   height: 75px;
+  min-height: 75px;
   gap: 10px;
   border-bottom: 2px solid
     ${({ $isAdmin }) => ($isAdmin ? colors.green[800] : colors.orange[800])};

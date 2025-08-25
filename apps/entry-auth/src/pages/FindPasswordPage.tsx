@@ -28,7 +28,7 @@ export const FindPasswordPage = () => {
       case 2:
         return '50%';
       case 3:
-        return "45%"
+        return '45%';
       default:
         return '70%';
     }
@@ -90,7 +90,6 @@ const ProgressIndicatorWrapper = styled.div`
 
 const FindPWPageContainer = styled.div<{ $width: string; $height: string }>`
   width: ${({ $width }) => $width || '70%'};
-  height: ${({ $height }) => $height || '90%'};
   min-width: 400px;
   background-color: ${colors.extra.realWhite};
   border-radius: 32px;
@@ -98,7 +97,7 @@ const FindPWPageContainer = styled.div<{ $width: string; $height: string }>`
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  margin-top: 35px;
+  margin-top: 30px;
   margin-bottom: 30px;
   padding-bottom: 20px;
 `;
@@ -109,6 +108,5 @@ const BackGroundWrapper = styled.div`
   display: flex;
   justify-content: center;
   overflow: hidden;
-  height: 100vh;
-  width: 100%;
+  height: calc(100vh - 70px);
 `;

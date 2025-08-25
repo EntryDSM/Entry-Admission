@@ -65,16 +65,15 @@ export const SignUpPage = () => {
 };
 
 const ProgressIndicatorWrapper = styled.div`
-  margin-top: 90px;
+  margin-top: 40px;
 
   @media (max-width: 768px) {
-    margin-top: 50px;
+    margin-top: 20px;
   }
 `;
 
 const SignUpPageContainer = styled.div<{ $width?: string }>`
   width: ${({ $width }) => $width || '70%'};
-  height: 80%;
   min-width: 400px;
   background-color: ${colors.extra.realWhite};
   border-radius: 32px;
@@ -92,6 +91,5 @@ const BackGroundWrapper = styled.div`
   display: flex;
   justify-content: center;
   overflow-x: hidden;
-  min-height: 100vh;
-  width: 100%;
+  height: calc(100vh - 70px);
 `;

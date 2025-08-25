@@ -63,8 +63,8 @@ const IconContainer = styled.div`
 
 const AuthCardContainer = styled.div`
   width: 100%;
-  max-width: 340px;
-  height: 400px;
+  max-width: 280px;
+  height: 345px;
   border: 1px solid ${colors.gray[300]};
   border-radius: 32px;
   display: flex;
