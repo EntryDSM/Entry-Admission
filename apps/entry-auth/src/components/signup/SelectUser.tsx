@@ -29,11 +29,9 @@ const CardWrapper = styled.div`
   width: 80%;
   display: flex;
   justify-content: center;
-  padding-bottom: 20px;
 `;
 
 const SelectUserContainer = styled.div`
-  overflow-x: hidden;
   width: 80%;
 `;
 
@@ -41,11 +39,9 @@ const CardContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 50px;
-  margin-bottom: 20px;
+  margin-top: 30px;
   overflow-y: hidden;
   padding-top: 15px;
-  gap: 10%;
 
   @media (max-width: 768px) {
     flex-direction: column;

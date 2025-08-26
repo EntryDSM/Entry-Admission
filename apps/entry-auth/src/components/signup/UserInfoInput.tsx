@@ -204,8 +204,8 @@ const SignUpContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  margin-top: 50px;
+  gap: 35px;
+  margin-top: 30px;
   width: 100%;
 
   @media (max-width: 768px) {
@@ -226,14 +226,13 @@ const MoveLoginView = styled.div`
 
 const SignUpButton = styled.button<{ $disabled: boolean }>`
   width: 100%;
-  height: 50px;
+  height: 45px;
   border-radius: 12px;
   background-color: ${colors.orange[800]};
   opacity: ${(props) => (props.$disabled ? '0.4' : '1')};
   color: ${colors.extra.realWhite};
   font-size: 14px;
   font-weight: 550;
-  margin-top: 22px;
   transition: all 0.3s ease;
   cursor: ${(props) => (props.$disabled ? 'not-allowed' : 'pointer')};
 
@@ -247,6 +246,7 @@ const UserInfoInputConatiner = styled.div`
   flex-direction: column;
   align-items: center;
   width: 50%;
+  overflow: hidden;
 
   @media (max-width: 768px) {
     width: 80%;

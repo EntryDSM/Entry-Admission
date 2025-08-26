@@ -54,7 +54,7 @@ const NextButton = styled.button`
   color: ${colors.extra.realWhite};
   font-size: 14px;
   font-weight: 550;
-  margin-top: 150px;
+  margin-top: 130px;
   transition: all 0.3s ease;
   cursor: pointer;
 

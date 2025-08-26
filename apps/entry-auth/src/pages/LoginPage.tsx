@@ -166,16 +166,16 @@ const BackGroundWrapper = styled.div`
   display: flex;
   justify-content: center;
   overflow-x: hidden;
+  height: calc(100vh - 70px);
 `;
 
 const LoginPageContainer = styled.div`
-  width: 40%;
-  min-width: 400px;
-  height: 620px;
+  padding: 0 100px;
   background-color: ${colors.extra.realWhite};
   border-radius: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
+  margin-bottom: 30px;
 `;

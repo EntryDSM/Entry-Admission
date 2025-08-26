@@ -106,7 +106,7 @@ export const AuthInput = ({
 };
 
 const ErrorMsg = styled.div`
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 11px;
   color: ${colors.extra.error};
 `;
