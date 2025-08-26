@@ -3,13 +3,12 @@ import styled from '@emotion/styled';
 import {
   Applicant,
   ApplicantDetailModal,
-  ApplicantExortBtn,
   CheckBox,
   FindApplicantInput,
   PagiNation,
 } from '../components';
 import { colors } from '@entry/design-token';
-import { useModal } from '@entry/ui';
+import { Button, useModal } from '@entry/ui';
 
 interface IApplicantType {
   number: number;
@@ -20,7 +19,7 @@ interface IApplicantType {
   submitted: boolean;
 }
 
-const ApplicantsListMock = [
+const ApplicantsListMockData = [
   {
     number: 1,
     name: '홍길동',
@@ -161,37 +160,26 @@ const statusOptions = [
   { key: 'submitted', label: '최종 제출' },
 ] as const;
 
-const buttonText = [
-  '지원자 검증 목록 출력',
-  '수험표 출력',
-  '지원자 코드 출력',
-  '지원자 목록 출력',
-];
-
 type RegionKey = (typeof regionOptions)[number]['key'];
 type AdmissionKey = (typeof admissionOptions)[number]['key'];
 type StatusKey = (typeof statusOptions)[number]['key'];
 
 export const ApplicantsList = () => {
+  // 지원자 리스트 상태 관리
+  const [applicantsList, setApplicantsList] = useState<IApplicantType[]>(
+    ApplicantsListMockData
+  );
+
   const [filters, setFilters] = useState<{
     region: Record<RegionKey, boolean>;
     admission: Record<AdmissionKey, boolean>;
     status: Record<StatusKey, boolean>;
   }>({
-    region: {
-      daejeon: false,
-      nationwide: false,
-    },
-    admission: {
-      general: false,
-      meister: false,
-      social: false,
-    },
-    status: {
-      received: false,
-      submitted: false,
-    },
+    region: { daejeon: false, nationwide: false },
+    admission: { general: false, meister: false, social: false },
+    status: { received: false, submitted: false },
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemPerPage = 10;
   const [selectedApplicant, setSelectedApplicant] =
@@ -212,12 +200,7 @@ export const ApplicantsList = () => {
         [key]: !prev[group][key],
       },
     }));
-
     setCurrentPage(1);
-  };
-
-  const handleButtonClick = () => {
-    // 버튼 클릭했을 때의 로직
   };
 
   const handleApplicantClick = (applicant: IApplicantType) => {
@@ -225,11 +208,53 @@ export const ApplicantsList = () => {
     open();
   };
 
-  // 페이지네이션 계산 로직 (아직은 더미값임)
-  const totalPage = Math.ceil(ApplicantsListMock.length / itemPerPage);
+  // received 상태 업데이트
+  const handleReceivedChange = (number: number, received: boolean) => {
+    setApplicantsList((prev) =>
+      prev.map((applicant) =>
+        applicant.number === number ? { ...applicant, received } : applicant
+      )
+    );
+  };
+
+  // submitted 상태 업데이트
+  const handleSubmittedChange = (number: number, submitted: boolean) => {
+    setApplicantsList((prev) =>
+      prev.map((applicant) =>
+        applicant.number === number ? { ...applicant, submitted } : applicant
+      )
+    );
+  };
+
+  // 필터링 로직 (업데이트된 applicantsList 사용)
+  const filteredApplicants = applicantsList.filter((a) => {
+    const regionActive = Object.values(filters.region).some(Boolean);
+    const admissionActive = Object.values(filters.admission).some(Boolean);
+    const statusActive = Object.values(filters.status).some(Boolean);
+
+    const regionOk =
+      !regionActive ||
+      (filters.region.daejeon && a.region === '대전') ||
+      (filters.region.nationwide && a.region === '전국');
+
+    const admissionOk =
+      !admissionActive ||
+      (filters.admission.general && a.admission === '일반 전형') ||
+      (filters.admission.meister && a.admission === '마이스터 인재 전형') ||
+      (filters.admission.social && a.admission === '사회통합 전형');
+
+    const statusOk =
+      !statusActive ||
+      (filters.status.received && a.received) ||
+      (filters.status.submitted && a.submitted);
+
+    return regionOk && admissionOk && statusOk;
+  });
+
+  const totalPage = Math.ceil(filteredApplicants.length / itemPerPage) || 1;
   const startIndex = (currentPage - 1) * itemPerPage;
   const endIndex = startIndex + itemPerPage;
-  const currentApplicants = ApplicantsListMock.slice(startIndex, endIndex);
+  const currentApplicants = filteredApplicants.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -237,7 +262,23 @@ export const ApplicantsList = () => {
 
   return (
     <Container>
-      <FindApplicantInput />
+      <HeadContent>
+        <FindApplicantInput />
+        <ButtonContiner>
+          <Button
+            color={colors.extra.realWhite}
+            backgroundColor={colors.green[400]}
+            hoverBackgroundColor={colors.green[500]}
+            children="수험번호 업데이트"
+          />
+          <Button
+            color={colors.extra.realWhite}
+            backgroundColor={colors.green[400]}
+            hoverBackgroundColor={colors.green[500]}
+            children="Excel로 내보내기"
+          />
+        </ButtonContiner>
+      </HeadContent>
 
       <FilterControl>
         <LabelContainer>
@@ -274,16 +315,6 @@ export const ApplicantsList = () => {
             ))}
           </Section>
         </LabelContainer>
-
-        <ButtonContainer>
-          {buttonText.map((text, idx) => (
-            <ApplicantExortBtn
-              key={idx}
-              text={text}
-              onClick={handleButtonClick}
-            />
-          ))}
-        </ButtonContainer>
       </FilterControl>
 
       {/* 지원자 목록 */}
@@ -311,9 +342,16 @@ export const ApplicantsList = () => {
             received={applicant.received}
             submitted={applicant.submitted}
             onClick={() => handleApplicantClick(applicant)}
+            onReceivedChange={(received) =>
+              handleReceivedChange(applicant.number, received)
+            }
+            onSubmittedChange={(submitted) =>
+              handleSubmittedChange(applicant.number, submitted)
+            }
           />
         ))}
       </ApplicantsAllList>
+
       {selectedApplicant && (
         <ApplicantDetailModal
           applicant={selectedApplicant}
@@ -323,7 +361,6 @@ export const ApplicantsList = () => {
       )}
 
       {/* 페이지네이션 */}
-
       <PagiNation
         currentPage={currentPage}
         totalPage={totalPage}
@@ -333,6 +370,12 @@ export const ApplicantsList = () => {
   );
 };
 
+const ButtonContiner = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -341,6 +384,13 @@ const Container = styled.div`
   @media (max-width: 768px) {
     padding: 0 16px;
   }
+`;
+
+const HeadContent = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const FilterControl = styled.div`
@@ -396,28 +446,6 @@ const Section = styled.div`
   }
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  @media (max-width: 1024px) {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  @media (max-width: 600px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-    max-width: 400px;
-  }
-
-  @media (max-width: 400px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 const ApplicantsTitle = styled.div`
   width: 100%;
   height: 40px;
@@ -450,19 +478,19 @@ const LeftTitle = styled.div`
   > div:nth-of-type(1) {
     width: 80px;
     text-align: center;
-  } /* 접수 번호 */
+  }
   > div:nth-of-type(2) {
     width: 80px;
     text-align: center;
-  } /* 이름 */
+  }
   > div:nth-of-type(3) {
     width: 80px;
     text-align: center;
-  } /* 지역 */
+  }
   > div:nth-of-type(4) {
     width: 150px;
     text-align: center;
-  } /* 전형 */
+  }
 
   @media (max-width: 1200px) {
     > div:nth-of-type(1) {
@@ -515,7 +543,7 @@ const RightTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-left: 30%;
-  flex: 1; /* 자동 확장 */
+  flex: 1;
 
   > div {
     width: 120px;
