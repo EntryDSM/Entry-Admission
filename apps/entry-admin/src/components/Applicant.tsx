@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
+import { toast } from 'react-toastify';
 
 interface IApplicantType {
   number: number;
@@ -9,6 +10,8 @@ interface IApplicantType {
   received: boolean;
   submitted: boolean;
   onClick?: () => void;
+  onReceivedChange?: (received: boolean) => void;
+  onSubmittedChange?: (submitted: boolean) => void;
 }
 
 export const Applicant = ({
@@ -19,7 +22,19 @@ export const Applicant = ({
   received,
   submitted,
   onClick,
+  onReceivedChange,
+  onSubmittedChange,
 }: IApplicantType) => {
+  const handleReceivedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onReceivedChange?.(e.target.checked);
+    toast.success('원서 도착 상태가 변경되었습니다.');
+  };
+
+  const handleSubmittedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSubmittedChange?.(e.target.checked);
+    toast.success('최종 제출 상태가 변경되었습니다.');
+  };
+
   return (
     <Container onClick={onClick}>
       <LeftContent>
@@ -29,8 +44,22 @@ export const Applicant = ({
         <Content className="mobile-hidden">{admission}</Content>
       </LeftContent>
       <RightContent>
-        <Content className="mobile-hidden">{received ? 'O' : 'X'}</Content>
-        <Content>{submitted ? 'O' : 'X'}</Content>
+        <CheckboxContent className="mobile-hidden">
+          <StyledCheckbox
+            type="checkbox"
+            checked={received}
+            onChange={handleReceivedChange}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </CheckboxContent>
+        <CheckboxContent>
+          <StyledCheckbox
+            type="checkbox"
+            checked={submitted}
+            onChange={handleSubmittedChange}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </CheckboxContent>
       </RightContent>
     </Container>
   );
@@ -136,27 +165,13 @@ const RightContent = styled.div`
   margin-left: 30%;
   flex: 1;
 
-  > div {
-    width: 120px;
-    text-align: center;
-  }
-
   @media (max-width: 1200px) {
-    > div {
-      width: 100px;
-    }
   }
 
   @media (max-width: 768px) {
-    > div {
-      width: 80px;
-    }
   }
 
   @media (max-width: 600px) {
-    > div {
-      width: 70px;
-    }
   }
 `;
 
@@ -181,5 +196,47 @@ const Content = styled.div`
   @media (max-width: 400px) {
     padding: 12px 0;
     font-size: 13px;
+  }
+`;
+
+const CheckboxContent = styled.div`
+  width: 120px;
+  text-align: center;
+  padding: 32px 0;
+
+  @media (max-width: 1200px) {
+    width: 100px;
+    padding: 24px 0;
+  }
+
+  @media (max-width: 768px) {
+    width: 80px;
+    padding: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    width: 70px;
+    padding: 16px 0;
+  }
+
+  @media (max-width: 400px) {
+    padding: 12px 0;
+  }
+`;
+
+const StyledCheckbox = styled.input`
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #4ade80;
+
+  @media (max-width: 600px) {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (max-width: 400px) {
+    width: 14px;
+    height: 14px;
   }
 `;
