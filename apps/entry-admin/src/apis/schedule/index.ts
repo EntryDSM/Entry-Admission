@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { instance } from '../instance';
+import { instance } from '@entry/util-config';
 import { toast } from 'react-toastify';
 import { IUpdateScheduleRequest } from './types';
 
