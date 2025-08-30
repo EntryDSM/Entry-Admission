@@ -7,20 +7,29 @@ interface IPostType {
   name: string;
   formula: string;
   resultVariable: string;
+  description: string;
+  region: string;
+  educationalStatus: string;
 }
 
 export const CalculatorPost = ({
   id,
   name,
   formula,
+  educationalStatus,
   resultVariable,
+  region,
+  description
 }: IPostType) => {
   return (
     <Container>
       <ContentContainer>
         <Content>{id}</Content>
         <Content>{name}</Content>
+        <Content>{description}</Content>
         <Content>{formula}</Content>
+        <Content>{region}</Content>
+        <Content>{educationalStatus}</Content>
         <Content>{resultVariable}</Content>
       </ContentContainer>
       <Button
@@ -38,7 +47,7 @@ export const CalculatorPost = ({
 const ContentContainer = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 2fr 6fr 2fr;
+  grid-template-columns: 1fr 2fr 3fr 4fr 1fr 1fr 2fr;
 `;
 
 const Content = styled.div`
@@ -53,7 +62,7 @@ const Content = styled.div`
 
 const Container = styled.div`
   width: 100%;
-  height: 83px;
+  padding: 20px;
   border-bottom: 1px solid ${colors.gray[300]};
   display: flex;
   align-items: center;
