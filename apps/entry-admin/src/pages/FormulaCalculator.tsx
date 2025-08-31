@@ -1,24 +1,33 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { AuthInput, Button, TabSection } from '@entry/ui';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { CalculatorPost, Keyword } from '../components';
 
 export const FormulaCalculator = () => {
   const [_, setCurrentPage] = useState(1);
-  const [variable, setVariable] = useState<string>('');
+  const [variableData, setVariableData] = useState<{name: string, region : string, educationalStatus: string}>({name : '',region: ''  ,educationalStatus: ''});
   const [formulaData, setFormulaData] = useState<{
     name: string;
     formula: string;
+    description: string,
     resultVariable: string;
+    region: string,
+    educationalStatus: string
   }>({
     name: '',
     formula: '',
+    description:'',
     resultVariable: '',
+    region: '',
+    educationalStatus: ''
   });
+
+  console.log(variableData)
+
   const [activeTab, setActiveTab] = useState<
-    'regularAdmission' | 'meisterAdmission' | 'socialIntegrationAdmission'
-  >('regularAdmission'); //type send
+    'COMMON' | 'MEISTER' | 'SOCIAL'
+  >('COMMON'); //type send
 
   const [variableKeyword, setVariableKeyword] = useState<
     { id: number; content: string }[]
@@ -42,81 +51,141 @@ export const FormulaCalculator = () => {
   ]);
 
   const [postData, setPostData] = useState<
-    { id: number; name: string; formula: string; resultVariable: string }[]
-  >([
+    { id: number; 
+      name: string;
+      formula: string;
+      description: string,
+      resultVariable: string;
+      educationalStatus: string;
+      region: string }[]>([
     {
       id: 1,
       name: '3학년 1학기 교과평균',
       formula:
         '({korean_3_1} + {social_3_1} + {history_3_1} + {math_3_1} + {science_3_1} + {tech_3_1} + {english_3_1}) / 7',
       resultVariable: '나는 스파이더맨',
+      description: 'dddd',
+      region: '대전',
+      educationalStatus: '졸업'
+      
     },
   ]);
 
-  const handleVariableDelClick = (id: number) => {
+  // useCallback으로 함수들 메모이제이션
+  const handleVariableDelClick = useCallback((id: number) => {
     //id del api
     //변수 전체 다시 불러오기
-  };
+  }, []);
 
-  const handleTabChange = (tab: string) => {
+  const handleFormulaRegionChange = useCallback((e : React.ChangeEvent<HTMLInputElement>) => {
+    setFormulaData((prev) => ({ ...prev, region: e.target.value }))
+  }, []);
+
+  const handleVariableEducationalStatusChange = useCallback((e : React.ChangeEvent<HTMLInputElement>) => {
+    setVariableData((prev) => ({ ...prev, educationalStatus: e.target.value }))
+  }, []);
+
+  const handleVariableRegionChange = useCallback((e : React.ChangeEvent<HTMLInputElement>) => {
+    setVariableData((prev) => ({ ...prev, region: e.target.value }))
+  }, []);
+
+  const handleFormulaEducationalStatusChange = useCallback((e : React.ChangeEvent<HTMLInputElement>) => {
+    setFormulaData((prev) => ({ ...prev, educationalStatus: e.target.value }))
+  }, []);
+
+  const handleTabChange = useCallback((tab: string) => {
     setActiveTab(
       tab as
-        | 'regularAdmission'
-        | 'meisterAdmission'
-        | 'socialIntegrationAdmission'
+        | 'COMMON'
+        | 'MEISTER'
+        | 'SOCIAL'
     );
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulaData((prev) => ({ ...prev, name: e.target.value }));
-  };
+  }, []);
 
-  const handleFormulaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormulaChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormulaData((prev) => ({ ...prev, formula: e.target.value }));
-  };
+  }, []);
+  
+  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormulaData((prev) => ({ ...prev, description: e.target.value }));
+  }, []);
 
-  const handleResultVariableChange = (
+  const handleResultVariableChange = useCallback((
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormulaData((prev) => ({ ...prev, resultVariable: e.target.value }));
-  };
+  }, []);
 
-  const handleVariableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVariable(e.target.value);
-  };
+  const handleVariableChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setVariableData((prev) => ({...prev, name:  e.target.value}));
+  }, []);
 
-  const TAB_TYPES = [
+  // TAB_TYPES를 useMemo로 메모이제이션
+  const TAB_TYPES = useMemo(() => [
     {
-      key: 'regularAdmission' as const,
+      key: 'COMMON' as const,
       label: '일반 전형',
       basePath: '/calculate/primary',
     },
     {
-      key: 'meisterAdmission' as const,
+      key: 'MEISTER' as const,
       label: '마이스터 인재 전형',
       basePath: '/calculate/graduated',
     },
     {
-      key: 'socialIntegrationAdmission' as const,
+      key: 'SOCIAL' as const,
       label: '사회통합 전형',
       basePath: '/calculate/qe',
     },
-  ];
+  ], []);
 
-  const variableAddClick = () => {
+  const variableAddClick = useCallback(() => {
     //variable add api
-    setVariable('');
-  };
+    setVariableData({name: '', region: '', educationalStatus: ''});
+  }, []);
 
-  const formulaDataAddClick = () => {
+  const formulaDataAddClick = useCallback(() => {
     //formulaData add api
     setFormulaData({
       name: '',
       formula: '',
+      description: '',
       resultVariable: '',
+      region: '',
+      educationalStatus: ''
     });
-  };
+  }, []);
+
+  // 렌더링 최적화를 위한 메모이제이션된 컴포넌트들
+  const keywordList = useMemo(() => 
+    variableKeyword.map((data) => (
+      <Keyword
+        onClick={() => handleVariableDelClick(data.id)}
+        key={data.id}
+      >
+        {data.content}
+      </Keyword>
+    )), [variableKeyword, handleVariableDelClick]);
+
+  const postList = useMemo(() =>
+    postData.map((data) => (
+      <CalculatorPost
+        key={data.id}
+        id={data.id}
+        resultVariable={data.resultVariable}
+        formula={data.formula}
+        name={data.name}
+        description={data.description}
+        region={data.region}
+        educationalStatus={data.educationalStatus}
+      />
+    )), [postData]);
+
   return (
     <Container>
       <Flex isColumn={true} gap={16} width="100%" height="fit-content">
@@ -130,7 +199,7 @@ export const FormulaCalculator = () => {
             onTypeChange={handleTabChange}
             options={TAB_TYPES}
           />
-          <Flex alignItems="center" height="fit-content" width="100%" gap={10}>
+          <Flex alignItems="start" height="fit-content" width="100%" gap={10}>
             <FormulaContainer>
               <AuthInput
                 height="fit-content"
@@ -146,10 +215,40 @@ export const FormulaCalculator = () => {
               />
               <AuthInput
                 height="fit-content"
+                placeholder="수식 설명을 입력하세요"
+                value={formulaData.description}
+                onChange={handleDescriptionChange}
+              />
+              <AuthInput
+                height="fit-content"
                 placeholder="결과 변수 명을 입력하세요"
                 value={formulaData.resultVariable}
                 onChange={handleResultVariableChange}
               />
+              <Flex width='fit-content' height='fit-content' gap={12}> 
+                <label>
+                  대전
+                  <input onChange={handleFormulaRegionChange} value="DAEJEON" checked={formulaData.region === 'DAEJEON'} type="radio" />
+                </label>
+                <label>
+                  전국
+                  <input onChange={handleFormulaRegionChange} value="NATIONWIDE" checked={formulaData.region === 'NATIONWIDE'} type="radio" />
+                </label>
+              </Flex>
+              <Flex width='fit-content' height='fit-content' gap={12}> 
+                <label>
+                  졸업예정
+                  <input onChange={handleFormulaEducationalStatusChange} value="PROSPECTIVE_GRADUATE" checked={formulaData.educationalStatus === 'PROSPECTIVE_GRADUATE'} type="radio" />
+                </label>
+                <label>
+                  졸업
+                  <input onChange={handleFormulaEducationalStatusChange} value="GRADUATE" checked={formulaData.educationalStatus === 'GRADUATE'} type="radio" />
+                </label>
+                <label>
+                  검정고시
+                  <input onChange={handleFormulaEducationalStatusChange} value="QUALIFICATION_EXAM" checked={formulaData.educationalStatus === 'QUALIFICATION_EXAM'} type="radio" />
+                </label>
+              </Flex>
             </FormulaContainer>
             <Button
               backgroundColor={colors.green[400]}
@@ -160,12 +259,39 @@ export const FormulaCalculator = () => {
             </Button>
           </Flex>
           <Flex alignItems="center" height="fit-content" width="100%" gap={10}>
+            <FormulaContainer>
+
             <AuthInput
               height="fit-content"
               placeholder="사용할 변수명을 입력하세요"
               onChange={handleVariableChange}
-              value={variable}
+              value={variableData.name}
             />
+            <Flex width='fit-content' height='fit-content' gap={12}> 
+                <label>
+                  대전
+                  <input onChange={handleVariableRegionChange} value="DAEJEON" checked={variableData.region === 'DAEJEON'} type="radio" />
+                </label>
+                <label>
+                  전국
+                  <input onChange={handleVariableRegionChange} value="NATIONWIDE" checked={variableData.region === 'NATIONWIDE'} type="radio" />
+                </label>
+              </Flex>
+              <Flex width='fit-content' height='fit-content' gap={12}> 
+                <label>
+                  졸업예정
+                  <input onChange={handleVariableEducationalStatusChange} value="PROSPECTIVE_GRADUATE" checked={variableData.educationalStatus === 'PROSPECTIVE_GRADUATE'} type="radio" />
+                </label>
+                <label>
+                  졸업
+                  <input onChange={handleVariableEducationalStatusChange} value="GRADUATE" checked={variableData.educationalStatus === 'GRADUATE'} type="radio" />
+                </label>
+                <label>
+                  검정고시
+                  <input onChange={handleVariableEducationalStatusChange} value="QUALIFICATION_EXAM" checked={variableData.educationalStatus === 'QUALIFICATION_EXAM'} type="radio" />
+                </label>
+            </Flex>
+            </FormulaContainer>
             <Button
               backgroundColor={colors.green[400]}
               hoverBackgroundColor={colors.green[500]}
@@ -182,14 +308,7 @@ export const FormulaCalculator = () => {
             전역 변수
           </Text>
           <Flex gap={12} alignItems="center" width="auto" height="auto">
-            {variableKeyword.map((data) => (
-              <Keyword
-                onClick={() => handleVariableDelClick(data.id)}
-                key={data.id}
-              >
-                {data.content}
-              </Keyword>
-            ))}
+            {keywordList}
           </Flex>
         </Flex>
         <Flex isColumn={true} width="100%" height="auto">
@@ -197,22 +316,17 @@ export const FormulaCalculator = () => {
             <ContentContainer>
               <Content>수식 번호</Content>
               <Content>수식 이름</Content>
+              <Content>수식 설명</Content>
               <Content>수식</Content>
+              <Content>지역 구분</Content>
+              <Content>졸업 구분</Content>
               <Content>결과 변수</Content>
             </ContentContainer>
             <BtnContainer>
               <Button>삭제하기</Button>
             </BtnContainer>
           </PostContainer>
-          {postData.map((data) => (
-            <CalculatorPost
-              key={data.id}
-              id={data.id}
-              resultVariable={data.resultVariable}
-              formula={data.formula}
-              name={data.name}
-            />
-          ))}
+          {postList}
         </Flex>
       </Flex>
     </Container>
@@ -244,7 +358,7 @@ const BtnContainer = styled.div`
 const ContentContainer = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 2fr 6fr 2fr;
+  grid-template-columns: 1fr 2fr 3fr 4fr 1fr 1fr 2fr;
 `;
 
 const Content = styled.div`

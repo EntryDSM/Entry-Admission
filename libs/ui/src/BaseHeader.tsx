@@ -52,7 +52,6 @@ export const AdminHeader = () => {
   const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
   const navData = [
-    { name: '정원 수정', path: '/admissions-quota' },
     { name: '전형 일정 수정', path: '/admissions-schedule' },
     { name: '지원자 조회', path: '/applicants-list' },
     { name: '공지사항', path: '/notice' },
