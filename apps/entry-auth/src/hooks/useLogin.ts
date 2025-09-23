@@ -8,14 +8,11 @@ export const useUserLogin = () => {
   return useMutation({
     mutationFn: (userData: IsignInRequestType) => loginUser(userData),
     onSuccess: (data) => {
-      console.log('유저 로그인 성공!', data);
       setAccessToken(data.accessToken);
       setRefreshToken(data.refreshToken);
       toast.success('로그인 성공!');
     },
     onError: (error: unknown) => {
-      console.error('유저 로그인 실패: ', error);
-
       let errorMessage = '로그인에 실패했습니다.';
 
       // error가 axios error인지 확인

@@ -8,14 +8,11 @@ export const useAdminLogin = () => {
   return useMutation({
     mutationFn: (adminData: IAdminSignInRequestType) => loginAdmin(adminData),
     onSuccess: (data) => {
-      console.log('관리자 로그인 성공!', data);
       setAdminAccessToken(data.accessToken);
       setAdminRefreshToken(data.refreshToken);
       toast.success('관리자 로그인 성공!');
     },
     onError: (error: unknown) => {
-      console.error('관리자 로그인 실패: ', error);
-
       let errorMessage = '로그인에 실패했습니다.';
 
       // error가 axios error인지 확인

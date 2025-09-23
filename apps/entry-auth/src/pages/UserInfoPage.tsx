@@ -9,14 +9,14 @@ import { getPassVerifyInfo } from '../apis';
 export const UserInfoPage = () => {
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordCheck, setPasswordCheck] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isLoadingPassData, setIsLoadingPassData] = useState(true);
-  const [checkedToken, setCheckedToken] = useState(false);
+  const [name, setName] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [passwordCheck, setPasswordCheck] = useState<string>('');
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isLoadingPassData, setIsLoadingPassData] = useState<boolean>(true);
+  const [checkedToken, setCheckedToken] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkedToken) return; // 이미 체크했으면 다시 실행하지 않음
@@ -80,7 +80,7 @@ export const UserInfoPage = () => {
 
   const handleCompleted = () => {
     if (isCompleted) {
-      navigate("/");
+      navigate('/');
     }
   };
 
