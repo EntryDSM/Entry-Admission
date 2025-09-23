@@ -1,6 +1,7 @@
 import { Cookies } from 'react-cookie';
-import { userInstance, getAdminId } from '@entry/util-config';
+import { userInstance } from '@entry/util-config';
 import {
+  getAdminId,
   getAccessToken,
   getRefreshToken,
   setAccessToken,

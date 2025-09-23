@@ -18,14 +18,6 @@ export const userInstance = axios.create({
   },
 });
 
-<<<<<<< HEAD
-export const statusInstance = axios.create({
-  baseURL: import.meta.env.VITE_STATUS_BASE_URL
-})
-export const scheduleInstance = axios.create({
-  baseURL: import.meta.env.VITE_SCHEDULE_BASE_URL
-})
-=======
 // 예: 스케줄, 상태 등 다른 instance
 export const scheduleInstance = axios.create({
   baseURL: import.meta.env.VITE_SCHEDULE_BASE_URL,
@@ -46,4 +38,3 @@ export const statusInstance = axios.create({
 export const applicationInstance = axios.create({
   baseURL: import.meta.env.VITE_APPLICATION_BASE_URL,
 });
->>>>>>> origin/feature/139-auth-api
