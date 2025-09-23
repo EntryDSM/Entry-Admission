@@ -1,16 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
 import { IAdminSignInRequestType } from '../apis/type';
 import { loginAdmin } from '../apis';
-import { setAdminAccessToken, setAdminRefreshToken } from '@entry/util-config';
+import { setAdminAccessToken, setAdminRefreshToken, setAdminId } from '@entry/util-config';
 import { toast } from 'react-toastify';
 
 export const useAdminLogin = () => {
   return useMutation({
     mutationFn: (adminData: IAdminSignInRequestType) => loginAdmin(adminData),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       setAdminAccessToken(data.accessToken);
       setAdminRefreshToken(data.refreshToken);
+      setAdminId(variables.adminId);
       toast.success('관리자 로그인 성공!');
+      window.location.href = 'https://admin.entrydsm.hs.kr';
     },
     onError: (error: unknown) => {
       let errorMessage = '로그인에 실패했습니다.';
