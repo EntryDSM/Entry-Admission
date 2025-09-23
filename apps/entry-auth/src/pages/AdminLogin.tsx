@@ -41,7 +41,6 @@ export const AdminLogin = () => {
 
   const handleLogin = () => {
     if (isFormValid) {
-      console.log('관리자 로그인 start', adminId, password);
       adminLoginMutation.mutate({
         adminId: adminId,
         password: password,

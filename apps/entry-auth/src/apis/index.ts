@@ -1,5 +1,3 @@
-export * from './userAuth';
-export * from './adminAuth';
-export * from './signup';
+export * from './auth';
 export * from './type';
 export * from './pass';

@@ -1,11 +1,11 @@
 import { userInstance, getAdminId } from '@entry/util-config';
-import { IAdminSignInRequestType, IAdminSignInResponseType } from './type';
+import { IAdminSignInRequestType, ITokenResponseType } from '../type';
 
 // 어드민 로그인
 export const loginAdmin = async (
   adminData: IAdminSignInRequestType
-): Promise<IAdminSignInResponseType> => {
-  const { data } = await userInstance.post<IAdminSignInResponseType>(
+): Promise<ITokenResponseType> => {
+  const { data } = await userInstance.post<ITokenResponseType>(
     '/admin/auth',
     adminData,
     {
@@ -21,10 +21,10 @@ export const loginAdmin = async (
 // 어드민 토큰 갱신
 export const refreshAdminToken = async (
   refreshToken: string
-): Promise<IAdminSignInResponseType> => {
+): Promise<ITokenResponseType> => {
   const adminId = getAdminId();
 
-  const { data } = await userInstance.put<IAdminSignInResponseType>(
+  const { data } = await userInstance.put<ITokenResponseType>(
     '/admin/auth',
     {},
     {

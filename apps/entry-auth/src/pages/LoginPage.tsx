@@ -67,7 +67,6 @@ export const LoginPage = () => {
       {
         onSuccess: (data) => {
           // 페이지 이동 추가
-          console.log('로그인 성공!', data);
           navigate('/');
         },
       }
