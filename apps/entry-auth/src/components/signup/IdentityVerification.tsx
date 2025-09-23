@@ -1,39 +1,35 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
+import { usePassVerification } from '../../hooks/usePassVerification';
 
 interface IIdentityVerificationViewType {
-  onNext: () => void;
+  onNext: (verifyData: { phoneNumber: string; name: string }) => void;
 }
 
 export const IdentityVerification = ({
   onNext,
 }: IIdentityVerificationViewType) => {
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const { startVerification, isLoading, isVerified, verifyData } =
+    usePassVerification();
 
-  const handleVerify = () => {
-    console.log('pass 인증 처리 중...');
-
-    // 인증 성공이라 가정하고 업데이트
-    setIsVerified(true);
-    console.log('pass 인증 완료');
-  };
-
-  // 다음 단계로 이동
-  const handleNext = () => {
-    if (!isVerified) {
-      console.log('pass인증이 필요합니다.');
-      handleVerify();
-    } else {
-      onNext();
+  useEffect(() => {
+    if (isVerified && verifyData) {
+      console.log('PASS 인증 완료, 자동으로 다음 단계로 이동:', verifyData);
+      onNext(verifyData);
     }
-  };
+  }, [isVerified, verifyData, onNext]);
 
   return (
     <Container>
       <Title>회원가입을 위한 본인 확인</Title>
-      <Description>다음 버튼을 눌러 PASS인증을 받아주세요.</Description>
-      <NextButton onClick={handleNext}>다음</NextButton>
+      <Description>다음 버튼을 눌러 PASS 인증을 받아주세요.</Description>
+      <NextButton
+        onClick={startVerification}
+        disabled={isLoading || isVerified}
+      >
+        {isLoading ? '인증 중...' : '다음'}
+      </NextButton>
     </Container>
   );
 };
@@ -49,7 +45,6 @@ const NextButton = styled.button`
   margin-top: 200px;
   transition: all 0.3s ease;
   cursor: pointer;
-
   &:hover {
     background-color: ${colors.orange[850]};
   }

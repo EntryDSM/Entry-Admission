@@ -8,6 +8,8 @@ interface ISelectUserType {
 // 회원가입 1단계
 export const SelectUser = ({ onNext }: ISelectUserType) => {
   const handleCardClick = (type: string) => {
+    const isParent = type === 'parent';
+    localStorage.setItem('isParent', JSON.stringify(isParent));
     onNext(type);
   };
 
@@ -18,7 +20,7 @@ export const SelectUser = ({ onNext }: ISelectUserType) => {
           <AuthCard isStudent={true} title="학생 명의로 인증" />
         </CardWrapper>
         <CardWrapper onClick={() => handleCardClick('parent')}>
-          <AuthCard isStudent={false} title="부모 명의로로 인증" />
+          <AuthCard isStudent={false} title="부모 명의로 인증" />
         </CardWrapper>
       </CardContainer>
     </SelectUserContainer>

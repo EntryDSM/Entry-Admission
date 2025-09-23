@@ -7,6 +7,7 @@ import {
   LoginPage,
   Page404,
   SignUpPage,
+  UserInfoPage,
 } from './pages';
 
 export const Router = createBrowserRouter([
@@ -21,6 +22,10 @@ export const Router = createBrowserRouter([
       {
         path: '/signup',
         element: <SignUpPage />,
+      },
+      {
+        path: '/user-info',
+        element: <UserInfoPage />,
       },
       {
         path: '/change-password',
