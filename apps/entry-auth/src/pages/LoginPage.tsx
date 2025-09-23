@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { AuthInput } from '@entry/ui';
 import { EntryAuthTitle } from '../components';
+import { useUserLogin } from '../hooks/useLogin';
 
 export const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -53,12 +54,24 @@ export const LoginPage = () => {
     setIsFormValid(isPhoneValid && isPasswordValid);
   }, [phoneNumber, password]);
 
+  const loginMutation = useUserLogin();
+
   const handleLogin = () => {
-    if (isFormValid) {
-      console.log('로그인 start', phoneNumber, password);
-    } else {
-      console.log('유효성 검사 실패');
-    }
+    if (!isFormValid) return;
+
+    loginMutation.mutate(
+      {
+        phoneNumber: phoneNumber.replace(/[^\d]/g, ''),
+        password,
+      },
+      {
+        onSuccess: (data) => {
+          // 페이지 이동 추가
+          console.log('로그인 성공!', data);
+          navigate('/');
+        },
+      }
+    );
   };
 
   return (
@@ -85,7 +98,10 @@ export const LoginPage = () => {
             errorMessage="비밀번호 형식이 올바르지 않습니다."
           />
         </InputWrapper>
-        <LoginButton onClick={handleLogin} $disabled={!isFormValid}>
+        <LoginButton
+          onClick={handleLogin}
+          $disabled={!isFormValid || loginMutation.isPending}
+        >
           로그인
         </LoginButton>
         <LoginKindContainer>

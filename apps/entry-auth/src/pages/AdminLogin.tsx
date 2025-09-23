@@ -4,58 +4,48 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { AuthInput } from '@entry/ui';
 import { EntryAuthTitle } from '../components';
+import { useAdminLogin } from '../hooks/useAdminLogin';
 
 export const AdminLogin = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [adminId, setAdminId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
-  const [phoneError, setPhoneError] = useState<boolean>(false);
+  const [adminIdError, setAdminIdError] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAdminIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
-    // 숫자만 추출
-    const onlyNumber = value.replace(/[^\d]/g, '');
-
-    // 000-0000-0000 포뱃팅
-    let formattedNumber = '';
-
-    if (onlyNumber.length < 4) {
-      formattedNumber = onlyNumber;
-    } else if (onlyNumber.length < 8) {
-      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(3)}`;
-    } else {
-      formattedNumber = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(
-        3,
-        7
-      )}-${onlyNumber.slice(7, 11)}`;
-    }
-
-    setPhoneNumber(formattedNumber);
-
-    setPhoneError(onlyNumber.length < 10);
+    setAdminId(value);
+    setAdminIdError(value.length < 1);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
 
-    setPasswordError(value.length < 8 || !/[!@#$%^&*(),.?":{}|<>]/.test(value));
+    const passwordRegex = /^(?=.*\d).{8,}$/;
+    setPasswordError(!passwordRegex.test(value));
   };
 
   useEffect(() => {
-    const isPhoneValid = phoneNumber.replace(/[^\d]/g, '').length >= 10;
-    const isPasswordValid =
-      password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const isAdminIdValid = adminId.length > 0;
+    const passwordRegex = /^(?=.*\d).{8,}$/;
 
-    setIsFormValid(isPhoneValid && isPasswordValid);
-  }, [phoneNumber, password]);
+    const isPasswordValid = passwordRegex.test(password);
+
+    setIsFormValid(isAdminIdValid && isPasswordValid);
+  }, [adminId, password]);
+
+  const adminLoginMutation = useAdminLogin();
 
   const handleLogin = () => {
     if (isFormValid) {
-      console.log('로그인 start', phoneNumber, password);
+      console.log('관리자 로그인 start', adminId, password);
+      adminLoginMutation.mutate({
+        adminId: adminId,
+        password: password,
+      });
     } else {
       console.log('유효성 검사 실패');
     }
@@ -67,13 +57,13 @@ export const AdminLogin = () => {
         <EntryAuthTitle children="EntryDSM 로그인" isAdmin={true} />
         <InputWrapper>
           <AuthInput
-            type="phone"
-            label="전화번호"
-            placeholder="010-XXXX-XXXX"
-            value={phoneNumber}
-            onChange={handlePhoneChange}
-            isError={!!phoneError}
-            errorMessage="올바른 형식이 아닙니다."
+            type="text"
+            label="아이디"
+            placeholder="아이디를 입력해주세요"
+            value={adminId}
+            onChange={handleAdminIdChange}
+            isError={!!adminIdError}
+            errorMessage="아이디를 입력해주세요."
           />
           <AuthInput
             label="비밀번호"
@@ -85,7 +75,10 @@ export const AdminLogin = () => {
             errorMessage="비밀번호 형식이 올바르지 않습니다."
           />
         </InputWrapper>
-        <LoginButton onClick={handleLogin} $disabled={!isFormValid}>
+        <LoginButton
+          onClick={handleLogin}
+          $disabled={!isFormValid || adminLoginMutation.isPending}
+        >
           로그인
         </LoginButton>
         <LoginKindContainer>

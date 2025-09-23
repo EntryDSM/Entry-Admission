@@ -6,56 +6,32 @@ import {
   SelectUser,
   ProgressIndicator,
   IdentityVerification,
-  UserInfoInput,
 } from '../components';
 
 export const SignUpPage = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 3;
+  const totalSteps = 2;
 
-  // 다음 단계로 이동
   const handleNextStep = () => {
-    if (currentStep < 3) {
-      setCurrentStep((prev) => prev + 1);
-    }
+    if (currentStep < 2) setCurrentStep((prev) => prev + 1);
   };
 
-  // 각 컴포넌트 width 설정
-  const containerWidth = (): string => {
-    switch (currentStep) {
-      case 1:
-        return '70%';
-      case 2:
-        return '45%';
-      case 3:
-        return '50%';
-      default:
-        return '70%';
-    }
+  const handlePassVerificationComplete = (data: {
+    phoneNumber: string;
+    name: string;
+  }) => {
+    console.log('PASS 인증 완료:', data);
   };
 
-  const containerHeight = (): string => {
-    switch (currentStep) {
-      case 1:
-        return 'auto';
-      case 2:
-        return 'auto';
-      case 3:
-        return '120%';
-      default:
-        return '';
-    }
-  };
+  const containerWidth = () => (currentStep === 2 ? '45%' : '70%');
+  const containerHeight = () => 'auto';
 
-  // 회원가입 완료 시 해당 컴포넌트 호출
   const renderContent = () => {
     switch (currentStep) {
       case 1:
         return <SelectUser onNext={handleNextStep} />;
       case 2:
-        return <IdentityVerification onNext={handleNextStep} />;
-      case 3:
-        return <UserInfoInput />;
+        return <IdentityVerification onNext={handlePassVerificationComplete} />;
       default:
         return null;
     }
@@ -82,7 +58,6 @@ export const SignUpPage = () => {
 
 const ProgressIndicatorWrapper = styled.div`
   margin-top: 40px;
-
   @media (max-width: 768px) {
     margin-top: 20px;
   }
