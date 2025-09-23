@@ -13,7 +13,7 @@ import {
 const cookies = new Cookies();
 
 // 로그인/회원가입/관리자 로그인 제외할 URL
-const skipAuthUrls = ['/user/auth', '/user', '/admin/auth'];
+const skipAuthUrls = ['/user/auth', '/user', '/admin/auth' , '/user/verify/info' , '/user/verify/popup'];
 
 userInstance.interceptors.request.use((config) => {
   config.headers = config.headers || {};
