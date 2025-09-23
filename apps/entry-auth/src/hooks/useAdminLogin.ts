@@ -12,6 +12,7 @@ export const useAdminLogin = () => {
       setAdminRefreshToken(data.refreshToken);
       setAdminId(variables.adminId);
       toast.success('관리자 로그인 성공!');
+      window.location.href = 'https://admin.entrydsm.hs.kr';
     },
     onError: (error: unknown) => {
       let errorMessage = '로그인에 실패했습니다.';
