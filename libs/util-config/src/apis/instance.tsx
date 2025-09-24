@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 공통 instance (baseURL은 필요 시 env에서 추가)
 export const instance = axios.create({
-  // baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
