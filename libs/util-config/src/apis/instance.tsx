@@ -13,7 +13,7 @@ import {
   setAdminRefreshToken,
   removeAdminAccessToken,
   removeAdminRefreshToken,
-} from '@entry/util-config';
+} from '../hooks/cookies';
 import { Cookies } from 'react-cookie';
 
 export const instance = axios.create({
