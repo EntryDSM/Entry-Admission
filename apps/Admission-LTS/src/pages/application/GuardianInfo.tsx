@@ -1,5 +1,6 @@
 import { Flex } from "@entry/design-token"
-import { FormElement, usePageData } from "@entry/ui"
+import { FormElement } from '../../components';
+import { usePageData } from "@entry/ui"
 
 export const GuardianInfo = () => {
   const [datas, setDatas] = usePageData('guardianInfo')

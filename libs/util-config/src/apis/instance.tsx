@@ -37,4 +37,8 @@ export const statusInstance = axios.create({
 
 export const applicationInstance = axios.create({
   baseURL: import.meta.env.VITE_APPLICATION_BASE_URL,
+  timeout: 50000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });

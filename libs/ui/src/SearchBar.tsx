@@ -7,6 +7,7 @@ interface ISearchBarType {
   width?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
+  onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 export const SearchBar = ({
@@ -14,6 +15,7 @@ export const SearchBar = ({
   width,
   onChange,
   value,
+  onKeyUp
 }: ISearchBarType) => {
   return (
     <FakeInput>
@@ -21,6 +23,7 @@ export const SearchBar = ({
         <Search />
       </ImageContainer>
       <SearchInput
+        onKeyUp={onKeyUp}
         type="text"
         width={width}
         placeholder={placeholder}

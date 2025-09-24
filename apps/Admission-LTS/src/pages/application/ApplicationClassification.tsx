@@ -1,5 +1,5 @@
 import { Flex } from '@entry/design-token';
-import { FormElement } from '@entry/ui';
+import { FormElement } from '../../components';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 
