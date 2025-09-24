@@ -5,9 +5,11 @@ import { colors } from '@entry/design-token';
 import { useNavigate } from 'react-router-dom';
 import { EntryAuthTitle } from '../components';
 import { getPassVerifyInfo } from '../apis';
+import { useSignUp } from '../hooks/useSignUp';
 
 export const UserInfoPage = () => {
   const navigate = useNavigate();
+  const signUpMutation = useSignUp();
 
   const [name, setName] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -19,7 +21,7 @@ export const UserInfoPage = () => {
   const [checkedToken, setCheckedToken] = useState<boolean>(false);
 
   useEffect(() => {
-    if (checkedToken) return; // 이미 체크했으면 다시 실행하지 않음
+    if (checkedToken) return;
 
     const loadPassData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -68,14 +70,22 @@ export const UserInfoPage = () => {
   const handleSignUp = async () => {
     if (!isFormValid) return;
 
-    console.log({
-      name,
+    const userData = {
       phoneNumber: phoneNumber.replace(/[^\d]/g, ''),
       password,
       isParent: JSON.parse(localStorage.getItem('isParent') || 'false'),
-    });
+    };
 
-    setIsCompleted(true);
+    try {
+      const result = await signUpMutation.mutateAsync(userData);
+
+      localStorage.setItem('accessToken', result.accessToken);
+      localStorage.setItem('refreshToken', result.refreshToken);
+
+      setIsCompleted(true);
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+    }
   };
 
   const handleCompleted = () => {

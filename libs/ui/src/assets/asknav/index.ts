@@ -1,2 +1,2 @@
 export * from './AskNavigation';
-export * from './Questions';
+export * from './Question';
