@@ -1,6 +1,6 @@
 import { colors, Flex } from '@entry/design-token';
 import { useState } from 'react';
-import { PreviousButton } from './PreviousButton';
+import { PreviousButton } from '@entry/ui';
 import { SchoolSearchModal } from './SchoolSearchModal';
 import styled from '@emotion/styled';
 

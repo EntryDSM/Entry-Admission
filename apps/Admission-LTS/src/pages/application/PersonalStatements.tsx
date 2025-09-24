@@ -1,5 +1,6 @@
 import { Flex } from '@entry/design-token';
-import { FormElement, usePageData } from '@entry/ui';
+import { usePageData } from '@entry/ui';
+import { FormElement } from '../../components';
 
 export const PersonalStatements = () => {
   const [datas, setDatas] = usePageData('personalStatements');

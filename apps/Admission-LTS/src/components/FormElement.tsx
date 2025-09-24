@@ -1,14 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { Caution, Check } from './assets';
-import { DropDownContent } from './DropDownContent';
-import { ImageContent } from './ImageContent';
-import { InputContent } from './InputContent';
-import { RadioContent } from './RadioContent';
+import { DropDownContent, Caution, Check, ImageContent, InputContent, RadioContent, TextAreaContent, AddressContent } from '@entry/ui';
 import { SearchContent } from './SearchContent';
-import { TextAreaContent } from './TextAreaContent';
-import { AddressContent } from './AddressContent';
 
 interface BaseFormElementProps {
   label?: string;
