@@ -8,16 +8,8 @@ export const createPassPopup = async () => {
 };
 
 export const getPassVerifyInfo = async (mdlToken: string) => {
-  try {
-    const res = await userInstance.get('/user/verify/info', {
-      params: {
-        mdl_tkn: mdlToken,
-      },
-    });
-
-    return res.data as { phoneNumber: string; name: string };
-  } catch (error) {
-    console.error('API 호출 실패:', error);
-    throw error;
-  }
+  const { data } = await userInstance.get('/user/verify/info', {
+    params: { mdl_tkn: mdlToken },
+  });
+  return data as { phoneNumber: string; name: string };
 };

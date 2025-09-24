@@ -4,64 +4,57 @@ import { AuthInput } from '@entry/ui';
 import { colors } from '@entry/design-token';
 import { useNavigate } from 'react-router-dom';
 import { EntryAuthTitle } from '../components';
-import { getPassVerifyInfo } from '../apis';
 import { useSignUp } from '../hooks/useSignUp';
+import { toast } from 'react-toastify';
+import { usePassVerification } from '../hooks/usePassVerification';
 
 export const UserInfoPage = () => {
   const navigate = useNavigate();
   const signUpMutation = useSignUp();
+  const {
+    isLoading: isLoadingPass,
+    isVerified,
+    verifyData,
+    error: passError,
+  } = usePassVerification();
 
   const [name, setName] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordCheck, setPasswordCheck] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [isLoadingPassData, setIsLoadingPassData] = useState<boolean>(true);
-  const [checkedToken, setCheckedToken] = useState<boolean>(false);
 
+  // PASS 인증 완료 시 데이터 적용
   useEffect(() => {
-    if (checkedToken) return;
+    if (isVerified && verifyData) {
+      setName(verifyData.name);
+      setPhoneNumber(verifyData.phoneNumber);
+    }
+  }, [isVerified, verifyData]);
 
-    const loadPassData = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const mdlToken =
-        urlParams.get('mdl_tkn') || localStorage.getItem('mdlToken');
-
-      if (!mdlToken) {
-        navigate('/signup');
-        return;
-      }
-
-      localStorage.setItem('mdlToken', mdlToken);
-
-      try {
-        const passData = await getPassVerifyInfo(mdlToken);
-        setName(passData.name);
-        setPhoneNumber(passData.phoneNumber);
-
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete('mdl_tkn');
-        window.history.replaceState({}, '', newUrl.toString());
-      } catch (error) {
-        console.error(error);
-        navigate('/signup');
-        return;
-      }
-
-      setIsLoadingPassData(false);
-      setCheckedToken(true);
-    };
-
-    loadPassData();
-  }, [navigate, checkedToken]);
+  // PASS 인증 실패 시 /signup으로 이동
+  useEffect(() => {
+    if (passError) {
+      navigate('/signup');
+    }
+  }, [passError, navigate]);
 
   useEffect(() => {
     const isNameValid = name.length > 0;
     const isPhoneValid = phoneNumber.replace(/[^\d]/g, '').length >= 10;
     const isPasswordValid =
       password.length >= 8 && /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (passwordCheck && password !== passwordCheck) {
+      setPasswordError('비밀번호가 일치하지 않습니다.');
+    } else {
+      setPasswordError('');
+    }
+
     const isPasswordCheckValid = password === passwordCheck;
+
     setIsFormValid(
       isNameValid && isPhoneValid && isPasswordValid && isPasswordCheckValid
     );
@@ -76,16 +69,19 @@ export const UserInfoPage = () => {
       isParent: JSON.parse(localStorage.getItem('isParent') || 'false'),
     };
 
-    try {
-      const result = await signUpMutation.mutateAsync(userData);
-
-      localStorage.setItem('accessToken', result.accessToken);
-      localStorage.setItem('refreshToken', result.refreshToken);
-
-      setIsCompleted(true);
-    } catch (error) {
-      console.error('회원가입 실패:', error);
-    }
+    signUpMutation.mutate(userData, {
+      onSuccess: (result) => {
+        localStorage.setItem('accessToken', result.accessToken);
+        localStorage.setItem('refreshToken', result.refreshToken);
+        setIsCompleted(true);
+      },
+      onError: (error) => {
+        if (error.status === 409) {
+          toast.error('이미 존재하는 전화번호입니다.');
+        }
+        console.error('회원가입 실패', error);
+      },
+    });
   };
 
   const handleCompleted = () => {
@@ -94,7 +90,7 @@ export const UserInfoPage = () => {
     }
   };
 
-  if (isLoadingPassData) {
+  if (isLoadingPass) {
     return (
       <BackGroundWrapper>
         <PageContainer>
@@ -162,12 +158,14 @@ export const UserInfoPage = () => {
               isEye
               value={passwordCheck}
               onChange={(e) => setPasswordCheck(e.target.value)}
+              isError={!!passwordError}
+              errorMessage={passwordError}
             />
             <SignUpButton $disabled={!isFormValid} onClick={handleSignUp}>
               회원가입
             </SignUpButton>
-            <BackToSignUpButton onClick={() => navigate('/signup')}>
-              이전 단계로
+            <BackToSignUpButton onClick={() => navigate('/')}>
+              로그인
             </BackToSignUpButton>
           </FormContainer>
         )}

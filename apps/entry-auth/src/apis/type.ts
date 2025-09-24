@@ -11,6 +11,12 @@ export interface IsignInRequestType {
   password: string;
 }
 
+// 비밀번호 변경
+export interface IChangePasswordRequestType {
+  phoneNumber: string;
+  newPassword: string;
+}
+
 // 토큰 갱신
 export interface IRefreshTokenHeaderType {
   'X-Refresh-Token': string;
