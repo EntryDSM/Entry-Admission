@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { instance } from '@entry/util-config';
+import { AdmissionUserInstance } from '@entry/util-config';
 
 export const useGetSchoolSearch = (schoolName: string) => {
   return useQuery({
     queryKey: ['school', schoolName],
     queryFn: async () => {
-      const { data } = await instance.get(`/schools`, {
+      const { data } = await AdmissionUserInstance.get(`/schools`, {
         params: { school_name: schoolName } 
       });
       return data;

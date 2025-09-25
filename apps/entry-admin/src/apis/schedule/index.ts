@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { instance } from '@entry/util-config';
+import { AdmissionAdminInstance } from '@entry/util-config';
 import { toast } from 'react-toastify';
 import { IUpdateScheduleRequest } from './types';
 
@@ -10,7 +10,7 @@ export const useGetSchedule = (type : string) => {
   return useQuery({
     queryKey: ['schedule', type],
     queryFn: async () => {
-      const { data } = await instance.get(`${path}?type=${type}`);
+      const { data } = await AdmissionAdminInstance.get(`${path}?type=${type}`);
       return data;
     },
   });
@@ -21,7 +21,7 @@ export const useGetAllSchedule = () => {
   return useQuery({
     queryKey: ['schedule'],
     queryFn: async () => {
-      const { data } = await instance.get(`${path}/all`);
+      const { data } = await AdmissionAdminInstance.get(`${path}/all`);
       return data;
     },
   });
@@ -31,7 +31,7 @@ export const useUpdateSchedule = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async(data: IUpdateScheduleRequest) => {
-      const response = await instance.patch(`${path}`, data);
+      const response = await AdmissionAdminInstance.patch(`${path}`, data);
       return response.data;
     }, 
     onSuccess: () => {

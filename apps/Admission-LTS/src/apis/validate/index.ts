@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
 import { IValidateRequest } from "./types"
-import { instance } from "@entry/util-config"
+import { AdmissionUserInstance } from "@entry/util-config"
 import { toast } from "react-toastify"
 
 export const useValidatePost = <T extends IValidateRequest>() => {
   return useMutation({
     mutationFn: async(data : T) => {
-      const response = await instance.post('/api/v1/validate', data);
+      const response = await AdmissionUserInstance.post('/api/v1/validate', data);
       return response.data
     },
     onSuccess: () => {

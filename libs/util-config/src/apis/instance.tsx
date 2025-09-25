@@ -16,130 +16,80 @@ import {
 } from '../hooks/cookies';
 import { Cookies } from 'react-cookie';
 
-export const instance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+export const AdmissionUserInstance = axios.create({
+  baseURL: 'https://api.entrydsm.hs.kr',
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
 
-export const userInstance = axios.create({
-  baseURL: import.meta.env.VITE_USER_BASE_URL,
+export const AdmissionAdminInstance = axios.create({
+  baseURL: 'https://api.entrydsm.hs.kr',
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
-});
-
-export const adminInstance = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_BASE_URL,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const scheduleInstance = axios.create({
-  baseURL: import.meta.env.VITE_SCHEDULE_BASE_URL,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const statusInstance = axios.create({
-  baseURL: import.meta.env.VITE_STATUS_BASE_URL,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const applicationInstance = axios.create({
-  baseURL: import.meta.env.VITE_APPLICATION_BASE_URL,
 });
 
 const cookies = new Cookies();
 
 const skipAuthUrls = [
-  '/user/auth',
-  '/user',
-  '/admin/auth',
-  '/user/verify/info',
-  '/user/verify/popup',
+  'POST /admin/auth',
+  'POST /user/auth',
+  'POST /user',
+  'POST /user/verify/popup',
+  'GET /user/verify/info',
 ];
 
-const instances = [
-  userInstance,
-  adminInstance,
-  scheduleInstance,
-  statusInstance,
-  applicationInstance,
-];
 
 /**
- * 요청 인터셉터
+ * 사용자 요청 인터셉터
  */
-const requestInterceptor = (
-  config: InternalAxiosRequestConfig,
-  type: 'user' | 'admin' = 'user'
-) => {
+const userRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers || {};
   const url = config.url || '';
-  const method = config.method || 'get';
+  const method = (config.method || 'get').toUpperCase();
 
-  // 인증 스킵 URL
-  const isSkip = skipAuthUrls.some(
-    (skipUrl) => url.includes(skipUrl) && method === 'post'
-  );
-
-  if (isSkip) {
-    // Admin 로그인 시 adminId와 역할 헤더 추가
-    if (url.includes('/admin/auth')) {
-      try {
-        const data =
-          typeof config.data === 'string'
-            ? JSON.parse(config.data)
-            : config.data;
-        const adminId = data?.adminId || getAdminId() || '';
-        config.headers['Request-User-Id'] = adminId;
-        config.headers['Request-User-Role'] = 'ADMIN';
-        console.log('[RequestInterceptor] Admin login header set:', adminId);
-      } catch (err) {
-        console.warn('[RequestInterceptor] adminId 파싱 실패', err);
-      }
-    }
+  // Bearer 토큰이 필요없는 엔드포인트 체크
+  const endpoint = `${method} ${url}`;
+  if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
 
-  // 토큰 가져오기 (user/admin 분리)
-  let token: string | undefined;
-  if (type === 'admin') {
-    token = getAdminAccessToken() || cookies.get('adminAccessToken');
-  } else {
-    token = getAccessToken() || cookies.get('accessToken');
+  const token = getAccessToken() || cookies.get('accessToken');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
-
-  if (!token) {
-    console.warn('[RequestInterceptor] No access token, redirect to login');
-    window.location.href = '/';
-    return config;
-  }
-
-  config.headers['Authorization'] = `Bearer ${token}`;
-  console.log('[RequestInterceptor] Authorization header set:', token);
 
   return config;
 };
 
-// userInstance → user 토큰 사용
-userInstance.interceptors.request.use((config) =>
-  requestInterceptor(config, 'user')
-);
-// adminInstance → admin 토큰 사용
-adminInstance.interceptors.request.use((config) =>
-  requestInterceptor(config, 'admin')
-);
-// 나머지 → 기본 user 토큰 사용
-[scheduleInstance, statusInstance, applicationInstance].forEach((inst) => {
-  inst.interceptors.request.use((config) => requestInterceptor(config, 'user'));
-});
+/**
+ * 관리자 요청 인터셉터
+ */
+const adminRequestInterceptor = (config: InternalAxiosRequestConfig) => {
+  config.headers = config.headers || {};
+  const url = config.url || '';
+  const method = (config.method || 'get').toUpperCase();
+
+  // Bearer 토큰이 필요없는 엔드포인트 체크
+  const endpoint = `${method} ${url}`;
+  if (skipAuthUrls.includes(endpoint)) {
+    return config;
+  }
+
+  const token = getAdminAccessToken() || cookies.get('adminAccessToken');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return config;
+};
+
+AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
+AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
 /**
- * 응답 인터셉터 (토큰 재발급 처리)
+ * 사용자 응답 인터셉터 (토큰 재발급 처리)
  */
-const responseInterceptor = async (error: AxiosError) => {
+const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
   if (!config) return Promise.reject(error);
 
@@ -148,17 +98,59 @@ const responseInterceptor = async (error: AxiosError) => {
   };
 
   if (response?.status === 401 && !retryConfig._retry) {
-    console.log('[ResponseInterceptor] 401 detected, trying refresh token');
+    console.log('[UserResponseInterceptor] 401 detected, trying refresh token');
     retryConfig._retry = true;
 
     try {
-      const adminRefreshToken =
-        getAdminRefreshToken() || cookies.get('adminRefreshToken');
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
+      if (userRefreshToken) {
+        console.log('[UserResponseInterceptor] User token refresh started');
+        const { data } = await AdmissionUserInstance.put(
+          '/user/auth',
+          {},
+          { headers: { 'X-Refresh-Token': userRefreshToken } }
+        );
 
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
+
+        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
+        return AdmissionUserInstance(retryConfig);
+      }
+
+      console.warn('[UserResponseInterceptor] No refresh token found');
+      throw new Error('No refresh token');
+    } catch (err) {
+      console.error('[UserResponseInterceptor] Token refresh failed', err);
+      removeAccessToken();
+      removeRefreshToken();
+      window.location.href = 'https://auth.entrydsm.hs.kr';
+    }
+  }
+
+  return Promise.reject(error);
+};
+
+/**
+ * 관리자 응답 인터셉터 (토큰 재발급 처리)
+ */
+const adminResponseInterceptor = async (error: AxiosError) => {
+  const { config, response } = error;
+  if (!config) return Promise.reject(error);
+
+  const retryConfig = config as InternalAxiosRequestConfig & {
+    _retry?: boolean;
+  };
+
+  if (response?.status === 401 && !retryConfig._retry) {
+    console.log('[AdminResponseInterceptor] 401 detected, trying refresh token');
+    retryConfig._retry = true;
+
+    try {
+      const adminRefreshToken = getAdminRefreshToken() || cookies.get('adminRefreshToken');
       if (adminRefreshToken) {
-        console.log('[ResponseInterceptor] Admin token refresh started');
-        const { data } = await adminInstance.put(
+        console.log('[AdminResponseInterceptor] Admin token refresh started');
+        const { data } = await AdmissionAdminInstance.put(
           '/admin/auth',
           {},
           {
@@ -174,28 +166,13 @@ const responseInterceptor = async (error: AxiosError) => {
         setAdminRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        return adminInstance(retryConfig);
-      } else if (userRefreshToken) {
-        console.log('[ResponseInterceptor] User token refresh started');
-        const { data } = await userInstance.put(
-          '/user/auth',
-          {},
-          { headers: { 'X-Refresh-Token': userRefreshToken } }
-        );
-
-        setAccessToken(data.accessToken);
-        setRefreshToken(data.refreshToken);
-
-        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        return userInstance(retryConfig);
-      } else {
-        console.warn('[ResponseInterceptor] No refresh token found');
-        throw new Error('No refresh token');
+        return AdmissionAdminInstance(retryConfig);
       }
+
+      console.warn('[AdminResponseInterceptor] No refresh token found');
+      throw new Error('No refresh token');
     } catch (err) {
-      console.error('[ResponseInterceptor] Token refresh failed', err);
-      removeAccessToken();
-      removeRefreshToken();
+      console.error('[AdminResponseInterceptor] Token refresh failed', err);
       removeAdminAccessToken();
       removeAdminRefreshToken();
       window.location.href = 'https://auth.entrydsm.hs.kr';
@@ -205,10 +182,12 @@ const responseInterceptor = async (error: AxiosError) => {
   return Promise.reject(error);
 };
 
-// 각 인스턴스에 responseInterceptor 적용
-instances.forEach((instance) => {
-  instance.interceptors.response.use(
-    (response) => response,
-    responseInterceptor
-  );
-});
+AdmissionUserInstance.interceptors.response.use(
+  (response) => response,
+  userResponseInterceptor
+);
+
+AdmissionAdminInstance.interceptors.response.use(
+  (response) => response,
+  adminResponseInterceptor
+);

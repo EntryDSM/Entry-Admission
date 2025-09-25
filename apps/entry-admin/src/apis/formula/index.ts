@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { IFormulaRequest } from "./types"
-import { instance } from "@entry/util-config";
+import { AdmissionAdminInstance } from "@entry/util-config";
 import { toast } from "react-toastify";
 
 export const useFormulaPost = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async(data : IFormulaRequest) => {
-      const response = await instance.post('/api/v1/formulas', data);
+      const response = await AdmissionAdminInstance.post('/api/v1/formulas', data);
       return response.data;
     },
     onSuccess: () => {
@@ -24,7 +24,7 @@ export const useGetFormula = () => {
   return useQuery({
     queryKey: ['formula'],
     queryFn: async () => {
-      const { data } = await instance.get('/api/v1/formulas');
+      const { data } = await AdmissionAdminInstance.get('/api/v1/formulas');
       return data;
     }
   })
@@ -34,7 +34,7 @@ export const useFormulaDelete = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async(formulaSetId : string) => {
-      await instance.delete(`/api/v1/formulas/${formulaSetId}`);
+      await AdmissionAdminInstance.delete(`/api/v1/formulas/${formulaSetId}`);
     },
     onSuccess: () => {
       toast.success('수식 삭제가 완료되었습니다.')

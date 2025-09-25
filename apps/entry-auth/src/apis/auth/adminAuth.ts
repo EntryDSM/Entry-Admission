@@ -1,19 +1,13 @@
-import { getAdminId, instance } from '@entry/util-config';
+import { getAdminId, AdmissionAdminInstance } from '@entry/util-config';
 import { IAdminSignInRequestType, ITokenResponseType } from '../type';
 
 // 어드민 로그인
 export const loginAdmin = async (
   adminData: IAdminSignInRequestType
 ): Promise<ITokenResponseType> => {
-  const { data } = await instance.post<ITokenResponseType>(
+  const { data } = await AdmissionAdminInstance.post<ITokenResponseType>(
     '/admin/auth',
-    adminData,
-    {
-      headers: {
-        'Request-User-Id': adminData.adminId,
-        'Request-User-Role': 'ADMIN',
-      },
-    }
+    adminData
   );
   return data;
 };
@@ -24,7 +18,7 @@ export const refreshAdminToken = async (
 ): Promise<ITokenResponseType> => {
   const adminId = getAdminId();
 
-  const { data } = await instance.put<ITokenResponseType>(
+  const { data } = await AdmissionAdminInstance.put<ITokenResponseType>(
     '/admin/auth',
     {},
     {

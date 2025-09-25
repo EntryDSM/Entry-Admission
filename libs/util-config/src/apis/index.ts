@@ -1,2 +1,2 @@
-export * from './instance';
+export { AdmissionUserInstance, AdmissionAdminInstance } from './instance';
 export * from './user';

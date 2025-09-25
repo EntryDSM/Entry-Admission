@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
 import { IAdmissionRequest } from "./types"
-import { instance } from "@entry/util-config"
+import { AdmissionUserInstance } from "@entry/util-config"
 import { toast } from "react-toastify"
 
 export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
   return useMutation({
     mutationFn: async(data : T) => {
-      const response = await instance.post('/api/v1/applications', data);
+      const response = await AdmissionUserInstance.post('/api/v1/applications', data);
       return response.data
     },
     onSuccess: () => {

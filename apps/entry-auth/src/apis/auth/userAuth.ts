@@ -1,11 +1,11 @@
-import { userInstance } from '@entry/util-config';
+import { AdmissionUserInstance } from '@entry/util-config';
 import { IsignInRequestType, ITokenResponseType } from '../type';
 
 // 유저 로그인
 export const loginUser = async (
   userData: IsignInRequestType
 ): Promise<ITokenResponseType> => {
-  const { data } = await userInstance.post<ITokenResponseType>(
+  const { data } = await AdmissionUserInstance.post<ITokenResponseType>(
     '/user/auth',
     userData
   );
@@ -16,7 +16,7 @@ export const loginUser = async (
 export const refreshUserToken = async (
   refreshToken: string
 ): Promise<ITokenResponseType> => {
-  const { data } = await userInstance.put<ITokenResponseType>(
+  const { data } = await AdmissionUserInstance.put<ITokenResponseType>(
     '/user/auth',
     {},
     {
