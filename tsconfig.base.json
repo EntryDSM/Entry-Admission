@@ -27,8 +27,8 @@
       "@entry/hooks/*": ["libs/hooks/src/*"],
       "@entry/ui": ["libs/ui/src/index.ts"],
       "@entry/ui/*": ["libs/ui/src/*"],
-      "@entry/util-config": ["libs/utils-config/src/index.ts"],
-      "@entry/util-config/*": ["libs/utils-config/src/*"]
+      "@entry/util-config": ["libs/util-config/src/index.ts"],
+      "@entry/util-config/*": ["libs/util-config/src/*"]
     }
   }
 }

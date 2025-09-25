@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { keyframes, css } from '@emotion/react';
 import { colors } from '@entry/design-token';
-import { School as school } from '@entry/ui';
+import { school } from '../assets';
 import { ArrowBottom, GrowToImg } from '../assets';
 import {
   AwardsSection,

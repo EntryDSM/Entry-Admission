@@ -3,6 +3,7 @@ import { EntryLogo, SideBarBtnIcon } from './assets';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useUserInfo } from '@entry/util-config';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
@@ -49,7 +50,7 @@ export const AdminHeader = () => {
   const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [datas] = useState<{ name: string }>({ name: '홍길동' });
+  // const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
   const navData = [
     { name: '전형 일정 수정', path: '/admissions-schedule' },
@@ -120,13 +121,15 @@ export const CommonHeader = () => {
   const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [datas] = useState<{ name: string }>({ name: '홍길동' });
+  // const [datas] = useState<{ name: string }>({ name: '홍길동' });
+  const { data: userInfo } = useUserInfo();
 
   const navData = [
     { name: '공지사항', path: '/notice' },
     { name: '자주 묻는 질문', path: '/faq' },
     { name: '성적 산출', path: '/calculate' },
     { name: '전형 요강', path: '/admission-overview' },
+    { name: '학교 소개', path: '/landing' },
   ];
 
   const navClick = (path: string) => {
@@ -183,7 +186,7 @@ export const CommonHeader = () => {
             마이페이지
           </NavContent>
           <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
-            {datas.name}
+            {userInfo?.name || '사용자'}
             <Text
               isSpan
               fontSize={18}

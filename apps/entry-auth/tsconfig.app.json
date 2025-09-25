@@ -15,7 +15,7 @@
       "vite/client"
     ],
     "jsxImportSource": "@emotion/react",
-    "rootDir": "src"
+    "rootDir": "."
   },
   "exclude": [
     "out-tsc",
