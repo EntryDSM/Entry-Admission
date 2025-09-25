@@ -7,64 +7,79 @@ import { useGetSchoolSearch } from '../apis';
 interface ISchoolSearchModalType {
   setIsShow: React.Dispatch<React.SetStateAction<boolean>>;
   isShow?: boolean;
-  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수
-  selectedValue?: string | null;
+  setSelectedName: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수
+  selectedName?: string | null;
+  setSelectedCode: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수
+  selectedCode?: string | null;
 }
 
 export const SchoolSearchModal = ({
-  setSelectedValue,
-  selectedValue,
+  setSelectedName,
+  selectedName,
+  setSelectedCode,
+  selectedCode,
   setIsShow,
   isShow,
 }: ISchoolSearchModalType) => {
   const [datas, setDatas] = useState<{code : string, name: string, information: string, address: string}[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>('');
-  const [tempSelectedValue, setTempSelectedValue] = useState<string | null>(
-    selectedValue ?? null
+  const [tempSelectedName, setTempSelectedName] = useState<string | null>(
+    selectedName ?? null
+  );
+  const [tempSelectedCode, setTempSelectedCode] = useState<string | null>(
+    selectedCode ?? null
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
-  const contentClick = (value: string) => {
-    setTempSelectedValue((prev) => (prev === value ? null : value)); // 선택된 값을 임시 저장에 저장
+  const contentClick = (name: string, code: string) => {
+    setTempSelectedName((prev) => (prev === name ? null : name)); // 선택된 값을 임시 저장에 저장
+    setTempSelectedCode((prev) => (prev === code ? null : code)); // 선택된 값을 임시 저장에 저장
   };
 
   const backRef = useRef<HTMLDivElement>(null);
   const backClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (backRef.current === e.target) {
-      setTempSelectedValue(selectedValue ?? null); // 원래 값으로 변경
+      setTempSelectedName(selectedName ?? null); // 원래 값으로 변경
+      setTempSelectedCode(selectedCode ?? null); // 원래 값으로 변경
       setIsShow(false);
+      setDatas([]) //검색 내역 초기화
+      setSearchValue('') //검색 내역 초기화
     }
   };
 
   const handleCancelClick = () => {
-    setTempSelectedValue(selectedValue ?? null); // 원래 값으로 변경
+    setTempSelectedName(selectedName ?? null); // 원래 값으로 변경
+    setTempSelectedCode(selectedCode ?? null); // 원래 값으로 변경
     setIsShow(false);
     setDatas([]) //검색 내역 초기화
+    setSearchValue('') //검색 내역 초기화
   };
 
   const handleConfirmClick = () => {
-    setSelectedValue(tempSelectedValue); // 선택
+    setSelectedName(tempSelectedName); // 선택
+    setSelectedCode(tempSelectedCode); //선택
     setIsShow(false);
-    setDatas([])//setDatas 초기화
+    setDatas([]) //검색 내역 초기화
+    setSearchValue('') //검색 내역 초기화
   };
 
   const { data, refetch } = useGetSchoolSearch(searchValue);
-
-
+  
+  
   const handleSearchKeyUp = (e : React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       refetch();
     }
   }
-
+  
   useEffect(() => {
-    if (data) {
+    if (data?.content) {
       setDatas(
-        data.map((item: any) => ({
+        data?.content.map((item: any) => ({
           code: item.code,
           name: item.name,
           information: item.information,
@@ -73,7 +88,8 @@ export const SchoolSearchModal = ({
       )
     }
   },[data])
-
+  
+  
   return (
     isShow && (
       <ModalBack ref={backRef} onClick={backClick}>
@@ -102,12 +118,12 @@ export const SchoolSearchModal = ({
           <ContentContainer>
             {datas.length > 0 ? (
               datas.map((data) => (
-                <Content onClick={() => contentClick(data.name)} key={data.code}>
-                  {data.name}
-                  {data.code}
-                  {data.address}
-                  {data.information}
-                  {data.name === tempSelectedValue ? (
+                <Content onClick={() => contentClick(data.name, data.code)} key={data.code}>
+                  <Text>{data.name}</Text>
+                  <Text color={colors.orange[800]}>{data.code}</Text>
+                  <Text color={colors.gray[400]} fontWeight={400}>{data.address}</Text>
+                  <Text color={colors.gray[400]} fontWeight={400}>{data.information}</Text>
+                  {data.name === tempSelectedName ? (
                     <Check />
                   ) : (
                     <Check color="transparent" />

@@ -88,8 +88,10 @@ export const ApplicationLayout = () => {
       setTitle('중학교 정보 입력');
     } else if (pathname.includes('personal-statements')) {
       setTitle('자기소개서 & 학업계획서');
-    } else {
+    } else if(pathname.includes('application-classification')) {
       setTitle('지원자 전형 구분');
+    } else {
+      setTitle('성적 기입')
     }
   }, [pathname]);
 

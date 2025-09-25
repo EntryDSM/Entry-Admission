@@ -49,8 +49,10 @@ interface ImageProps {
 
 interface SearchProps {
   type: 'search';
-  selectedValue?: string | null;
-  setSelectedValue?: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedName?: string | null;
+  setSelectedName?: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedCode?: string | null;
+  setSelectedCode?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 interface AddressProps {
@@ -120,7 +122,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
       case 'dropDown':
         return (props.dropDownValues?.length ?? 0) > 0;
       case 'search':
-        return props.selectedValue !== null && props.selectedValue !== undefined && props.selectedValue !== '';
+        return props.selectedName !== null && props.selectedName !== undefined && props.selectedName !== '' && props.selectedCode !== null && props.selectedCode !== undefined && props.selectedCode !== '';
       case 'address':
         return props.addressDetailValue !== null && props.addressValue !== null && props.postalCodeValue !== null && props.addressDetailValue !== "" && props.addressValue !== "" && props.postalCodeValue !== "" ;
       default:
@@ -190,10 +192,12 @@ export const FormElement = React.memo<FormElementProps>((props) => {
 
       case 'search':
         // setSelectedValue가 있을 때만 렌더링
-        return props.setSelectedValue ? (
+        return props.setSelectedName && props.setSelectedCode ? (
           <SearchContent
-            selectedValue={props.selectedValue}
-            setSelectedValue={props.setSelectedValue}
+            selectedName={props.selectedName}
+            setSelectedName={props.setSelectedName}
+            selectedCode={props.selectedCode}
+            setSelectedCode={props.setSelectedCode}
           />
         ) : null;
 

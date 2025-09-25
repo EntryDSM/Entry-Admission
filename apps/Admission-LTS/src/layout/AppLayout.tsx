@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
-import { canProceedToNext, ApplicationNav, usePageData, useApplicationData } from '@entry/ui';
+import { canProceedToNext, usePageData, useApplicationData } from '@entry/ui';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import {ApplicationNav} from '../components'
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify'
 

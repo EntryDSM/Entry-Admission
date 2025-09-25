@@ -5,13 +5,17 @@ import { SchoolSearchModal } from './SchoolSearchModal';
 import styled from '@emotion/styled';
 
 interface ISearchType {
-  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수로 변경
-  selectedValue?: string | null;
+  setSelectedName: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수로 변경
+  selectedName?: string | null;
+  setSelectedCode: React.Dispatch<React.SetStateAction<string | null>>; // ✅ 필수로 변경
+  selectedCode?: string | null;
 }
 
 export const SearchContent = ({
-  selectedValue,
-  setSelectedValue,
+  selectedName,
+  setSelectedName,
+  setSelectedCode,
+  selectedCode,
 }: ISearchType) => {
   const [isShow, setIsShow] = useState(false);
 
@@ -22,12 +26,14 @@ export const SearchContent = ({
         readOnly={true}
         width="300px"
         placeholder="중학교 이름을 입력해주세요."
-        value={selectedValue ?? ''}
+        value={selectedName ?? ''}
       />
       <PreviousButton onClick={() => setIsShow(true)}>검색</PreviousButton>
       <SchoolSearchModal
-        selectedValue={selectedValue}
-        setSelectedValue={setSelectedValue}
+        selectedName={selectedName}
+        setSelectedName={setSelectedName}
+        selectedCode={selectedCode}
+        setSelectedCode={setSelectedCode}
         isShow={isShow}
         setIsShow={setIsShow}
       />

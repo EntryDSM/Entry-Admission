@@ -1,9 +1,12 @@
 import { Flex } from '@entry/design-token';
 import { usePageData } from '@entry/ui';
 import { FormElement } from '../../components';
+import { useEffect, useState } from 'react';
 
 export const MiddleSchoolInfo = () => {
   const [datas, setDatas] = usePageData('middleSchoolInfo');
+  const [selectedName, setSelectedName] = useState<string | null>(datas.schoolName || null)
+  const [selectedCode, setSelectedCode] = useState<string | null>(datas.schoolName || null)
 
   console.log(datas);
 
@@ -28,11 +31,17 @@ export const MiddleSchoolInfo = () => {
     setDatas({ ...datas, teacherName: value });
   };
 
+  useEffect(() => {
+    setDatas({ ...datas, schoolCode: selectedCode, schoolName: selectedName });
+  },[selectedName, selectedCode])
+
   return (
     <Flex isColumn={true} width="100%" height="fit-content">
       <FormElement
-        selectedValue={datas.schoolName}
-        setSelectedValue={(value) => setDatas({ ...datas, schoolName: value })}
+        selectedName={datas.schoolName}
+        setSelectedName={setSelectedName}
+        selectedCode={datas.schoolCode}
+        setSelectedCode={setSelectedCode}
         type="search"
         label="중학교 이름"
       />
