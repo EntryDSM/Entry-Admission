@@ -1,27 +1,13 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { Button, EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 
 export const Landing = () => {
   const [name, _] = useState<string>('김이름');
-  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    // 초기 체크
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
 
   const handleStartClick = () => {
     navigate('/application-classification');

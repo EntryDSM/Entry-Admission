@@ -1,5 +1,8 @@
 {
   "name": "@entry/Admission-LTS",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "react-device-detect": "^2.2.3"
+  }
 }
