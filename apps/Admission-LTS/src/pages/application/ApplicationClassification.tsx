@@ -6,10 +6,10 @@ import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 export const ApplicationClassification = () => {
   const [datas, setDatas] = usePageData('applicationClassification');
 
-  // 1990 ~ 2025년 생성
+  // 1990 ~ 2030년 생성
   const yearDates = eachYearOfInterval({
     start: new Date(1990, 0, 1),
-    end: new Date(2025, 11, 31),
+    end: new Date(2030, 11, 31),
   });
   const years = yearDates.map((date) => parseInt(format(date, 'yyyy')));
 

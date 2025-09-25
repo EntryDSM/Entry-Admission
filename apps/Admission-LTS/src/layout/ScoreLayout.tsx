@@ -28,7 +28,7 @@ export const GedScoreLayout = () => {
             {currentData ? currentData.name : 'Error'}
           </Text>
           <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
-            관련 항목이 없는 경우 ✕ 로 기입하세요.
+            관련 항목이 없는 경우 0으로 기입하세요.
           </Text>
         </TitleContainer>
         <ScorePageNav datas={datas} />

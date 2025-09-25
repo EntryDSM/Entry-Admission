@@ -1,11 +1,10 @@
 import { colors, Flex } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { PreviousButton } from './PreviousButton';
-import { useNavigate } from 'react-router-dom';
-import { useApplicationData, useCheckPageData, usePageData } from './contexts';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useApplicationData, useCheckPageData, usePageData, PreviousButton, previousDataRef, performSave, hasChanged, serializeStateWithFiles } from '@entry/ui';
 import { useEffect, useState, useRef } from 'react';
-import { previousDataRef, performSave, hasChanged, serializeStateWithFiles } from './utils/skipNextAutoSave';
 import { BeatLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -13,7 +12,7 @@ interface IApplicationNavType {
   setCurrentPage: (page: number) => void;
   graduationType?: string;
   validateCurrentPage?: (page: number) => { canProceed: boolean; message?: string };
-  toast?: (message: string) => void; // 외부에서 toast 전달
+  // toast?: (message: string) => void; // 외부에서 toast 전달
 }
 
 const PAGES_PER_GROUP = 6;
@@ -24,7 +23,7 @@ export const ApplicationNav = ({
   setCurrentPage,
   graduationType,
   validateCurrentPage,
-  toast = (msg: string) => window.alert(msg),
+  // toast = (msg: string) => window.alert(msg),
 }: IApplicationNavType) => {
   const [datas] = usePageData('applicationClassification');
   const [isSubmitBlocked, setIsSubmitBlocked] = useState<boolean>(true);
@@ -35,6 +34,7 @@ export const ApplicationNav = ({
   const { saveToStorage, state } = useApplicationData();
   const [checkData] = useCheckPageData('check');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const paginationInfo = calculatePaginationInfo(currentPage, totalPages);
 
@@ -95,16 +95,28 @@ export const ApplicationNav = ({
   };
 
   const handleNextPage = async () => {
-    if (!state) return toast('데이터를 불러오는 중입니다.');
+    if (!state) return toast.success('데이터를 불러오는 중입니다.');
 
     if (currentPage === 1 && (!datas.graduationType || !datas.graduationType.trim())) {
-      return toast('졸업 구분은 필수값입니다.');
+      return toast.error('졸업 구분은 필수값입니다.');
     }
 
     // ✅ validation 먼저 체크
     if (validateCurrentPage) {
       const validation = validateCurrentPage(currentPage);
-      if (!validation.canProceed) return toast(validation.message || '필수 항목을 모두 입력해주세요.');
+      if (!validation.canProceed) return toast.error(validation.message || '필수 항목을 모두 입력해주세요.');
+    }
+
+    const currentPath = location.pathname;
+    if (currentPath.includes('/activity-graduate')) {
+      // 성적 검증 api 호출
+      toast.success('sddd')
+    } else if (currentPath.includes('/activity-prospective-graduate')) {
+      // 성적 검증 api 호출
+      toast.success('sddd')
+    } else if (currentPath.includes('/ged/attendance-volunteer')) {
+      // 성적 검증 api 호출
+      toast.success('sddd')
     }
 
     await saveBeforeNavigation();
@@ -113,13 +125,13 @@ export const ApplicationNav = ({
 
   const handlePageClick = async (targetPage: number) => {
     if (targetPage === currentPage) return;
-    if (!state) return toast('데이터를 불러오는 중입니다.');
+    if (!state) return toast.success('데이터를 불러오는 중입니다.');
     
 
     // ✅ validation 먼저 체크
     if (validateCurrentPage) {
       const validation = validateCurrentPage(currentPage);
-      if (!validation.canProceed) return toast(validation.message || '필수 항목을 모두 입력해주세요.');
+      if (!validation.canProceed) return toast.error(validation.message || '필수 항목을 모두 입력해주세요.');
     }
 
     await saveBeforeNavigation();
