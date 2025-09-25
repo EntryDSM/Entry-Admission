@@ -38,9 +38,6 @@
       "path": "../../libs/ui/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/util-config/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/design-token/tsconfig.lib.json"
     }
   ]
