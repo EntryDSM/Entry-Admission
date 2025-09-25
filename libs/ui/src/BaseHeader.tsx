@@ -127,6 +127,7 @@ export const CommonHeader = () => {
     { name: '자주 묻는 질문', path: '/faq' },
     { name: '성적 산출', path: '/calculate' },
     { name: '전형 요강', path: '/admission-overview' },
+    { name: '학교 소개', path: '/landing' },
   ];
 
   const navClick = (path: string) => {

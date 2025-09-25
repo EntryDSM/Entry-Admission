@@ -9,7 +9,10 @@ export const AdmissionOverviewPage = () => {
       <Title>신입생 전형 요강</Title>
       <SubTitle>2025학년도 신입생 전형 일정</SubTitle>
       <TableContainer>
-        <TableImage src={ADMISSION_OVERVIEW} alt="2025학년도 신입생 전형 일정표" />
+        <TableImage
+          src={ADMISSION_OVERVIEW}
+          alt="2025학년도 신입생 전형 일정표"
+        />
       </TableContainer>
       <AttachmentSection>
         <AttachmentTable>
@@ -93,7 +96,7 @@ const AttachmentTitle = styled.div`
   text-align: center;
   font-size: 14px;
   font-weight: 600;
-  color: ${colors.gray[600]};
+  color: ${colors.gray[500]};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,9 +112,9 @@ const AttachmentContent = styled.div`
 
 const AttachmentLink = styled.a`
   font-size: 14px;
-  color: ${colors.gray[700]};
+  color: ${colors.gray[500]};
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: underline;
   }
