@@ -143,9 +143,9 @@ export const LoginPage = () => {
           >
             회원가입
           </div>
-          <AuthLink onClick={() => navigate('/find-password')}>
+          {/* <AuthLink onClick={() => navigate('/find-password')}>
             비밀번호 찾기
-          </AuthLink>
+          </AuthLink> */}
           <div
             style={{ cursor: 'pointer' }}
             onClick={() => navigate('/admin-login')}

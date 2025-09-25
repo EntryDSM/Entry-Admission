@@ -9,11 +9,10 @@ const root = ReactDOM.createRoot(
 
 const queryClient = new QueryClient();
 
-
 root.render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <StrictMode>
       <App />
-    </QueryClientProvider>
-  </StrictMode>
+    </StrictMode>
+  </QueryClientProvider>
 );

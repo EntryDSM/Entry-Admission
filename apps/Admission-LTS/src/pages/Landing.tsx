@@ -1,16 +1,50 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { Button, EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Landing = () => {
   const [name, _] = useState<string>('김이름');
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // 초기 체크
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   const handleStartClick = () => {
     navigate('/application-classification');
   };
+
+  if (isMobile) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          backgroundColor: '#f5f5f5',
+          fontSize: '20px',
+          color: '#333',
+          textAlign: 'center',
+        }}
+      >
+        모바일에서는 접근할 수 없습니다.
+      </div>
+    );
+  }
   return (
     <Flex
       width="100%"
@@ -86,21 +120,23 @@ export const Landing = () => {
           </ContentContainer>
           <ContentContainer>
             <Text fontSize={18} fontWeight={500}>
-              현재 
+              현재
               <Text
                 isSpan={true}
                 fontSize={18}
                 fontWeight={500}
                 color={colors.orange[800]}
               >
-                {" "}
+                {' '}
                 {name}
-              </Text>
-              {" "}지원자님 계정으로 로그인되어 있습니다.
+              </Text>{' '}
+              지원자님 계정으로 로그인되어 있습니다.
             </Text>
           </ContentContainer>
         </Flex>
-        <Button width='100%' onClick={handleStartClick}>원서 접수 시작</Button>
+        <Button width="100%" onClick={handleStartClick}>
+          원서 접수 시작
+        </Button>
       </Flex>
     </Flex>
   );

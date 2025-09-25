@@ -4,6 +4,10 @@ import { ApplicationTimeline, FaqSection, InfoSection } from '../components';
 import { school } from '../assets';
 
 export const Main = () => {
+  const handleApplyClick = () => {
+    window.location.href = 'https://admission.entrydsm.hs.kr';
+  };
+
   return (
     <>
       <MainContainer>
@@ -19,7 +23,7 @@ export const Main = () => {
 
           <TimelineSection>
             <ApplicationTimeline />
-            <ApplyButton>지원하기</ApplyButton>
+            <ApplyButton onClick={handleApplyClick}>지원하기</ApplyButton>
           </TimelineSection>
         </ContentWrapper>
       </MainContainer>

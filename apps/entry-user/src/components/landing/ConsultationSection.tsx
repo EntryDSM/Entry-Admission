@@ -3,7 +3,7 @@ import { colors } from '@entry/design-token';
 
 export const ConsultationSection = () => {
   const handleHomepageClick = () => {
-    window.location.href = '/';
+    window.open('https://dsmhs.djsch.kr/main.do', '_blank');
   };
 
   return (
