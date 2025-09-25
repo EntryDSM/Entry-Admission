@@ -32,7 +32,15 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../libs/util-config/src/apis/getUserInfo.ts",
+    "../../libs/util-config/src/apis/type.ts",
+    "../../libs/util-config/src/hooks/useUserInfo.ts"
+  ],
   "references": [
     {
       "path": "../../libs/ui/tsconfig.lib.json"

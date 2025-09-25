@@ -12,7 +12,21 @@ export const LoginPage = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // 768px 이하를 모바일로 판단
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -72,6 +86,25 @@ export const LoginPage = () => {
       }
     );
   };
+
+  if (isMobile) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          backgroundColor: '#f5f5f5',
+          fontSize: '20px',
+          color: '#333',
+          textAlign: 'center',
+        }}
+      >
+        모바일에서는 접근할 수 없습니다.
+      </div>
+    );
+  }
 
   return (
     <BackGroundWrapper>
