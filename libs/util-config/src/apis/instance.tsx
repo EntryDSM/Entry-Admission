@@ -28,6 +28,12 @@ export const userInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const adminInstance = axios.create({
+  baseURL: import.meta.env.VITE_ADMIN_BASE_URL,
+  timeout: 50000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 export const scheduleInstance = axios.create({
   baseURL: import.meta.env.VITE_SCHEDULE_BASE_URL,
   timeout: 50000,
@@ -56,12 +62,19 @@ const skipAuthUrls = [
 
 const instances = [
   userInstance,
+  adminInstance,
   scheduleInstance,
   statusInstance,
   applicationInstance,
 ];
 
-const requestInterceptor = (config: InternalAxiosRequestConfig) => {
+/**
+ * 요청 인터셉터
+ */
+const requestInterceptor = (
+  config: InternalAxiosRequestConfig,
+  type: 'user' | 'admin' = 'user'
+) => {
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = config.method || 'get';
@@ -80,8 +93,8 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
             ? JSON.parse(config.data)
             : config.data;
         const adminId = data?.adminId || getAdminId() || '';
-        (config.headers as any).set?.('Request-User-Id', adminId);
-        (config.headers as any).set?.('Request-User-Role', 'ADMIN');
+        config.headers['Request-User-Id'] = adminId;
+        config.headers['Request-User-Role'] = 'ADMIN';
         console.log('[RequestInterceptor] Admin login header set:', adminId);
       } catch (err) {
         console.warn('[RequestInterceptor] adminId 파싱 실패', err);
@@ -90,9 +103,13 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
     return config;
   }
 
-  // 토큰 가져오기
-  const token =
-    getAdminAccessToken() || getAccessToken() || cookies.get('accessToken');
+  // 토큰 가져오기 (user/admin 분리)
+  let token: string | undefined;
+  if (type === 'admin') {
+    token = getAdminAccessToken() || cookies.get('adminAccessToken');
+  } else {
+    token = getAccessToken() || cookies.get('accessToken');
+  }
 
   if (!token) {
     console.warn('[RequestInterceptor] No access token, redirect to login');
@@ -100,16 +117,28 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
     return config;
   }
 
-  (config.headers as any).set?.('Authorization', `Bearer ${token}`);
+  config.headers['Authorization'] = `Bearer ${token}`;
   console.log('[RequestInterceptor] Authorization header set:', token);
 
   return config;
 };
 
-instances.forEach((instance) => {
-  instance.interceptors.request.use(requestInterceptor);
+// userInstance → user 토큰 사용
+userInstance.interceptors.request.use((config) =>
+  requestInterceptor(config, 'user')
+);
+// adminInstance → admin 토큰 사용
+adminInstance.interceptors.request.use((config) =>
+  requestInterceptor(config, 'admin')
+);
+// 나머지 → 기본 user 토큰 사용
+[scheduleInstance, statusInstance, applicationInstance].forEach((inst) => {
+  inst.interceptors.request.use((config) => requestInterceptor(config, 'user'));
 });
 
+/**
+ * 응답 인터셉터 (토큰 재발급 처리)
+ */
 const responseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
   if (!config) return Promise.reject(error);
@@ -125,11 +154,11 @@ const responseInterceptor = async (error: AxiosError) => {
     try {
       const adminRefreshToken =
         getAdminRefreshToken() || cookies.get('adminRefreshToken');
-      const refreshToken = getRefreshToken() || cookies.get('refreshToken');
+      const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
 
       if (adminRefreshToken) {
         console.log('[ResponseInterceptor] Admin token refresh started');
-        const { data } = await userInstance.put(
+        const { data } = await adminInstance.put(
           '/admin/auth',
           {},
           {
@@ -144,26 +173,20 @@ const responseInterceptor = async (error: AxiosError) => {
         setAdminAccessToken(data.accessToken);
         setAdminRefreshToken(data.refreshToken);
 
-        (retryConfig.headers as any).set?.(
-          'Authorization',
-          `Bearer ${data.accessToken}`
-        );
-        return userInstance(retryConfig);
-      } else if (refreshToken) {
+        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
+        return adminInstance(retryConfig);
+      } else if (userRefreshToken) {
         console.log('[ResponseInterceptor] User token refresh started');
         const { data } = await userInstance.put(
           '/user/auth',
           {},
-          { headers: { 'X-Refresh-Token': refreshToken } }
+          { headers: { 'X-Refresh-Token': userRefreshToken } }
         );
 
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
 
-        (retryConfig.headers as any).set?.(
-          'Authorization',
-          `Bearer ${data.accessToken}`
-        );
+        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
         return userInstance(retryConfig);
       } else {
         console.warn('[ResponseInterceptor] No refresh token found');
