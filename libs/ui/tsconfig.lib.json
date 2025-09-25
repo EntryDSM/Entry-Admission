@@ -12,7 +12,6 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "jsxImportSource": "@emotion/react",
-    "rootDir": "src",
     "jsx": "react-jsx",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
   },
@@ -35,6 +34,7 @@
   "references": [
     {
       "path": "../design-token/tsconfig.lib.json"
-    }
+    },
+    { "path": "../util-config/tsconfig.lib.json" }
   ]
 }

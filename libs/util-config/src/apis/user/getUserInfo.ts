@@ -1,4 +1,4 @@
-import { userInstance } from '@entry/util-config';
+import { userInstance } from '../instance';
 import { IUserInfoResponseType } from './type';
 
 // 유저 정보 조회 API

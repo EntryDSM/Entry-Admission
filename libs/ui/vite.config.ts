@@ -19,6 +19,7 @@ export default defineConfig(() => ({
     alias: {
       '@entry/design-token': resolve(__dirname, '../design-token/src'),
       '@entry/hooks': resolve(__dirname, '../hooks/src'),
+      '@entry/util-config': resolve(__dirname, '../util-config/src'),
     },
   },
   // Uncomment this if you are using workers.

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getUserInfo, IUserInfoResponseType } from '../apis';
-import { getAccessToken } from '@entry/util-config';
+import { getAccessToken } from './cookies';
 import { AxiosError } from 'axios';
 import { useEffect } from 'react';
 

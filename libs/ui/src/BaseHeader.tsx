@@ -50,7 +50,7 @@ export const AdminHeader = () => {
   const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [datas] = useState<{ name: string }>({ name: '홍길동' });
+  // const [datas] = useState<{ name: string }>({ name: '홍길동' });
 
   const navData = [
     { name: '전형 일정 수정', path: '/admissions-schedule' },
@@ -121,8 +121,8 @@ export const CommonHeader = () => {
   const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [datas] = useState<{ name: string }>({ name: '홍길동' });
-  // const { data: userInfo } = useUserInfo();
+  // const [datas] = useState<{ name: string }>({ name: '홍길동' });
+  const { data: userInfo } = useUserInfo();
 
   const navData = [
     { name: '공지사항', path: '/notice' },
@@ -186,7 +186,7 @@ export const CommonHeader = () => {
             마이페이지
           </NavContent>
           <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
-            {/* {userInfo?.name || '사용자'} */}
+            {userInfo?.name || '사용자'}
             <Text
               isSpan
               fontSize={18}
