@@ -6,9 +6,8 @@ import { useEffect, useState } from 'react';
 export const MiddleSchoolInfo = () => {
   const [datas, setDatas] = usePageData('middleSchoolInfo');
   const [selectedName, setSelectedName] = useState<string | null>(datas.schoolName || null)
-  const [selectedCode, setSelectedCode] = useState<string | null>(datas.schoolName || null)
+  const [selectedCode, setSelectedCode] = useState<string | null>(datas.schoolCode || null)
 
-  console.log(datas);
 
   const handleSchoolPhoneChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

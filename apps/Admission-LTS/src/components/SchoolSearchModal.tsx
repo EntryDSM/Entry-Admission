@@ -123,11 +123,14 @@ export const SchoolSearchModal = ({
                   <Text color={colors.orange[800]}>{data.code}</Text>
                   <Text color={colors.gray[400]} fontWeight={400}>{data.address}</Text>
                   <Text color={colors.gray[400]} fontWeight={400}>{data.information}</Text>
-                  {data.code === tempSelectedCode ? (
-                    <Check />
-                  ) : (
-                    <Check color="transparent" />
-                  )}
+                  {(() => {
+                    // temp 상태가 있으면 temp 기준으로 체크
+                    if (tempSelectedCode !== null) {
+                      return data.code === tempSelectedCode ? <Check /> : <Check color="transparent" />;
+                    }
+                    // temp 상태가 없으면 실제 선택된 값 기준으로 체크  
+                    return data.code === selectedCode ? <Check /> : <Check color="transparent" />;
+                  })()}
                 </Content>
               ))
             ) : (
