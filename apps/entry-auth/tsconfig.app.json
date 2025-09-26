@@ -14,8 +14,7 @@
       "@nx/react/typings/image.d.ts",
       "vite/client"
     ],
-    "jsxImportSource": "@emotion/react",
-    "rootDir": "."
+    "jsxImportSource": "@emotion/react"
   },
   "exclude": [
     "out-tsc",
