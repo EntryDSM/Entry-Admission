@@ -110,13 +110,13 @@ export const ApplicationNav = ({
     const currentPath = location.pathname;
     if (currentPath.includes('/activity-graduate')) {
       // 성적 검증 api 호출
-      toast.success('sddd')
+      // toast.success('sddd')
     } else if (currentPath.includes('/activity-prospective-graduate')) {
       // 성적 검증 api 호출
-      toast.success('sddd')
+      // toast.success('sddd')
     } else if (currentPath.includes('/ged/attendance-volunteer')) {
       // 성적 검증 api 호출
-      toast.success('sddd')
+      // toast.success('sddd')
     }
 
     await saveBeforeNavigation();
@@ -126,7 +126,7 @@ export const ApplicationNav = ({
   const handlePageClick = async (targetPage: number) => {
     if (targetPage === currentPage) return;
     if (!state) return toast.success('데이터를 불러오는 중입니다.');
-    
+
 
     // ✅ validation 먼저 체크
     if (validateCurrentPage) {
