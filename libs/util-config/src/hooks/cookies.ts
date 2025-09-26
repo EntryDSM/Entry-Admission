@@ -12,7 +12,7 @@ const getCookieOptions = () => {
   return {
     path: '/',
     expires,
-    domain: isLocalhost ? 'localhost' : '.entrydsm.hs.kr',
+    domain: isLocalhost ? 'localhost' : '.entrydsm.kr',
     secure: !isLocalhost, // HTTPS 환경에서만 전송 (로컬 제외)
     sameSite: isLocalhost ? ('lax' as const) : ('none' as const), // 서브도메인 간 쿠키 공유 허용
   };
