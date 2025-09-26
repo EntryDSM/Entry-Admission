@@ -18,14 +18,14 @@ export const Submitted = () => {
         <Flex width='100%' height='fit-content' isColumn={true} gap={16}>
           <MsgWrapper>
             최종 원서를 출력해,<br/>
-            서명과 직은을 찍은 뒤 반드시 본교로 발송 또는 방문 접수하세요.
+            서명과 직인을 찍은 뒤 반드시 본교로 발송 또는 방문 접수하세요.
           </MsgWrapper>
           <MsgWrapper>
             마이페이지에서 지원 내역을 확인할 수 있습니다.
-            <Button>마이페이지</Button>
+            <Button onClick={() => window.location.href = 'https://entrydsm.kr/mypage'}>마이페이지</Button>
           </MsgWrapper>
         </Flex>
-        <Button width="100%">홈으로 돌아가기</Button>
+        <Button width="100%" onClick={() => window.location.href = 'https://entrydsm.kr'}>홈으로 돌아가기</Button>
       </Flex>
     </Flex>
   );
