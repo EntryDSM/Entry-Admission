@@ -43,22 +43,22 @@ jobs:
       - name: Deploy entry-user to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-user/dist --project-name=entry-user --production
+        run: wrangler pages deploy apps/entry-user/dist --project-name=entry-user
 
       - name: Deploy entry-admin to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-admin/dist --project-name=entry-admin --production
+        run: wrangler pages deploy apps/entry-admin/dist --project-name=entry-admin
 
       - name: Deploy entry-auth to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-auth/dist --project-name=entry-auth --production
+        run: wrangler pages deploy apps/entry-auth/dist --project-name=entry-auth
 
       - name: Deploy admission-lts to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/admission-lts/dist --project-name=entry-admission --production
+        run: wrangler pages deploy apps/admission-lts/dist --project-name=entry-admission
 
       - name: Deployment success notification
         if: success()
