@@ -139,7 +139,7 @@ export const CommonHeader = () => {
   };
 
   const handleLoginClick = () => {
-    navigate('/auth/login');
+    window.location.href = 'https://auth.entrydsm.kr';
   };
 
   const isLoggedIn = accessToken && userInfo && !isError;
