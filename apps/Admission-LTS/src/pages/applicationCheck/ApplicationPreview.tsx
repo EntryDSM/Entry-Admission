@@ -61,7 +61,7 @@ export const ApplicationPreview = () => {
       schoolCode: middleSchoolInfo.schoolCode || "",
       userName: applicantInfo.applicantName || "",
       applicantTel: applicantInfo.applicantNumber || "", // 수정된 필드명
-      birthday: applicantInfo.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
+      birthday: applicantInfo?.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
       schoolRegion: applicationClassification?.regionSelection || "",
       gender: applicantInfo.gender || "",
       schoolName: middleSchoolInfo.schoolName || "",
