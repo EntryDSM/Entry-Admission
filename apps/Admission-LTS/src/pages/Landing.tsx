@@ -3,11 +3,22 @@ import { Button, EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGetAllSchedule } from '../apis';
+import { useUserInfo } from '@entry/util-config';
+import { ClipLoader } from 'react-spinners';
 
 export const Landing = () => {
-  const [name, _] = useState<string>('김이름');
+  const [name, setName] = useState<string>('');
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [scheduleDatas, setScheduleDatas] = useState<{startDate: string, endDate: string, resultDate: string}>({
+    startDate: '',
+    endDate: '',
+    resultDate: ''
+  })
   const navigate = useNavigate();
+
+  const {data : scheduleData, isLoading} = useGetAllSchedule()
+  const { data: userData } = useUserInfo();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -25,6 +36,31 @@ export const Landing = () => {
   const handleStartClick = () => {
     navigate('/application-classification');
   };
+
+  
+  const findDate = (type: string) =>
+    scheduleData?.schedules.find((s: any) => s.type === type)?.date || "";
+  
+  const formatDate = (date: string) => {
+    if (!date) return "";
+    return date.split("T")[0];
+  };
+
+  useEffect(() => {
+    setScheduleDatas({
+      startDate: formatDate(findDate('START_DATE')),
+      endDate: formatDate(findDate('END_DATE')),
+      resultDate: formatDate(findDate('FIRST_ANNOUNCEMENT'))
+    });
+  }, [scheduleData])
+
+
+  useEffect(() => {
+    if (userData?.name) {
+    setName(userData.name);
+  }
+  },[userData])
+
 
   if (isMobile) {
     return (
@@ -94,7 +130,7 @@ export const Landing = () => {
                 fontWeight={500}
                 color={colors.orange[800]}
               >
-                10월 17일
+                {scheduleDatas.startDate}
               </Text>
               부터{' '}
               <Text
@@ -103,7 +139,7 @@ export const Landing = () => {
                 fontWeight={500}
                 color={colors.orange[800]}
               >
-                20일
+                {scheduleDatas.endDate}
               </Text>
               까지 진행되며, 결과 발표는{' '}
               <Text
@@ -112,7 +148,7 @@ export const Landing = () => {
                 fontWeight={500}
                 color={colors.orange[800]}
               >
-                11월 8일{' '}
+                {scheduleDatas.resultDate}{' '}
               </Text>
               입니다.
             </Text>
@@ -137,9 +173,28 @@ export const Landing = () => {
           원서 접수 시작
         </Button>
       </Flex>
+      {isLoading && (
+      <LoadingModal>
+        <ClipLoader color={colors.orange[800]} size={100} />
+      </LoadingModal>
+      )}
     </Flex>
   );
 };
+
+const LoadingModal = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+`;
+
 
 const ContentContainer = styled.div`
   width: 100%;
