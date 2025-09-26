@@ -67,21 +67,9 @@ export interface ApplicationData {
   studyPlan: string;
 }
 
-// 원서 접수
+// 원서 접수/수정 (Upsert)
 export const submitApplication = async (data: ApplicationData) => {
   const response = await TestInstance.post('/application', data);
-  return response.data;
-};
-
-// 원서 조회
-export const getApplication = async () => {
-  const response = await TestInstance.get('/application');
-  return response.data;
-};
-
-// 원서 수정
-export const updateApplication = async (data: Partial<ApplicationData>) => {
-  const response = await TestInstance.put('/application', data);
   return response.data;
 };
 
@@ -95,6 +83,16 @@ export const confirmApplication = async () => {
 export const cancelApplication = async () => {
   const response = await TestInstance.patch('/application/cancel');
   return response.data;
+};
+
+// 원서 PDF 미리보기용 URL 생성
+export const getApplicationPDFUrl = async (): Promise<string> => {
+  const response = await TestInstance.get('/application/pdf', {
+    responseType: 'blob',
+  });
+
+  // Blob URL 생성하여 반환
+  return window.URL.createObjectURL(new Blob([response.data]));
 };
 
 // 원서 PDF 다운로드

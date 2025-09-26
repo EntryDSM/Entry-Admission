@@ -3,6 +3,7 @@ import React, {
   useContext,
   useReducer,
   useCallback,
+  useEffect,
 } from 'react';
 
 interface IApplicationClassificationType {
@@ -266,8 +267,8 @@ const applicationReducer = (
 interface ApplicationContextType {
   state: ApplicationState;
   updatePageData: (page: keyof ApplicationState, data: any) => void;
-  saveToStorage: () => Promise<void>;
-  loadFromStorage: () => Promise<void>;
+  saveToStorage: () => void;
+  loadFromStorage: () => void;
   clearAllData: () => void;
 }
 
@@ -275,57 +276,49 @@ const ApplicationDataContext = createContext<
   ApplicationContextType | undefined
 >(undefined);
 
-const DB_NAME = 'ApplicationFormDB';
-const DB_VERSION = 1;
-const STORE_NAME = 'formData';
+const STORAGE_KEY = 'applicationFormData';
 
-const openDB = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-      }
-    };
-  });
+const saveToLocalStorage = (data: ApplicationState): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    console.log('데이터가 localStorage에 저장되었습니다.');
+  } catch (error) {
+    console.error('localStorage 저장 실패:', error);
+  }
 };
 
-const saveToIndexedDB = async (data: ApplicationState): Promise<void> => {
-  const db = await openDB();
-  const transaction = db.transaction([STORE_NAME], 'readwrite');
-  const store = transaction.objectStore(STORE_NAME);
-
-  await new Promise<void>((resolve, reject) => {
-    const request = store.put({ id: 'applicationData', data });
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve();
-  });
+const loadFromLocalStorage = (): ApplicationState | null => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      console.log('localStorage에서 데이터를 불러왔습니다:', data);
+      return data;
+    }
+    return null;
+  } catch (error) {
+    console.error('localStorage 로드 실패:', error);
+    return null;
+  }
 };
 
-const loadFromIndexedDB = async (): Promise<ApplicationState | null> => {
-  const db = await openDB();
-  const transaction = db.transaction([STORE_NAME], 'readonly');
-  const store = transaction.objectStore(STORE_NAME);
-
-  return new Promise((resolve, reject) => {
-    const request = store.get('applicationData');
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => {
-      const result = request.result;
-      resolve(result ? result.data : null);
-    };
-  });
+const clearLocalStorage = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    console.log('localStorage 데이터가 삭제되었습니다.');
+  } catch (error) {
+    console.error('localStorage 삭제 실패:', error);
+  }
 };
 
 export const ApplicationDataProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [state, dispatch] = useReducer(applicationReducer, initialState);
+  // localStorage에서 초기 데이터 로드
+  const [state, dispatch] = useReducer(applicationReducer, () => {
+    const savedData = loadFromLocalStorage();
+    return savedData || initialState;
+  });
 
   const updatePageData = useCallback(
     (page: keyof ApplicationState, data: any) => {
@@ -334,30 +327,29 @@ export const ApplicationDataProvider: React.FC<{
     []
   );
 
-  const saveToStorage = useCallback(async () => {
-    try {
-      await saveToIndexedDB(state);
-      console.log('데이터가 임시저장되었습니다.');
-    } catch (error) {
-      console.error('임시저장 실패:', error);
-    }
+  const saveToStorage = useCallback(() => {
+    saveToLocalStorage(state);
+    console.log('데이터가 임시저장되었습니다.');
   }, [state]);
 
-  const loadFromStorage = useCallback(async () => {
-    try {
-      const savedData = await loadFromIndexedDB();
-      if (savedData) {
-        dispatch({ type: 'LOAD_FROM_STORAGE', payload: savedData });
-        console.log('저장된 데이터를 불러왔습니다.');
-      }
-    } catch (error) {
-      console.error('데이터 로드 실패:', error);
+  const loadFromStorage = useCallback(() => {
+    const savedData = loadFromLocalStorage();
+    if (savedData) {
+      dispatch({ type: 'LOAD_FROM_STORAGE', payload: savedData });
+      console.log('저장된 데이터를 불러왔습니다.');
     }
   }, []);
 
   const clearAllData = useCallback(() => {
+    clearLocalStorage();
     dispatch({ type: 'CLEAR_ALL_DATA' });
+    console.log('모든 데이터가 삭제되었습니다.');
   }, []);
+
+  // 상태 변경 시 자동으로 localStorage에 저장
+  useEffect(() => {
+    saveToLocalStorage(state);
+  }, [state]);
 
   const value: ApplicationContextType = {
     state,

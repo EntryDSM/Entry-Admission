@@ -29,7 +29,7 @@ export const AdmissionAdminInstance = axios.create({
 });
 
 export const TestInstance = axios.create({
-  baseURL: "http://localhost:3449" ,
+  baseURL: "https://t1.ncloud.sbs" ,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -48,6 +48,7 @@ let isUserRefreshingToken = false;
 let isAdminRefreshingToken = false;
 
 const userRequestInterceptor = (config: InternalAxiosRequestConfig) => {
+  console.log("asd;fkljasd;k")
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();

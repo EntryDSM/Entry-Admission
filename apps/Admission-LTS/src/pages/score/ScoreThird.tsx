@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flex } from '@entry/design-token';
 import { GradeManager, usePageData } from '@entry/ui';
 
@@ -7,6 +7,11 @@ export const ScoreThird = () => {
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
 
   const [subjectGrades, setSubjectGrades] = usePageData('thirdGraduate');
+
+  // 성적 변경 시 디버깅
+  useEffect(() => {
+    console.log('ScoreThird - subjectGrades 변경됨:', subjectGrades);
+  }, [subjectGrades]);
 
   return (
     <Flex width="100%" height="100%" isColumn={true}>

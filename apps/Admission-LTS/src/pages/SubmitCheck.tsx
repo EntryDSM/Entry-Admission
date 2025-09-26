@@ -1,5 +1,5 @@
 import { colors, Flex, Text } from '@entry/design-token';
-import { InputContent, useCheckPageData, Button } from '@entry/ui';
+import { InputContent, useCheckPageData, Button, useApplicationData } from '@entry/ui';
 import { submitApplication, confirmApplication, ApplicationData } from '../apis';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -8,6 +8,7 @@ export const SubmitCheck = () => {
   const [datas, setDatas] = useCheckPageData('check');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { state } = useApplicationData(); // 전체 상태 가져오기
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -16,46 +17,55 @@ export const SubmitCheck = () => {
 
   // 모든 페이지 데이터를 가져와서 API 형식으로 변환
   const getAllApplicationData = (): ApplicationData => {
-    // localStorage에서 모든 페이지 데이터 수집
-    const applicationClassification = JSON.parse(localStorage.getItem('applicationClassification') || '{}');
-    const applicantInfo = JSON.parse(localStorage.getItem('applicantInfo') || '{}');
-    const guardianInfo = JSON.parse(localStorage.getItem('guardianInfo') || '{}');
-    const middleSchoolInfo = JSON.parse(localStorage.getItem('middleSchoolInfo') || '{}');
-    const personalStatements = JSON.parse(localStorage.getItem('personalStatements') || '{}');
+    // useApplicationData에서 데이터 가져오기
+    const applicationClassification = state.applicationClassification || {};
+    const applicantInfo = state.applicantInfo || {};
+    const guardianInfo = state.guardianInfo || {};
+    const middleSchoolInfo = state.middleSchoolInfo || {};
+    const personalStatements = state.personalStatements || {};
 
-    // 성적 데이터들 수집
-    const scoreData = JSON.parse(localStorage.getItem('scoreData') || '{}');
-    const activityData = JSON.parse(localStorage.getItem('activityData') || '{}');
+    // 성적 관련 데이터들
+    const firstGraduate = state.firstGraduate || {};
+    const secondGraduate = state.secondGraduate || {};
+    const thirdGraduate = state.thirdGraduate || {};
+    const fourthGraduate = state.fourthGraduate || {};
+
+    // 활동 관련 데이터들
+    const activityGraduate = state.activityGraduate || {};
+    const attendanceVolunteer = state.attendanceVolunteer || {};
 
     return {
       entranceYear: "2025",
       receiptCode: "",
       schoolCode: middleSchoolInfo.schoolCode || "",
       userName: applicantInfo.applicantName || "",
-      applicantTel: applicantInfo.phoneNumber || "",
+      applicantTel: applicantInfo.applicantNumber || "",
       birthday: applicantInfo.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
       schoolRegion: applicationClassification.regionSelection || "",
       gender: applicantInfo.gender || "",
       schoolName: middleSchoolInfo.schoolName || "",
       educationalStatus: applicationClassification.graduationType || "",
       address: guardianInfo.address || "",
-      detailAddress: guardianInfo.detailAddress || "",
-      parentName: guardianInfo.parentName || "",
-      parentRelation: guardianInfo.parentRelation || "",
-      parentTel: guardianInfo.parentPhoneNumber || "",
+      detailAddress: guardianInfo.addressDetail || "",
+      parentName: guardianInfo.guardianName || "",
+      parentRelation: guardianInfo.relationship ? guardianInfo.relationship.join('') : "",
+      parentTel: guardianInfo.guardianNumber || "",
       region: applicationClassification.regionSelection || "",
       applicationType: applicationClassification.typeSelection || "",
       applicationRemark: applicantInfo.specialNotes || "",
       imageUrl: applicantInfo.idPhoto || "",
-      absenceDayCount: activityData.absenceDayCount || "0",
-      latenessCount: activityData.latenessCount || "0",
-      earlyLeaveCount: activityData.earlyLeaveCount || "0",
-      lectureAbsenceCount: activityData.lectureAbsenceCount || "0",
-      volunteerTime: activityData.volunteerTime || "0",
-      koreanThirdGradeSecondSemester: scoreData.korean?.[3]?.[1] || "",
-      koreanThirdGradeFirstSemester: scoreData.korean?.[3]?.[0] || "",
-      koreanSecondGradeSecondSemester: scoreData.korean?.[2]?.[1] || "",
-      koreanSecondGradeFirstSemester: scoreData.korean?.[2]?.[0] || "",
+      absenceDayCount: attendanceVolunteer.absenceDayCount || activityGraduate.absenceDayCount || "0",
+      latenessCount: attendanceVolunteer.latenessCount || activityGraduate.latenessCount || "0",
+      earlyLeaveCount: attendanceVolunteer.earlyLeaveCount || activityGraduate.earlyLeaveCount || "0",
+      lectureAbsenceCount: attendanceVolunteer.lectureAbsenceCount || activityGraduate.lectureAbsenceCount || "0",
+      volunteerTime: attendanceVolunteer.volunteerTime || activityGraduate.volunteerTime || "0",
+
+      // 3학년 성적
+      koreanThirdGradeSecondSemester: thirdGraduate.korean?.[1] || "",
+      koreanThirdGradeFirstSemester: thirdGraduate.korean?.[0] || "",
+      // 2학년 성적
+      koreanSecondGradeSecondSemester: secondGraduate.korean?.[1] || "",
+      koreanSecondGradeFirstSemester: secondGraduate.korean?.[0] || "",
       socialThirdGradeSecondSemester: scoreData.social?.[3]?.[1] || "",
       socialThirdGradeFirstSemester: scoreData.social?.[3]?.[0] || "",
       socialSecondGradeSecondSemester: scoreData.social?.[2]?.[1] || "",
@@ -88,9 +98,9 @@ export const SubmitCheck = () => {
       day: applicationClassification.graduationDate?.[2]?.toString() || "1",
       veteransNumber: applicantInfo.veteransNumber || "",
       teacherName: middleSchoolInfo.teacherName || "",
-      teacherTel: middleSchoolInfo.teacherPhoneNumber || "",
+      teacherTel: middleSchoolInfo.schoolPhone || "",
       examCode: "",
-      selfIntroduction: personalStatements.selfIntroduction || "",
+      selfIntroduction: personalStatements.personalStmt || "",
       studyPlan: personalStatements.studyPlan || ""
     };
   };
@@ -105,9 +115,9 @@ export const SubmitCheck = () => {
     try {
       const applicationData = getAllApplicationData();
 
-      // 원서 제출
+      // 원서 접수
       await submitApplication(applicationData);
-      console.log('원서 제출 성공');
+      console.log('원서 접수 성공');
 
       // 원서 확정
       await confirmApplication();
