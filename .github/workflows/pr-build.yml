@@ -1,15 +1,11 @@
-name: EntryDSM PR Build Check
+name: EntryDSM Cloudflare Pages Deploy
 
 on:
   push:
-    branches: ["**"]
-  pull_request:
-    types: [opened, synchronize, reopened]
-  pull_request_review:
-    types: [submitted]
+    branches: ["develop"]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: macos-latest
 
     env:
@@ -38,10 +34,36 @@ jobs:
       - name: Build entry-auth
         run: yarn nx build entry-auth
 
-      - name: Build success notification
-        if: success()
-        run: echo "✅ OK"
+      - name: Build admission-lts
+        run: yarn nx build admission-lts
 
-      - name: Build failure notification
+      - name: Setup Cloudflare Wrangler
+        run: npm install -g wrangler
+
+      - name: Deploy entry-user to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy dist/apps/entry-user --project-name=entry-user
+
+      - name: Deploy entry-admin to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy dist/apps/entry-admin --project-name=entry-admin
+
+      - name: Deploy entry-auth to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy dist/apps/entry-auth --project-name=entry-auth
+
+      - name: Deploy admission-lts to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy dist/apps/admission-lts --project-name=entry-admission
+
+      - name: Deployment success notification
+        if: success()
+        run: echo "✅ 모든 배포 완료"
+
+      - name: Deployment failure notification
         if: failure()
-        run: echo "❌ FAIL"
+        run: echo "❌ 배포 실패"
