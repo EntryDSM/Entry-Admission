@@ -76,8 +76,8 @@ export const ApplicationPreview = () => {
       applicationRemark: applicantInfo.specialNotes || "",
       imageUrl: applicantInfo.idPhoto || "",
       absenceDayCount: attendanceVolunteer?.absenceDayCount || activityGraduate?.absenceDayCount || "0",
-      latenessCount: attendanceVolunteer.latenessCount || activityGraduate.latenessCount || "0",
-      earlyLeaveCount: attendanceVolunteer.earlyLeaveCount || activityGraduate.earlyLeaveCount || "0",
+      latenessCount: attendanceVolunteer?.latenessCount || activityGraduate?.latenessCount || "0",
+      earlyLeaveCount: attendanceVolunteer?.earlyLeaveCount || activityGraduate?.earlyLeaveCount || "0",
       lectureAbsenceCount: attendanceVolunteer.lectureAbsenceCount || activityGraduate.lectureAbsenceCount || "0",
       volunteerTime: attendanceVolunteer?.volunteerTime || activityGraduate?.volunteerTime || "0",
       // 3학년 성적 (thirdGraduate에서) - 1학기/2학기 모두 같은 값 사용

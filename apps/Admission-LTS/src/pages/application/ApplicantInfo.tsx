@@ -25,8 +25,8 @@ export const ApplicantInfo = () => {
     return Array.from({ length: daysCount }, (_, i) => i + 1);
   };
 
-  const selectedYear = datas.dateOfBirth?.[0] || years[0];
-  const selectedMonth = datas.dateOfBirth?.[1] || months[0];
+  const selectedYear = datas?.dateOfBirth?.[0] || years[0];
+  const selectedMonth = datas?.dateOfBirth?.[1] || months[0];
 
   // day 배열 계산
   const days = getDaysInMonth(selectedYear as number, selectedMonth as number);
