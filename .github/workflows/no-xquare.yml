@@ -11,7 +11,7 @@ jobs:
     env:
       NX_CLOUD_ACCESS_TOKEN: ""
       NX_SKIP_NX_CACHE: true
-      VITE_BASE_URL: https://api.entrydsm.hs.kr
+      VITE_BASE_URL: https://api.entrydsm.kr
 
     steps:
       - name: Checkout code
