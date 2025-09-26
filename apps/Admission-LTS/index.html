@@ -34,7 +34,6 @@
           var x = document.getElementsByTagName('script')[0];
           x.parentNode.insertBefore(s, x);
 
-          // 2️⃣ 스크립트가 로드되면 boot 실행
           s.onload = function () {
             ChannelIO('boot', {
               pluginKey: '732c4fd2-2526-4b32-bd62-c1fce4829dd4',
