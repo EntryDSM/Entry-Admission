@@ -63,7 +63,7 @@ export const MyPage = () => {
 
   const handleApplicationSubmit = () => {
     // 원서 접수 페이지로 이동
-    window.open('https://admission.entry.kr', '_blank');
+    window.open('https://admission.entrydsm.kr', '_blank');
   };
 
   const handleDownloadApplication = async () => {
