@@ -1,9 +1,10 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { EntryLogo, SideBarBtnIcon } from './assets';
+import { Button } from './Button';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useUserInfo } from '@entry/util-config';
+import { useUserInfo, getAccessToken } from '@entry/util-config';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
@@ -121,8 +122,8 @@ export const CommonHeader = () => {
   const [isSideClick, setIsSideClick] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  // const [datas] = useState<{ name: string }>({ name: '홍길동' });
-  const { data: userInfo } = useUserInfo();
+  const accessToken = getAccessToken();
+  const { data: userInfo, error, isError } = useUserInfo();
 
   const navData = [
     { name: '공지사항', path: '/notice' },
@@ -136,6 +137,12 @@ export const CommonHeader = () => {
     setIsSideClick(false);
     navigate(path);
   };
+
+  const handleLoginClick = () => {
+    navigate('/auth/login');
+  };
+
+  const isLoggedIn = accessToken && userInfo && !isError;
 
   return (
     <HeaderContainer scrollPosition={scrollPosition}>
@@ -173,30 +180,41 @@ export const CommonHeader = () => {
             </NavContent>
           ))}
         </Flex>
-        <Flex
-          gap={20}
-          alignItems="center"
-          width="fit-content"
-          height="fit-content"
-        >
-          <NavContent
-            onClick={() => navClick('/mypage')}
-            isPath={pathname === '/mypage'}
+        {isLoggedIn ? (
+          <Flex
+            gap={20}
+            alignItems="center"
+            width="fit-content"
+            height="fit-content"
           >
-            마이페이지
-          </NavContent>
-          <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
-            {userInfo?.name || '사용자'}
-            <Text
-              isSpan
-              fontSize={18}
-              fontWeight={400}
-              color={colors.gray[500]}
+            <NavContent
+              onClick={() => navClick('/mypage')}
+              isPath={pathname === '/mypage'}
             >
-              님
+              마이페이지
+            </NavContent>
+            <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
+              {userInfo?.name || '사용자'}
+              <Text
+                isSpan
+                fontSize={18}
+                fontWeight={400}
+                color={colors.gray[500]}
+              >
+                님
+              </Text>
             </Text>
-          </Text>
-        </Flex>
+          </Flex>
+        ) : (
+          <Button
+            width="100px"
+            backgroundColor={colors.orange[800]}
+            hoverBackgroundColor={colors.orange[850]}
+            onClick={handleLoginClick}
+          >
+            로그인
+          </Button>
+        )}
         <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
       </Flex>
       {isSideClick && (

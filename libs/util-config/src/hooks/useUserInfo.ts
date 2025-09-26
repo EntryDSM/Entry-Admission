@@ -17,7 +17,8 @@ export const useUserInfo = () => {
     refetchOnMount: false,
     retry: (failureCount: number, error: AxiosError) => {
       const status = error.response?.status;
-      return status !== 401 && status !== 404 && failureCount < 1;
+      // 401, 403은 인터셉터에서 처리하도록 재시도 허용, 404만 재시도 안함
+      return status !== 404 && failureCount < 1;
     },
   });
 
@@ -26,6 +27,7 @@ export const useUserInfo = () => {
       const status = query.error.response?.status;
       const messages = {
         401: '인증되지 않은 사용자',
+        403: '접근 권한이 없습니다',
         404: '사용자를 찾을 수 없음',
       } as const;
 
