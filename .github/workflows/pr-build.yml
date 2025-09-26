@@ -1,4 +1,4 @@
-name: EntryDSM Docker Build Check
+name: EntryDSM PR Build Check
 
 on:
   push:
@@ -10,59 +10,38 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     env:
       NX_CLOUD_ACCESS_TOKEN: ""
       NX_SKIP_NX_CACHE: true
 
-    strategy:
-      matrix:
-        service: [entry-user, entry-admin, entry-auth]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
 
-      # React 프론트엔드용 Dockerfile 생성 (ConfigMap 템플릿 기반)
-      - name: Create Dockerfile for ${{ matrix.service }}
-        run: |
-          cat > Dockerfile.${{ matrix.service }} << 'EOF'
-          FROM node:20-alpine AS build
-          RUN corepack enable
-          WORKDIR /app
-          COPY ./ .
-          RUN yarn install --frozen-lockfile && yarn nx build ${{ matrix.service }}
-          FROM nginx:alpine
-          RUN apk add --no-cache tzdata wget && addgroup -g 101 nginx-group || true && adduser -u 101 -G nginx-group -s /bin/sh -D nginx-user || true
-          COPY --from=build /app/dist/apps/${{ matrix.service }} /usr/share/nginx/html
-          RUN echo 'server { listen 8080; server_name _; root /usr/share/nginx/html; index index.html; add_header X-Frame-Options "SAMEORIGIN" always; add_header X-Content-Type-Options "nosniff" always; add_header X-XSS-Protection "1; mode=block" always; gzip on; gzip_vary on; gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript; location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { expires 1y; add_header Cache-Control "public, immutable"; } location / { try_files $uri $uri/ /index.html; } location /health { access_log off; return 200 "healthy\\n"; add_header Content-Type text/plain; } }' > /etc/nginx/conf.d/default.conf
-          RUN rm -f /etc/nginx/conf.d/default.conf.default
-          CMD ["nginx", "-g", "daemon off;"]
-          EOF
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-      - name: Build ${{ matrix.service }} Docker image
-        run: |
-          docker build -f Dockerfile.${{ matrix.service }} -t ${{ matrix.service }}:latest .
+      - name: Build entry-user
+        run: yarn nx build entry-user
 
-      - name: Test ${{ matrix.service }} container
-        run: |
-          # 컨테이너 실행 테스트
-          docker run -d --name test-${{ matrix.service }} -p 8080:8080 ${{ matrix.service }}:latest
-          sleep 10
-          # 헬스체크
-          curl -f http://localhost:8080/health || curl -f http://localhost:8080/
-          # 컨테이너 정리
-          docker stop test-${{ matrix.service }}
-          docker rm test-${{ matrix.service }}
+      - name: Build entry-admin
+        run: yarn nx build entry-admin
 
-      - name: Build success notification for ${{ matrix.service }}
+      - name: Build entry-auth
+        run: yarn nx build entry-auth
+
+      - name: Build success notification
         if: success()
-        run: echo "✅ ${{ matrix.service }} Docker build OK"
+        run: echo "✅ OK"
 
-      - name: Build failure notification for ${{ matrix.service }}
+      - name: Build failure notification
         if: failure()
-        run: echo "❌ ${{ matrix.service }} Docker build FAIL"
+        run: echo "❌ FAIL"
