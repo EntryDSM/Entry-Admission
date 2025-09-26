@@ -78,7 +78,6 @@ export const PasswordModal = ({
               borderColor={colors.gray[300]}
               hoverBackgroundColor="none"
               onClick={handleClose}
-              disabled={isLoading}
             >
               취소
             </PreviousButton>
@@ -86,7 +85,6 @@ export const PasswordModal = ({
               backgroundColor={colors.extra.error}
               hoverBackgroundColor="none"
               onClick={handleConfirm}
-              disabled={isLoading || !password.trim()}
             >
               {isLoading ? '처리 중...' : btnText}
             </PreviousButton>
@@ -130,7 +128,7 @@ const PasswordInputContainer = styled.div`
 const PasswordLabel = styled.label`
   font-size: 16px;
   font-weight: 500;
-  color: ${colors.gray[700]};
+  color: ${colors.gray[500]};
 `;
 
 const PasswordInput = styled.input`
