@@ -36,7 +36,7 @@ export const SchoolSearchModal = ({
   };
 
   const contentClick = (name: string, code: string) => {
-    setTempSelectedName((prev) => (prev === name ? null : name)); // 선택된 값을 임시 저장에 저장
+    setTempSelectedName((prev) => (prev === name && tempSelectedCode === code ? null : name)); // 선택된 값을 임시 저장에 저장
     setTempSelectedCode((prev) => (prev === code ? null : code)); // 선택된 값을 임시 저장에 저장
   };
 
@@ -123,7 +123,7 @@ export const SchoolSearchModal = ({
                   <Text color={colors.orange[800]}>{data.code}</Text>
                   <Text color={colors.gray[400]} fontWeight={400}>{data.address}</Text>
                   <Text color={colors.gray[400]} fontWeight={400}>{data.information}</Text>
-                  {data.name === tempSelectedName ? (
+                  {data.code === tempSelectedCode ? (
                     <Check />
                   ) : (
                     <Check color="transparent" />
