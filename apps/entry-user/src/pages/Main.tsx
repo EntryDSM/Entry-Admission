@@ -2,9 +2,22 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { ApplicationTimeline, FaqSection, InfoSection } from '../components';
 import { school } from '../assets';
+import { getAccessToken } from '@entry/util-config';
+import { useSchedule } from '../hooks/useSchedule';
 
 export const Main = () => {
+  const isLoggedIn = !!getAccessToken();
+  const { data: startDate } = useSchedule({ type: 'START_DATE' });
+  const { data: endDate } = useSchedule({ type: 'END_DATE' });
+  const today = new Date();
+
+  const isTrueSchedule =
+    startDate && endDate
+      ? today >= new Date(startDate.date) && today <= new Date(endDate.date)
+      : false;
+
   const handleApplyClick = () => {
+    if (!isLoggedIn || !isTrueSchedule) return;
     window.location.href = 'https://admission.entrydsm.kr';
   };
 
@@ -23,7 +36,9 @@ export const Main = () => {
 
           <TimelineSection>
             <ApplicationTimeline />
-            <ApplyButton onClick={handleApplyClick}>지원하기</ApplyButton>
+            <ApplyButton onClick={handleApplyClick} disabled={!isLoggedIn}>
+              지원하기
+            </ApplyButton>
           </TimelineSection>
         </ContentWrapper>
       </MainContainer>
@@ -145,6 +160,12 @@ const ApplyButton = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: ${colors.orange[500]};
+    cursor: not-allowed;
+    transform: none;
   }
 
   @media (max-width: 1200px) {
