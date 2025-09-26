@@ -1,31 +1,16 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { Button, CancelModal, ShowResultModal, PasswordModal, useModal } from '@entry/ui';
-import { getUserInfo, IUserInfoResponseType, deleteUser } from '@entry/util-config';
+import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModal, useModal } from '@entry/ui';
+import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, TestInstance } from '@entry/util-config';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-interface QuestionItem {
-  id: number;
-  category: string;
-  content: string;
-}
-
-interface ApplicationStatus {
-  type: string;
-  status: string;
-}
 
 export const MyPage = () => {
-  const [cancelSubmitOpen, setCancelSubmitOpen] = useState<boolean>(false);
   const [delOpen, setDelOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
-  const [questions] = useState<QuestionItem[]>([
-    { id: 1, category: '입학 문의', content: '지원서 작성 중 문의사항이 있습니다.' },
-    { id: 2, category: '기타', content: '기숙사 관련 질문입니다.' },
-    { id: 3, category: '진로', content: '입학 후 진로에 대해 궁금합니다.' },
-  ]);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState<boolean>(false);
 
   const resultModal = useModal();
 
@@ -35,11 +20,6 @@ export const MyPage = () => {
     queryFn: getUserInfo,
   });
 
-  // 임시 지원 상태 (실제로는 API에서 가져와야 함)
-  const [applicationStatus] = useState<ApplicationStatus>({
-    type: '일반 전형',
-    status: '제출 완료'
-  });
 
   // 회원 탈퇴 API
   const deleteUserMutation = useMutation({
@@ -56,10 +36,18 @@ export const MyPage = () => {
     },
   });
 
-  const handleCancelSubmitClick = () => {
-    // TODO: 제출 취소 API 연동
-    console.log('제출 취소 API 호출');
-  };
+  // 비밀번호 변경 API
+  const changePasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: () => {
+      toast.success('비밀번호가 성공적으로 변경되었습니다.');
+      setChangePasswordModalOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || '비밀번호 변경 중 오류가 발생했습니다.');
+    },
+  });
+
 
   const handleDelClick = () => {
     setDelOpen(true);
@@ -69,20 +57,40 @@ export const MyPage = () => {
     deleteUserMutation.mutate({ password });
   };
 
-  const handleCheckResult = () => {
-    // TODO: 결과 확인 API 연동
-    console.log('결과 확인 API 호출');
-    resultModal.open();
+  const handleChangePasswordConfirm = (phoneNumber: string, newPassword: string) => {
+    changePasswordMutation.mutate({ phoneNumber, newPassword });
   };
 
-  const handleDownloadApplication = () => {
-    // TODO: 원서 다운로드 API 연동
-    console.log('원서 다운로드 API 호출');
+  const handleApplicationSubmit = () => {
+    // 원서 접수 페이지로 이동
+    window.open('https://admission.entry.kr', '_blank');
+  };
+
+  const handleDownloadApplication = async () => {
+    try {
+      const response = await TestInstance.get('/application/pdf', {
+        responseType: 'blob',
+      });
+
+      // Blob으로 파일 다운로드 처리
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '입학원서.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('원서가 다운로드되었습니다.');
+    } catch (error) {
+      toast.error('원서 다운로드 중 오류가 발생했습니다.');
+      console.error('원서 다운로드 에러:', error);
+    }
   };
 
   const handleChangePassword = () => {
-    // TODO: 비밀번호 변경 페이지로 이동
-    console.log('비밀번호 변경 페이지로 이동');
+    setChangePasswordModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -107,18 +115,6 @@ export const MyPage = () => {
         <UserName>{userInfo?.name || '사용자'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
-        <StatusTitle>지원 상태</StatusTitle>
-
-        <StatusCard>
-          <StatusRow>
-            <StatusLabel>{applicationStatus.type}</StatusLabel>
-          </StatusRow>
-          <StatusDivider />
-          <StatusRow>
-            <StatusSubLabel>지원서 상태:</StatusSubLabel>
-            <StatusValue>{applicationStatus.status}</StatusValue>
-          </StatusRow>
-        </StatusCard>
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
@@ -128,38 +124,23 @@ export const MyPage = () => {
               color={colors.orange[800]}
               borderColor={colors.orange[800]}
               hoverBackgroundColor="transparent"
-              onClick={handleCheckResult}
+              onClick={handleApplicationSubmit}
             >
-              발표 결과 확인
+              원서 접수하기
             </Button>
           </Flex>
           <Button
-            backgroundColor={colors.gray[50]}
-            color={colors.extra.error}
-            borderColor={colors.extra.error}
-            hoverBackgroundColor="transparent"
-            onClick={() => setCancelSubmitOpen(true)}
+            backgroundColor={colors.gray[100]}
+            color={colors.gray[400]}
+            borderColor={colors.gray[300]}
+            hoverBackgroundColor={colors.gray[100]}
+            disabled
           >
             원서 작성 제출 취소
           </Button>
         </ButtonGroup>
 
-        <QuestionsTitle>작성한 질문</QuestionsTitle>
-
-        <QuestionsTable>
-          <TableHeader>
-            <ColumnCategory>구분</ColumnCategory>
-            <ColumnContent>제목</ColumnContent>
-          </TableHeader>
-          <TableBody>
-            {questions.map((question) => (
-              <TableRow key={question.id}>
-                <ColumnCategory>{question.category}</ColumnCategory>
-                <ColumnContent>{question.content}</ColumnContent>
-              </TableRow>
-            ))}
-          </TableBody>
-        </QuestionsTable>
+        <EmptyQuestionsArea />
 
         <SettingsTitle>설정</SettingsTitle>
 
@@ -203,14 +184,6 @@ export const MyPage = () => {
         </SettingsSection>
       </ContentWrapper>
       <CancelModal
-        setIsOpen={setCancelSubmitOpen}
-        isOpen={cancelSubmitOpen}
-        title="제출 취소하시겠습니까?"
-        content="제출 취소 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
-        btnText="제출 취소"
-        onClick={handleCancelSubmitClick}
-      />
-      <CancelModal
         setIsOpen={setDelOpen}
         isOpen={delOpen}
         title="탈퇴하시겠습니까?"
@@ -230,6 +203,14 @@ export const MyPage = () => {
         btnText="탈퇴하기"
         onConfirm={handlePasswordConfirm}
         isLoading={deleteUserMutation.isPending}
+      />
+
+      <ChangePasswordModal
+        setIsOpen={setChangePasswordModalOpen}
+        isOpen={changePasswordModalOpen}
+        onConfirm={handleChangePasswordConfirm}
+        isLoading={changePasswordMutation.isPending}
+        userPhoneNumber={userInfo?.phoneNumber || ''}
       />
 
       <ShowResultModal
@@ -271,53 +252,6 @@ const PhoneNumber = styled.div`
   margin-top: 12px;
 `;
 
-const StatusTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 600;
-  color: inherit;
-  margin: 24px 0 0 0;
-`;
-
-const StatusCard = styled.div`
-  background-color: ${colors.gray[50]};
-  border-radius: 8px;
-  padding: 20px 40px;
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const StatusRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 0;
-`;
-
-const StatusDivider = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: ${colors.gray[300]};
-  margin: 4px 0;
-`;
-
-const StatusLabel = styled.span`
-  font-size: 20px;
-  font-weight: 400;
-  color: ${colors.gray[500]};
-`;
-
-const StatusSubLabel = styled.span`
-  font-size: 24px;
-  font-weight: 500;
-  color: ${colors.gray[500]};
-`;
-
-const StatusValue = styled.span`
-  font-size: 24px;
-  color: ${colors.orange[800]};
-  font-weight: 500;
-`;
 
 const ButtonGroup = styled.div`
   display: flex;
@@ -334,54 +268,6 @@ const QuestionsTitle = styled.h2`
   margin: 137px 0 0 0;
 `;
 
-const QuestionsTable = styled.div`
-  width: 100%;
-  border-top: 1px solid ${colors.gray[200]};
-  margin-top: 40px;
-  background-color: white;
-`;
-
-const TableHeader = styled.div`
-  display: flex;
-  border-bottom: 1px solid ${colors.gray[200]};
-  padding: 16px 0;
-  font-weight: 600;
-  font-size: 24px;
-  background-color: white;
-`;
-
-const TableBody = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const TableRow = styled.div`
-  display: flex;
-  padding: 16px 0;
-  border-bottom: 1px solid ${colors.gray[200]};
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: white;
-
-  &:hover {
-    background-color: ${colors.gray[50]};
-  }
-`;
-
-const ColumnCategory = styled.div`
-  width: 150px;
-  text-align: center;
-  color: ${colors.gray[500]};
-  font-size: 24px;
-`;
-
-const ColumnContent = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  color: ${colors.gray[500]};
-  font-size: 24px;
-`;
 
 const SettingsTitle = styled.h2`
   font-size: 20px;
@@ -411,4 +297,13 @@ const SettingsLabel = styled.span`
 const SettingsButtonGroup = styled.div`
   display: flex;
   gap: 12px;
+`;
+
+const EmptyQuestionsArea = styled.div`
+  width: 100%;
+  height: 200px;
+  background-color: white;
+  border: 1px solid white;
+  border-radius: 8px;
+  margin-top: 40px;
 `;

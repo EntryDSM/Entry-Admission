@@ -7,3 +7,8 @@ export interface IUserInfoResponseType {
 export interface IDeleteUserRequestType {
   password: string;
 }
+
+export interface IChangePasswordRequestType {
+  phoneNumber: string;
+  newPassword: string;
+}

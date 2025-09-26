@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import { Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
+import { useCalculationData } from '../contexts/CalculationDataContext';
+import { calculateAllScores } from '../utils/scoreCalculator';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -14,12 +16,16 @@ interface ScoreResult {
 }
 
 export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => {
+  const { state } = useCalculationData();
+
   if (!isOpen) return null;
 
+  const calculatedScores = calculateAllScores(state);
+
   const results: ScoreResult[] = [
-    { name: '일반 전형', score: '173.000', total: '173' },
-    { name: '사회통합 전형', score: '104.000', total: '119' },
-    { name: '마이스터 인재', score: '104.000', total: '119' }
+    { name: '일반 전형', score: calculatedScores.general.score, total: calculatedScores.general.total },
+    { name: '사회통합 전형', score: calculatedScores.social.score, total: calculatedScores.social.total },
+    { name: '마이스터 인재', score: calculatedScores.meister.score, total: calculatedScores.meister.total }
   ];
 
   return (

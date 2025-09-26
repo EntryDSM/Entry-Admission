@@ -21,5 +21,6 @@ export * from './TabSection';
 export * from './utils';
 export * from './CancelModal';
 export * from './PasswordModal';
+export * from './ChangePasswordModal';
 export * from './modal';
 export * from './AddressContent'
