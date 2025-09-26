@@ -44,7 +44,7 @@ export const FaqSection = () => {
       <QuestionMent>궁금한 점이 있다면?</QuestionMent>
       <TitleWrapper>
         <Title>자주 묻는 질문</Title>
-        <MoveButton onClick={() => navigate('')}>
+        <MoveButton onClick={() => navigate('/faq')}>
           이동하기
           <MoveRightArrow />
         </MoveButton>

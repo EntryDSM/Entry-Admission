@@ -33,8 +33,10 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../design-token/tsconfig.lib.json"
+      "path": "../util-config/tsconfig.lib.json"
     },
-    { "path": "../util-config/tsconfig.lib.json" }
+    {
+      "path": "../design-token/tsconfig.lib.json"
+    }
   ]
 }

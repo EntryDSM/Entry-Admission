@@ -1,0 +1,70 @@
+name: EntryDSM Cloudflare Pages Deploy
+
+on:
+  push:
+    branches: ["develop"]
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ""
+      NX_SKIP_NX_CACHE: true
+      VITE_BASE_URL: https://api.entrydsm.kr
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build entry-user
+        run: yarn nx build entry-user
+
+      - name: Build entry-admin
+        run: yarn nx build entry-admin
+
+      - name: Build entry-auth
+        run: yarn nx build entry-auth
+
+      - name: Build admission-lts
+        run: yarn nx build admission-lts
+
+      - name: Setup Cloudflare Wrangler
+        run: npm install -g wrangler
+
+      - name: Deploy entry-user to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy apps/entry-user/dist --project-name=entry-user
+
+      - name: Deploy entry-admin to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy apps/entry-admin/dist --project-name=entry-admin
+
+      - name: Deploy entry-auth to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy apps/entry-auth/dist --project-name=entry-auth
+
+      - name: Deploy admission-lts to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages deploy apps/admission-lts/dist --project-name=entry-admission
+
+      - name: Deployment success notification
+        if: success()
+        run: echo "✅ 모든 배포 완료"
+
+      - name: Deployment failure notification
+        if: failure()
+        run: echo "❌ 배포 실패"

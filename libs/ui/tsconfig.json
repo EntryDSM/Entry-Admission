@@ -3,13 +3,13 @@
   "include": [],
   "references": [
     {
+      "path": "../util-config"
+    },
+    {
       "path": "../design-token"
     },
     {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "../util-config"
     }
   ],
   "extends": "../../tsconfig.base.json"

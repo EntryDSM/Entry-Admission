@@ -17,13 +17,13 @@ import {
 import { Cookies } from 'react-cookie';
 
 export const AdmissionUserInstance = axios.create({
-  baseURL: 'https://api.entrydsm.hs.kr',
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 export const AdmissionAdminInstance = axios.create({
-  baseURL: 'https://api.entrydsm.hs.kr',
+  baseURL: import.meta.env.VITE_BASE_URL ,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -97,14 +97,12 @@ const userResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
-  if (response?.status === 401 && !retryConfig._retry) {
-    console.log('[UserResponseInterceptor] 401 detected, trying refresh token');
+  if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
     retryConfig._retry = true;
 
     try {
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
       if (userRefreshToken) {
-        console.log('[UserResponseInterceptor] User token refresh started');
         const { data } = await AdmissionUserInstance.put(
           '/user/auth',
           {},
@@ -115,16 +113,23 @@ const userResponseInterceptor = async (error: AxiosError) => {
         setRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        return AdmissionUserInstance(retryConfig);
+        try {
+          const retryResponse = await AdmissionUserInstance(retryConfig);
+          return retryResponse;
+        } catch (retryError: any) {
+          // 리프레시 후 재시도에서도 401/403이 오면 완전 로그아웃
+          if (retryError.response?.status === 401 || retryError.response?.status === 403) {
+            throw retryError; // catch 블록으로 넘어가서 로그아웃 처리
+          }
+          throw retryError;
+        }
       }
 
-      console.warn('[UserResponseInterceptor] No refresh token found');
       throw new Error('No refresh token');
     } catch (err) {
-      console.error('[UserResponseInterceptor] Token refresh failed', err);
       removeAccessToken();
       removeRefreshToken();
-      window.location.href = 'https://auth.entrydsm.hs.kr';
+      window.location.href = 'https://auth.entrydsm.kr';
     }
   }
 
@@ -142,8 +147,8 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
-  if (response?.status === 401 && !retryConfig._retry) {
-    console.log('[AdminResponseInterceptor] 401 detected, trying refresh token');
+  if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
+    console.log(`[AdminResponseInterceptor] ${response.status} detected, trying refresh token`);
     retryConfig._retry = true;
 
     try {
@@ -166,7 +171,17 @@ const adminResponseInterceptor = async (error: AxiosError) => {
         setAdminRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        return AdmissionAdminInstance(retryConfig);
+        try {
+          const retryResponse = await AdmissionAdminInstance(retryConfig);
+          return retryResponse;
+        } catch (retryError: any) {
+          // 리프레시 후 재시도에서도 401/403이 오면 완전 로그아웃
+          if (retryError.response?.status === 401 || retryError.response?.status === 403) {
+            console.error('[AdminResponseInterceptor] Still unauthorized after refresh, logging out');
+            throw retryError; // catch 블록으로 넘어가서 로그아웃 처리
+          }
+          throw retryError;
+        }
       }
 
       console.warn('[AdminResponseInterceptor] No refresh token found');
@@ -175,7 +190,7 @@ const adminResponseInterceptor = async (error: AxiosError) => {
       console.error('[AdminResponseInterceptor] Token refresh failed', err);
       removeAdminAccessToken();
       removeAdminRefreshToken();
-      window.location.href = 'https://auth.entrydsm.hs.kr';
+      window.location.href = 'https://auth.entrydsm.kr';
     }
   }
 

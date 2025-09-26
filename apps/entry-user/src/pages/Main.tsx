@@ -5,7 +5,7 @@ import { school } from '../assets';
 
 export const Main = () => {
   const handleApplyClick = () => {
-    window.location.href = 'https://admission.entrydsm.hs.kr';
+    window.location.href = 'https://admission.entrydsm.kr';
   };
 
   return (

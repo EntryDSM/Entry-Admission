@@ -11,7 +11,7 @@ export const useUserLogin = () => {
       setAccessToken(data.accessToken);
       setRefreshToken(data.refreshToken);
       toast.success('로그인 성공!');
-      window.location.href = 'https://user.entrydsm.hs.kr';
+      window.location.href = 'https://entrydsm.kr/mypage';
     },
     onError: (error: unknown) => {
       let errorMessage = '로그인에 실패했습니다.';
