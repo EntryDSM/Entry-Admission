@@ -58,7 +58,7 @@ jobs:
       - name: Deploy admission-lts to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/admission-lts/dist --project-name=admission-lts --production
+        run: wrangler pages deploy apps/admission-lts/dist --project-name=entry-admission --production
 
       - name: Deployment success notification
         if: success()
