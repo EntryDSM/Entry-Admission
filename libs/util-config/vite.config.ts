@@ -10,7 +10,7 @@ export default defineConfig(() => ({
   plugins: [
     react(),
     dts({
-      // entryRoot: 'src',
+      entryRoot: 'src',
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
   ],

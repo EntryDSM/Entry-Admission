@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../util-config"
+    },
+    {
       "path": "../design-token"
     },
     {

@@ -3,6 +3,7 @@ import { EntryLogo, SideBarBtnIcon } from './assets';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useUserInfo } from '@entry/util-config';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
@@ -121,7 +122,7 @@ export const CommonHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   // const [datas] = useState<{ name: string }>({ name: '홍길동' });
-  // const { data: userInfo } = useUserInfo();
+  const { data: userInfo } = useUserInfo();
 
   const navData = [
     { name: '공지사항', path: '/notice' },
@@ -185,7 +186,7 @@ export const CommonHeader = () => {
             마이페이지
           </NavContent>
           <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
-            {/* {userInfo?.name || '사용자'} */}
+            {userInfo?.name || '사용자'}
             <Text
               isSpan
               fontSize={18}
