@@ -924,6 +924,11 @@
   resolved "https://registry.yarnpkg.com/@borewit/text-codec/-/text-codec-0.1.1.tgz#7e7f27092473d5eabcffef693a849f2cc48431da"
   integrity sha512-5L/uBxmjaCIX5h8Z+uu+kA9BQLkc/Wl06UGR5ajNRxu+/XjonB5i8JpgFMrPj3LXTCPA0pv8yxUvbUi+QthGGA==
 
+"@channel.io/channel-web-sdk-loader@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@channel.io/channel-web-sdk-loader/-/channel-web-sdk-loader-2.0.0.tgz#d8bc196222a9b8045af6c8418f7693c466db6100"
+  integrity sha512-Z8DDpf2lAaYr/3aAnwQtxg0L8MYWgi/hhGV8c5/SLCV6Fx5Gssj7mfyHHrCVC315B0icmLYqZsXBlmbf6cN8Jg==
+
 "@emnapi/core@^1.1.0", "@emnapi/core@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@emnapi/core/-/core-1.5.0.tgz#85cd84537ec989cebb2343606a1ee663ce4edaf0"

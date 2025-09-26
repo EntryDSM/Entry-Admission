@@ -5,6 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@channel.io/channel-web-sdk-loader": "^2.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "11.11.0",
     "@react-router/node": "^7.2.0",

@@ -10,6 +10,49 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        var w = window;
+        if (w.ChannelIO)
+          return w.console.error('ChannelIO script included twice.');
+        var ch = function () {
+          ch.c(arguments);
+        };
+        ch.q = [];
+        ch.c = function (args) {
+          ch.q.push(args);
+        };
+        w.ChannelIO = ch;
+
+        function l() {
+          if (w.ChannelIOInitialized) return;
+          w.ChannelIOInitialized = true;
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.async = true;
+          s.src = 'https://cdn.channel.io/plugin/ch-plugin-web.js';
+          var x = document.getElementsByTagName('script')[0];
+          x.parentNode.insertBefore(s, x);
+
+          s.onload = function () {
+            ChannelIO('boot', {
+              pluginKey: '732c4fd2-2526-4b32-bd62-c1fce4829dd4',
+            });
+          };
+        }
+
+        if (document.readyState === 'complete') l();
+        else {
+          w.addEventListener('DOMContentLoaded', l);
+          w.addEventListener('load', l);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      ChannelIO('boot', {
+        pluginKey: '732c4fd2-2526-4b32-bd62-c1fce4829dd4',
+      });
+    </script>
   </body>
 </html>
