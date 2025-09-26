@@ -124,7 +124,7 @@ const userResponseInterceptor = async (error: AxiosError) => {
       console.error('[UserResponseInterceptor] Token refresh failed', err);
       removeAccessToken();
       removeRefreshToken();
-      window.location.href = 'https://auth.entrydsm.hs.kr';
+      window.location.href = 'https://auth.entrydsm.kr';
     }
   }
 
@@ -175,7 +175,7 @@ const adminResponseInterceptor = async (error: AxiosError) => {
       console.error('[AdminResponseInterceptor] Token refresh failed', err);
       removeAdminAccessToken();
       removeAdminRefreshToken();
-      window.location.href = 'https://auth.entrydsm.hs.kr';
+      window.location.href = 'https://auth.entrydsm.kr';
     }
   }
 
