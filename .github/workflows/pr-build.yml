@@ -37,41 +37,28 @@ jobs:
       - name: Build admission-lts
         run: yarn nx build admission-lts
 
-      - name: Check build output directories
-        run: |
-          echo "빌드 결과물 확인:"
-          find . -name "dist" -type d
-          echo "entry-user 빌드 결과물:"
-          ls -la apps/entry-user/dist/ || echo "apps/entry-user/dist 없음"
-          echo "entry-admin 빌드 결과물:"
-          ls -la apps/entry-admin/dist/ || echo "apps/entry-admin/dist 없음"
-          echo "entry-auth 빌드 결과물:"
-          ls -la apps/entry-auth/dist/ || echo "apps/entry-auth/dist 없음"
-          echo "admission-lts 빌드 결과물:"
-          ls -la apps/admission-lts/dist/ || echo "apps/admission-lts/dist 없음"
-
       - name: Setup Cloudflare Wrangler
         run: npm install -g wrangler
 
       - name: Deploy entry-user to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-user/dist --project-name=entry-user
+        run: wrangler pages deploy apps/entry-user/dist --project-name=entry-user --production
 
       - name: Deploy entry-admin to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-admin/dist --project-name=entry-admin
+        run: wrangler pages deploy apps/entry-admin/dist --project-name=entry-admin --production
 
       - name: Deploy entry-auth to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/entry-auth/dist --project-name=entry-auth
+        run: wrangler pages deploy apps/entry-auth/dist --project-name=entry-auth --production
 
       - name: Deploy admission-lts to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: wrangler pages deploy apps/admission-lts/dist --project-name=admission-lts
+        run: wrangler pages deploy apps/admission-lts/dist --project-name=admission-lts --production
 
       - name: Deployment success notification
         if: success()
