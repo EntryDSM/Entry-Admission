@@ -38,6 +38,10 @@ const skipAuthUrls = [
   'GET /user/verify/info',
 ];
 
+// 403 에러로 인한 무한 재시도 방지 플래그
+let isUserRefreshingToken = false;
+let isAdminRefreshingToken = false;
+
 
 /**
  * 사용자 요청 인터셉터
@@ -97,22 +101,39 @@ const userResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
+  // 403 에러 시 무한 재시도 방지
+  if (response?.status === 403 && isUserRefreshingToken) {
+    removeAccessToken();
+    removeRefreshToken();
+    window.location.href = '/logout';
+    return Promise.reject(error);
+  }
+
   if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
     retryConfig._retry = true;
+    isUserRefreshingToken = true;
 
     try {
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
       if (userRefreshToken) {
-        const { data } = await AdmissionUserInstance.put(
+        const refreshResponse = await AdmissionUserInstance.put(
           '/user/auth',
           {},
           { headers: { 'X-Refresh-Token': userRefreshToken } }
         );
 
+        // 200이 아니면 로그아웃 처리
+        if (refreshResponse.status !== 200) {
+          throw new Error(`Refresh failed with status: ${refreshResponse.status}`);
+        }
+
+        const { data } = refreshResponse;
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
+        isUserRefreshingToken = false;
+
         try {
           const retryResponse = await AdmissionUserInstance(retryConfig);
           return retryResponse;
@@ -127,9 +148,10 @@ const userResponseInterceptor = async (error: AxiosError) => {
 
       throw new Error('No refresh token');
     } catch (err) {
+      isUserRefreshingToken = false;
       removeAccessToken();
       removeRefreshToken();
-      window.location.href = 'https://auth.entrydsm.kr';
+      window.location.href = '/logout';
     }
   }
 
@@ -147,15 +169,24 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
+  // 403 에러 시 무한 재시도 방지
+  if (response?.status === 403 && isAdminRefreshingToken) {
+    removeAdminAccessToken();
+    removeAdminRefreshToken();
+    window.location.href = '/logout';
+    return Promise.reject(error);
+  }
+
   if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
     console.log(`[AdminResponseInterceptor] ${response.status} detected, trying refresh token`);
     retryConfig._retry = true;
+    isAdminRefreshingToken = true;
 
     try {
       const adminRefreshToken = getAdminRefreshToken() || cookies.get('adminRefreshToken');
       if (adminRefreshToken) {
         console.log('[AdminResponseInterceptor] Admin token refresh started');
-        const { data } = await AdmissionAdminInstance.put(
+        const refreshResponse = await AdmissionAdminInstance.put(
           '/admin/auth',
           {},
           {
@@ -167,10 +198,18 @@ const adminResponseInterceptor = async (error: AxiosError) => {
           }
         );
 
+        // 200이 아니면 로그아웃 처리
+        if (refreshResponse.status !== 200) {
+          throw new Error(`Admin refresh failed with status: ${refreshResponse.status}`);
+        }
+
+        const { data } = refreshResponse;
         setAdminAccessToken(data.accessToken);
         setAdminRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
+        isAdminRefreshingToken = false;
+
         try {
           const retryResponse = await AdmissionAdminInstance(retryConfig);
           return retryResponse;
@@ -188,9 +227,10 @@ const adminResponseInterceptor = async (error: AxiosError) => {
       throw new Error('No refresh token');
     } catch (err) {
       console.error('[AdminResponseInterceptor] Token refresh failed', err);
+      isAdminRefreshingToken = false;
       removeAdminAccessToken();
       removeAdminRefreshToken();
-      window.location.href = 'https://auth.entrydsm.kr';
+      window.location.href = '/logout';
     }
   }
 

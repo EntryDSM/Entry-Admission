@@ -5,6 +5,7 @@ import {
   ChangePasswordPage,
   FindPasswordPage,
   LoginPage,
+  LogoutPage,
   Page404,
   SignUpPage,
   UserInfoPage,
@@ -38,6 +39,10 @@ export const Router = createBrowserRouter([
       {
         path: '/admin-login',
         element: <AdminLogin />,
+      },
+      {
+        path: '/logout',
+        element: <LogoutPage />,
       },
     ],
   },
