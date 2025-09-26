@@ -24,15 +24,15 @@ export const ApplicationClassification = () => {
     return Array.from({ length: daysCount }, (_, i) => i + 1);
   };
 
-  const selectedYear = datas.graduationDate?.[0] || years[0];
-  const selectedMonth = datas.graduationDate?.[1] || months[0];
+  const selectedYear = datas?.graduationDate?.[0] || years[0];
+  const selectedMonth = datas?.graduationDate?.[1] || months[0];
 
   // day 배열 계산
   const days = getDaysInMonth(selectedYear as number, selectedMonth as number);
 
   // 졸업구분에 따른 드롭다운 데이터 생성
   const getFormDropDownData = () => {
-    if (datas.graduationType === "졸업") {
+    if (datas?.graduationType === "졸업") {
       // 졸업: 년월일 모두 표시
       return [
         {
@@ -43,7 +43,7 @@ export const ApplicationClassification = () => {
           ],
         },
       ];
-    } else if (datas.graduationType === "졸업 예정") {
+    } else if (datas?.graduationType === "졸업 예정") {
       // 졸업 예정: 년월만 표시
       return [
         {
@@ -94,9 +94,9 @@ export const ApplicationClassification = () => {
 
   // 설명 텍스트 동적 생성
   const getExplanationText = () => {
-    if (datas.graduationType === "졸업") {
+    if (datas?.graduationType === "졸업") {
       return "졸업한 연월일을 모두 선택해주세요.";
-    } else if (datas.graduationType === "졸업 예정") {
+    } else if (datas?.graduationType === "졸업 예정") {
       return "졸업 예정자의 경우 졸업 예정월만 선택해주세요.";
     }
     return "";
@@ -108,7 +108,7 @@ export const ApplicationClassification = () => {
         label="전형 선택"
         type="radio"
         radioDatas={formRadioData[0].data}
-        selectedRadio={datas.typeSelection}
+        selectedRadio={datas?.typeSelection}
         setSelectedRadio={handleTypeSelection}
       />
 
@@ -116,7 +116,7 @@ export const ApplicationClassification = () => {
         label="지역 선택"
         type="radio"
         radioDatas={formRadioData[1].data}
-        selectedRadio={datas.regionSelection}
+        selectedRadio={datas?.regionSelection}
         setSelectedRadio={handleRegionSelection}
       />
 
@@ -124,18 +124,18 @@ export const ApplicationClassification = () => {
         label="졸업 구분"
         type="radio"
         radioDatas={formRadioData[2].data}
-        selectedRadio={datas.graduationType}
+        selectedRadio={datas?.graduationType}
         setSelectedRadio={handleGraduationTypeSelection}
       />
-      {datas.graduationType && 
-       datas.graduationType !== "검정고시 (중학교 졸업 학력)" && 
+      {datas?.graduationType &&
+       datas?.graduationType !== "검정고시 (중학교 졸업 학력)" && 
        formDropDownData.length > 0 && (
         <FormElement
           explanation={getExplanationText()}
-          label={datas.graduationType === "졸업" ? "졸업 연월일" : "졸업 예정 연월"}
+          label={datas?.graduationType === "졸업" ? "졸업 연월일" : "졸업 예정 연월"}
           type="dropDown"
           dropDownDatas={formDropDownData[0].data}
-          dropDownValues={datas.graduationDate}
+          dropDownValues={datas?.graduationDate || []}
           onDropDownChange={handleDropdownChange}
         />
       )}

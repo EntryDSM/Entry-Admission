@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { Button, CancelModal, ShowResultModal, useModal } from '@entry/ui';
+import { Button, CancelModal, ShowResultModal, PasswordModal, useModal } from '@entry/ui';
+import { getUserInfo, IUserInfoResponseType, deleteUser } from '@entry/util-config';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 interface QuestionItem {
   id: number;
@@ -9,52 +12,117 @@ interface QuestionItem {
   content: string;
 }
 
+interface ApplicationStatus {
+  type: string;
+  status: string;
+}
+
 export const MyPage = () => {
   const [cancelSubmitOpen, setCancelSubmitOpen] = useState<boolean>(false);
   const [delOpen, setDelOpen] = useState<boolean>(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [questions] = useState<QuestionItem[]>([
-    { id: 1, category: '입학 문의', content: '안녕하세요' },
-    { id: 2, category: '기타', content: '안녕하세요' },
-    { id: 3, category: '진로', content: '안녕하세요' },
+    { id: 1, category: '입학 문의', content: '지원서 작성 중 문의사항이 있습니다.' },
+    { id: 2, category: '기타', content: '기숙사 관련 질문입니다.' },
+    { id: 3, category: '진로', content: '입학 후 진로에 대해 궁금합니다.' },
   ]);
 
   const resultModal = useModal();
 
+  // 사용자 정보 조회
+  const { data: userInfo, isLoading: isUserLoading } = useQuery<IUserInfoResponseType>({
+    queryKey: ['userInfo'],
+    queryFn: getUserInfo,
+  });
+
+  // 임시 지원 상태 (실제로는 API에서 가져와야 함)
+  const [applicationStatus] = useState<ApplicationStatus>({
+    type: '일반 전형',
+    status: '제출 완료'
+  });
+
+  // 회원 탈퇴 API
+  const deleteUserMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      toast.success('회원 탈퇴가 완료되었습니다.');
+      setPasswordModalOpen(false);
+      setDelOpen(false);
+      // 로그아웃 처리
+      window.location.href = '/logout';
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || '회원 탈퇴 중 오류가 발생했습니다.');
+    },
+  });
+
   const handleCancelSubmitClick = () => {
-    // 제출 취소 api
+    // TODO: 제출 취소 API 연동
+    console.log('제출 취소 API 호출');
   };
 
   const handleDelClick = () => {
-    // 회원 탈퇴 api
+    setDelOpen(true);
+  };
+
+  const handlePasswordConfirm = (password: string) => {
+    deleteUserMutation.mutate({ password });
   };
 
   const handleCheckResult = () => {
-    // 결과 확인 api 호출 후 모달 열기
+    // TODO: 결과 확인 API 연동
+    console.log('결과 확인 API 호출');
     resultModal.open();
   };
+
+  const handleDownloadApplication = () => {
+    // TODO: 원서 다운로드 API 연동
+    console.log('원서 다운로드 API 호출');
+  };
+
+  const handleChangePassword = () => {
+    // TODO: 비밀번호 변경 페이지로 이동
+    console.log('비밀번호 변경 페이지로 이동');
+  };
+
+  const handleLogout = () => {
+    // TODO: 로그아웃 API 연동
+    console.log('로그아웃 API 호출');
+    window.location.href = '/logout';
+  };
+
+  if (isUserLoading) {
+    return (
+      <PageContainer>
+        <ContentWrapper>
+          <div>로딩 중...</div>
+        </ContentWrapper>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
       <ContentWrapper>
-        <UserName>홍길동님</UserName>
-        <PhoneNumber>010-0000-0000</PhoneNumber>
+        <UserName>{userInfo?.name || '사용자'}님</UserName>
+        <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
         <StatusTitle>지원 상태</StatusTitle>
 
         <StatusCard>
           <StatusRow>
-            <StatusLabel>일반 전형</StatusLabel>
+            <StatusLabel>{applicationStatus.type}</StatusLabel>
           </StatusRow>
           <StatusDivider />
           <StatusRow>
             <StatusSubLabel>지원서 상태:</StatusSubLabel>
-            <StatusValue>제출 완료</StatusValue>
+            <StatusValue>{applicationStatus.status}</StatusValue>
           </StatusRow>
         </StatusCard>
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
-            <Button>원서 다운로드</Button>
+            <Button onClick={handleDownloadApplication}>원서 다운로드</Button>
             <Button
               backgroundColor={colors.gray[50]}
               color={colors.orange[800]}
@@ -103,6 +171,7 @@ export const MyPage = () => {
               color={colors.gray[500]}
               borderColor={colors.gray[500]}
               hoverBackgroundColor="transparent"
+              onClick={handleChangePassword}
             >
               비밀번호 변경
             </Button>
@@ -116,6 +185,7 @@ export const MyPage = () => {
                 color={colors.gray[500]}
                 borderColor={colors.gray[500]}
                 hoverBackgroundColor="transparent"
+                onClick={handleLogout}
               >
                 로그아웃
               </Button>
@@ -146,7 +216,20 @@ export const MyPage = () => {
         title="탈퇴하시겠습니까?"
         content="탈퇴 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
         btnText="탈퇴하기"
-        onClick={handleDelClick}
+        onClick={() => {
+          setDelOpen(false);
+          setPasswordModalOpen(true);
+        }}
+      />
+
+      <PasswordModal
+        setIsOpen={setPasswordModalOpen}
+        isOpen={passwordModalOpen}
+        title="비밀번호 확인"
+        content="회원 탈퇴를 위해 비밀번호를 입력해주세요."
+        btnText="탈퇴하기"
+        onConfirm={handlePasswordConfirm}
+        isLoading={deleteUserMutation.isPending}
       />
 
       <ShowResultModal
@@ -255,6 +338,7 @@ const QuestionsTable = styled.div`
   width: 100%;
   border-top: 1px solid ${colors.gray[200]};
   margin-top: 40px;
+  background-color: white;
 `;
 
 const TableHeader = styled.div`
@@ -277,6 +361,7 @@ const TableRow = styled.div`
   border-bottom: 1px solid ${colors.gray[200]};
   cursor: pointer;
   transition: background-color 0.2s ease;
+  background-color: white;
 
   &:hover {
     background-color: ${colors.gray[50]};

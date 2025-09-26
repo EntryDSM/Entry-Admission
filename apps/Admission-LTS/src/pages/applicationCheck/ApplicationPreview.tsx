@@ -62,17 +62,17 @@ export const ApplicationPreview = () => {
       userName: applicantInfo.applicantName || "",
       applicantTel: applicantInfo.applicantNumber || "", // 수정된 필드명
       birthday: applicantInfo.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
-      schoolRegion: applicationClassification.regionSelection || "",
+      schoolRegion: applicationClassification?.regionSelection || "",
       gender: applicantInfo.gender || "",
       schoolName: middleSchoolInfo.schoolName || "",
-      educationalStatus: applicationClassification.graduationType || "",
+      educationalStatus: applicationClassification?.graduationType || "",
       address: guardianInfo.address || "",
       detailAddress: guardianInfo.addressDetail || "", // 수정된 필드명
       parentName: guardianInfo.guardianName || "", // 수정된 필드명
       parentRelation: guardianInfo.relationship ? guardianInfo.relationship.join('') : "", // 수정된 필드명
       parentTel: guardianInfo.guardianNumber || "", // 수정된 필드명
-      region: applicationClassification.regionSelection || "",
-      applicationType: applicationClassification.typeSelection || "",
+      region: applicationClassification?.regionSelection || "",
+      applicationType: applicationClassification?.typeSelection || "",
       applicationRemark: applicantInfo.specialNotes || "",
       imageUrl: applicantInfo.idPhoto || "",
       absenceDayCount: attendanceVolunteer.absenceDayCount || activityGraduate.absenceDayCount || "0",
@@ -112,12 +112,12 @@ export const ApplicationPreview = () => {
       englishSecondGradeFirstSemester: secondGraduate.eng || "",
       englishSecondGradeSecondSemester: secondGraduate.eng || "",
 
-      applicationCase: applicationClassification.typeSelection || "",
+      applicationCase: applicationClassification?.typeSelection || "",
       hasCompetitionPrize: "",
       hasCertificate: "",
-      year: applicationClassification.graduationDate?.[0]?.toString() || "2025",
-      month: applicationClassification.graduationDate?.[1]?.toString() || "3",
-      day: applicationClassification.graduationDate?.[2]?.toString() || "1",
+      year: applicationClassification?.graduationDate?.[0]?.toString() || "2025",
+      month: applicationClassification?.graduationDate?.[1]?.toString() || "3",
+      day: applicationClassification?.graduationDate?.[2]?.toString() || "1",
       veteransNumber: applicantInfo.veteransNumber || "",
       teacherName: middleSchoolInfo.teacherName || "",
       teacherTel: middleSchoolInfo.schoolPhone || "",

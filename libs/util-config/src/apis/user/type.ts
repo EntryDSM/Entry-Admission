@@ -3,3 +3,7 @@ export interface IUserInfoResponseType {
   phoneNumber: string;
   isParent: boolean;
 }
+
+export interface IDeleteUserRequestType {
+  password: string;
+}
