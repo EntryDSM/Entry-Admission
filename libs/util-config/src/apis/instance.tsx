@@ -28,6 +28,12 @@ export const AdmissionAdminInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const TestInstance = axios.create({
+  baseURL: "http://localhost:3449" ,
+  timeout: 50000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 const cookies = new Cookies();
 
 const skipAuthUrls = [
@@ -38,42 +44,37 @@ const skipAuthUrls = [
   'GET /user/verify/info',
 ];
 
-// 403 에러로 인한 무한 재시도 방지 플래그
 let isUserRefreshingToken = false;
 let isAdminRefreshingToken = false;
 
-
-/**
- * 사용자 요청 인터셉터
- */
 const userRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  // Bearer 토큰이 필요없는 엔드포인트 체크
   const endpoint = `${method} ${url}`;
   if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
 
   const token = getAccessToken() || cookies.get('accessToken');
+  console.log('[UserRequestInterceptor] Token found:', !!token, 'for URL:', config.baseURL + url);
+
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
+    console.log('[UserRequestInterceptor] Authorization header set');
+  } else {
+    console.warn('[UserRequestInterceptor] No token available');
   }
 
   return config;
 };
 
-/**
- * 관리자 요청 인터셉터
- */
 const adminRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  // Bearer 토큰이 필요없는 엔드포인트 체크
   const endpoint = `${method} ${url}`;
   if (skipAuthUrls.includes(endpoint)) {
     return config;
@@ -87,12 +88,10 @@ const adminRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
+TestInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
-/**
- * 사용자 응답 인터셉터 (토큰 재발급 처리)
- */
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
   if (!config) return Promise.reject(error);
@@ -101,7 +100,6 @@ const userResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
-  // 403 에러 시 무한 재시도 방지
   if (response?.status === 403 && isUserRefreshingToken) {
     removeAccessToken();
     removeRefreshToken();
@@ -122,7 +120,6 @@ const userResponseInterceptor = async (error: AxiosError) => {
           { headers: { 'X-Refresh-Token': userRefreshToken } }
         );
 
-        // 200이 아니면 로그아웃 처리
         if (refreshResponse.status !== 200) {
           throw new Error(`Refresh failed with status: ${refreshResponse.status}`);
         }
@@ -135,12 +132,15 @@ const userResponseInterceptor = async (error: AxiosError) => {
         isUserRefreshingToken = false;
 
         try {
-          const retryResponse = await AdmissionUserInstance(retryConfig);
+          const instanceToUse = config.baseURL?.includes('localhost:3449')
+            ? TestInstance
+            : AdmissionUserInstance;
+
+          const retryResponse = await instanceToUse(retryConfig);
           return retryResponse;
         } catch (retryError: any) {
-          // 리프레시 후 재시도에서도 401/403이 오면 완전 로그아웃
           if (retryError.response?.status === 401 || retryError.response?.status === 403) {
-            throw retryError; // catch 블록으로 넘어가서 로그아웃 처리
+            throw retryError;
           }
           throw retryError;
         }
@@ -158,9 +158,6 @@ const userResponseInterceptor = async (error: AxiosError) => {
   return Promise.reject(error);
 };
 
-/**
- * 관리자 응답 인터셉터 (토큰 재발급 처리)
- */
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
   if (!config) return Promise.reject(error);
@@ -169,7 +166,6 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     _retry?: boolean;
   };
 
-  // 403 에러 시 무한 재시도 방지
   if (response?.status === 403 && isAdminRefreshingToken) {
     removeAdminAccessToken();
     removeAdminRefreshToken();
@@ -198,7 +194,6 @@ const adminResponseInterceptor = async (error: AxiosError) => {
           }
         );
 
-        // 200이 아니면 로그아웃 처리
         if (refreshResponse.status !== 200) {
           throw new Error(`Admin refresh failed with status: ${refreshResponse.status}`);
         }
@@ -214,10 +209,9 @@ const adminResponseInterceptor = async (error: AxiosError) => {
           const retryResponse = await AdmissionAdminInstance(retryConfig);
           return retryResponse;
         } catch (retryError: any) {
-          // 리프레시 후 재시도에서도 401/403이 오면 완전 로그아웃
           if (retryError.response?.status === 401 || retryError.response?.status === 403) {
             console.error('[AdminResponseInterceptor] Still unauthorized after refresh, logging out');
-            throw retryError; // catch 블록으로 넘어가서 로그아웃 처리
+            throw retryError;
           }
           throw retryError;
         }
@@ -238,6 +232,11 @@ const adminResponseInterceptor = async (error: AxiosError) => {
 };
 
 AdmissionUserInstance.interceptors.response.use(
+  (response) => response,
+  userResponseInterceptor
+);
+
+TestInstance.interceptors.response.use(
   (response) => response,
   userResponseInterceptor
 );

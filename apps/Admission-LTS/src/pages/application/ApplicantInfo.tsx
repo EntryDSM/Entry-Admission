@@ -3,6 +3,7 @@ import { Flex } from '@entry/design-token';
 import { FormElement } from '../../components';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
+import { uploadImage } from '../../apis';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
@@ -65,9 +66,17 @@ export const ApplicantInfo = () => {
     setDatas({ ...datas, specialNotes: value });
   };
 
-  const handleImgChange = (file: File | null) => {
+  const handleImgChange = async (file: File | null) => {
     if (file) {
-      setDatas({ ...datas, idPhoto: file });
+      try {
+        const response = await uploadImage(file);
+        setDatas({ ...datas, idPhoto: response.imageUrl });
+        console.log('이미지 업로드 성공:', response.imageUrl);
+      } catch (error) {
+        console.error('이미지 업로드 실패:', error);
+        // 업로드 실패 시 로컬 파일로 설정 (임시)
+        setDatas({ ...datas, idPhoto: file });
+      }
     }
   };
 

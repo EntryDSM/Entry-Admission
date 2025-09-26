@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllSchedule } from '../apis';
-import { useUserInfo } from '@entry/util-config';
+import { getUserInfo } from '@entry/util-config';
 import { ClipLoader } from 'react-spinners';
 
 export const Landing = () => {
@@ -18,7 +18,6 @@ export const Landing = () => {
   const navigate = useNavigate();
 
   const {data : scheduleData, isLoading} = useGetAllSchedule()
-  const { data: userData } = useUserInfo();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -56,10 +55,18 @@ export const Landing = () => {
 
 
   useEffect(() => {
-    if (userData?.name) {
-    setName(userData.name);
-  }
-  },[userData])
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        setName(userInfo.name);
+      } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+        setName('지원자');
+      }
+    };
+
+    fetchUserInfo();
+  }, [])
 
 
   if (isMobile) {
