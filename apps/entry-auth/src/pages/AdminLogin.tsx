@@ -87,9 +87,6 @@ export const AdminLogin = () => {
           >
             회원가입
           </div>
-          <AuthLink onClick={() => navigate('/find-password')}>
-            비밀번호 찾기
-          </AuthLink>
           <div style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
             유저 로그인
           </div>
@@ -98,14 +95,6 @@ export const AdminLogin = () => {
     </BackGroundWrapper>
   );
 };
-
-const AuthLink = styled.div`
-  width: 130px;
-  display: flex;
-  justify-content: center;
-  border-inline: 2px solid ${colors.gray[100]};
-  cursor: pointer;
-`;
 
 const LoginKindContainer = styled.div`
   display: flex;
