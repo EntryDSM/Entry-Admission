@@ -98,42 +98,35 @@ const userResponseInterceptor = async (error: AxiosError) => {
   };
 
   if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
-    console.log(`[UserResponseInterceptor] ${response.status} detected, trying refresh token`);
     retryConfig._retry = true;
 
     try {
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
       if (userRefreshToken) {
-        console.log('[UserResponseInterceptor] User token refresh started');
         const { data } = await AdmissionUserInstance.put(
           '/user/auth',
           {},
           { headers: { 'X-Refresh-Token': userRefreshToken } }
         );
 
-        console.log('[UserResponseInterceptor] Token refresh successful, new token received');
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
 
         retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        console.log('[UserResponseInterceptor] Retrying original request with new token');
         try {
           const retryResponse = await AdmissionUserInstance(retryConfig);
           return retryResponse;
         } catch (retryError: any) {
           // 리프레시 후 재시도에서도 401/403이 오면 완전 로그아웃
           if (retryError.response?.status === 401 || retryError.response?.status === 403) {
-            console.error(`[UserResponseInterceptor] Original request still failed with ${retryError.response?.status} after token refresh. This indicates account/permission issues.`);
             throw retryError; // catch 블록으로 넘어가서 로그아웃 처리
           }
           throw retryError;
         }
       }
 
-      console.warn('[UserResponseInterceptor] No refresh token found');
       throw new Error('No refresh token');
     } catch (err) {
-      console.error('[UserResponseInterceptor] Token refresh failed', err);
       removeAccessToken();
       removeRefreshToken();
       window.location.href = 'https://auth.entrydsm.kr';
@@ -205,14 +198,8 @@ const adminResponseInterceptor = async (error: AxiosError) => {
 };
 
 AdmissionUserInstance.interceptors.response.use(
-  (response) => {
-    console.log('[UserResponseInterceptor] Success response:', response.config.url);
-    return response;
-  },
-  (error) => {
-    console.log('[UserResponseInterceptor] Error caught:', error.response?.status, error.config?.url);
-    return userResponseInterceptor(error);
-  }
+  (response) => response,
+  userResponseInterceptor
 );
 
 AdmissionAdminInstance.interceptors.response.use(
