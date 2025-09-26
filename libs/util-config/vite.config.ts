@@ -10,7 +10,7 @@ export default defineConfig(() => ({
   plugins: [
     react(),
     dts({
-      entryRoot: 'src',
+      // entryRoot: 'src',
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
   ],
@@ -38,7 +38,7 @@ export default defineConfig(() => ({
     },
     rollupOptions: {
       // External packages that should not be bundled into your library.
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', '@tanstack/react-query'],
     },
   },
 }));

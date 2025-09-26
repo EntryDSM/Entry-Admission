@@ -7,9 +7,6 @@
     },
     {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "../util-config"
     }
   ],
   "extends": "../../tsconfig.base.json"
