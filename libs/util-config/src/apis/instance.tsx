@@ -17,13 +17,13 @@ import {
 import { Cookies } from 'react-cookie';
 
 export const AdmissionUserInstance = axios.create({
-  baseURL: 'https://api.entrydsm.hs.kr',
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 export const AdmissionAdminInstance = axios.create({
-  baseURL: 'https://api.entrydsm.hs.kr',
+  baseURL: import.meta.env.VITE_BASE_URL ,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });

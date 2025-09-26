@@ -4,17 +4,18 @@ const cookies = new Cookies();
 
 // 쿠키 옵션 (로컬/배포 환경 구분)
 const getCookieOptions = () => {
-  const isLocalhost = window.location.hostname === 'localhost';
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('localhost:');
   const expires = new Date();
   expires.setDate(expires.getDate() + 1); // 1일 후 만료
 
   return {
     path: '/',
     expires,
-    domain: isLocalhost ? undefined : '.entrydsm.hs.kr',
+    domain: isLocalhost ? 'localhost' : '.entrydsm.hs.kr',
     secure: !isLocalhost, // HTTPS 환경에서만 전송 (로컬 제외)
-    sameSite: isLocalhost ? 'lax' : 'none', // 서브도메인 간 쿠키 공유 허용
-  } as const;
+    sameSite: isLocalhost ? ('lax' as const) : ('none' as const), // 서브도메인 간 쿠키 공유 허용
+  };
 };
 
 // 공통 remove 함수
