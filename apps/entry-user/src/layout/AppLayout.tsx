@@ -35,7 +35,7 @@ export const AppLayout = () => {
       if (!isLocalhost && currentURL.includes('entrydsm.kr')) {
         const siteAccess = cookies.get('site_access');
         if (!siteAccess) {
-          window.location.href = 'https://naver.com';
+          window.location.href = 'https://entrydsm.kr/error_fixing';
         }
       }
     }

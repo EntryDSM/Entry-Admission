@@ -15,6 +15,7 @@ import {
   Main,
   NoticePage,
   Page404,
+  ErrorFixingPage,
 } from './pages';
 
 export const Router = createBrowserRouter([
@@ -49,6 +50,10 @@ export const Router = createBrowserRouter([
       {
         path: '/mypage',
         element: <MyPage />,
+      },
+      {
+        path: '/error_fixing',
+        element: <ErrorFixingPage />,
       },
       {
         path: '/calculate',
