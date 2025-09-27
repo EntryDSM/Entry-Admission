@@ -14,18 +14,9 @@ export const BannerDisplay = ({ selectedBanner }: IBannerDisplayType) => {
     jobis,
     meal: dms,
     blip,
-    xquare: dms,
   };
 
-  const banners = [
-    'dms',
-    'pick',
-    'dormitory',
-    'jobis',
-    'meal',
-    'blip',
-    'xquare',
-  ];
+  const banners = ['dms', 'pick', 'dormitory', 'jobis', 'meal', 'blip'];
   const currentIndex = banners.indexOf(selectedBanner);
 
   return (
