@@ -2,6 +2,17 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { useNavigate } from 'react-router-dom';
 import { noticeIcon, downloadIcon, noticeMoveArrowIcon } from '../../assets';
+import { useGetAllNotice } from '../../apis';
+import { useEffect, useState } from 'react';
+
+interface NoticeItem {
+  id: number;
+  title: string;
+  createdAt: string;
+  isPinned: boolean;
+  type: 'GUIDE' | 'NOTICE'
+}
+
 
 export const InfoSection = () => {
   const navigate = useNavigate();
@@ -12,25 +23,43 @@ export const InfoSection = () => {
     hasDownload: true,
   };
 
-  const notices = [
-    {
-      title: '기숙사 탈출하면 벌점 몇 점인지에 대해',
-      date: '2024.03.21',
-      badge: 'NEW',
-    },
-    {
-      title: '입학 공지지사항에 대해서',
-      date: '2024.03.21',
-    },
-    {
-      title: '지후의 디자인 건',
-      date: '2024.03.21',
-    },
-    {
-      title: '입학 안내사항 파일 다운로드',
-      date: '2024.03.21',
-    },
-  ];
+  const {data, isLoading} = useGetAllNotice('NOTICE');
+  const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
+
+  const formatDate = (dateString: string) => {
+      return dateString.split('T')[0]; 
+    };
+  
+  useEffect(() => {
+      if (data && Array.isArray(data?.notices)) {
+      const formattedNotices = data.notices.map(notice => ({
+        ...notice,
+        createdAt: formatDate(notice.createdAt)
+      }));
+      setNoticeItems(formattedNotices);
+    }
+    }, [data]);
+
+
+  // const notices = [
+  //   {
+  //     title: '기숙사 탈출하면 벌점 몇 점인지에 대해',
+  //     date: '2024.03.21',
+  //     badge: 'NEW',
+  //   },
+  //   {
+  //     title: '입학 공지지사항에 대해서',
+  //     date: '2024.03.21',
+  //   },
+  //   {
+  //     title: '지후의 디자인 건',
+  //     date: '2024.03.21',
+  //   },
+  //   {
+  //     title: '입학 안내사항 파일 다운로드',
+  //     date: '2024.03.21',
+  //   },
+  // ];
 
   return (
     <Container>
@@ -54,16 +83,15 @@ export const InfoSection = () => {
             </NoticeContent>
             <DownloadIcon src={downloadIcon} alt="다운로드" />
           </MainNoticeCard>
-
-          {notices.map((notice, index) => (
-            <NoticeItem key={index} onClick={() => navigate('')}>
+          {noticeItems.map((notice, index) => (
+            <NoticeItem key={index} onClick={() => navigate(`/notice/${notice.id}`)}>
               <NoticeContent>
                 <NoticeInfo>
                   <NoticeTitle>
                     {notice.title}
-                    {notice.badge && <BadgeHot>{notice.badge}</BadgeHot>}
+                    {/* {notice.badge && <BadgeHot>{notice.badge}</BadgeHot>} */}
                   </NoticeTitle>
-                  {notice.date && <NoticeDate>{notice.date}</NoticeDate>}
+                  {notice.createdAt && <NoticeDate>{notice.createdAt}</NoticeDate>}
                 </NoticeInfo>
               </NoticeContent>
               <ArrowIcon src={noticeMoveArrowIcon} alt="이동" />

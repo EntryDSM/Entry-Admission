@@ -35,9 +35,16 @@ export const NoticeDetailPage = () => {
 
   const { data, isLoading, error } = useGetDetailNotice(id);
 
+  const formatDate = (dateString: string) => {
+      return dateString.split('T')[0]; 
+    };
+
   useEffect(() => {
     if (data) {
-      setNoticeDetail(data);
+      setNoticeDetail({
+        ...data,
+        createdAt: formatDate(data.createdAt)
+      });
     }
   }, [data]);
   
