@@ -149,25 +149,29 @@ export const FaqPage = () => {
           </TableHeader>
 
           <TableBody>
-            {currentItems.map((item) => (
-              <FaqItemContainer key={item.id}>
-                <TableRow
-                  isExpanded={expandedItems.includes(item.id)}
-                  onClick={() => handleFaqClick(item.id)}
-                >
-                  <ColumnCategory>
-                    {CATEGORY_LABELS[item.category]}
-                  </ColumnCategory>
-                  <ColumnTitle>{item.title}</ColumnTitle>
-                </TableRow>
-                {expandedItems.includes(item.id) && (
-                  <AnswerSection>
-                    <AnswerLabel>답변</AnswerLabel>
-                    <AnswerContent>{item.content}</AnswerContent>
-                  </AnswerSection>
-                )}
-              </FaqItemContainer>
-            ))}
+            {currentItems.length > 0 ? (
+              currentItems.map((item) => (
+                <FaqItemContainer key={item.id}>
+                  <TableRow
+                    isExpanded={expandedItems.includes(item.id)}
+                    onClick={() => handleFaqClick(item.id)}
+                  >
+                    <ColumnCategory>
+                      {CATEGORY_LABELS[item.category]}
+                    </ColumnCategory>
+                    <ColumnTitle>{item.title}</ColumnTitle>
+                  </TableRow>
+                  {expandedItems.includes(item.id) && (
+                    <AnswerSection>
+                      <AnswerLabel>답변</AnswerLabel>
+                      <AnswerContent>{item.content}</AnswerContent>
+                    </AnswerSection>
+                  )}
+                </FaqItemContainer>
+              ))
+            ) : (
+              <NoDataRow>자주 묻는 질문이 없습니다.</NoDataRow>
+            )}
           </TableBody>
         </TableContainer>
 
@@ -180,6 +184,12 @@ export const FaqPage = () => {
     </PageContainer>
   );
 };
+
+const NoDataRow = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  color: ${colors.gray[400]};
+`;
 
 const PageContainer = styled.div`
   width: 100%;
