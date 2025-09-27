@@ -12,11 +12,10 @@ export const BannerDisplay = ({ selectedBanner }: IBannerDisplayType) => {
     pick,
     dormitory: daedong,
     jobis,
-    meal: dms,
     blip,
   };
 
-  const banners = ['dms', 'pick', 'dormitory', 'jobis', 'meal', 'blip'];
+  const banners = Object.keys(bannerImages);
   const currentIndex = banners.indexOf(selectedBanner);
 
   return (
