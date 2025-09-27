@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModal, useModal } from '@entry/ui';
-import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, TestInstance } from '@entry/util-config';
+import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, TestInstance, removeAccessToken, removeRefreshToken } from '@entry/util-config';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
@@ -95,8 +95,10 @@ export const MyPage = () => {
 
   const handleLogout = () => {
     // TODO: 로그아웃 API 연동
-    console.log('로그아웃 API 호출');
-    window.location.href = '/logout';
+    // console.log('로그아웃 API 호출');
+    removeAccessToken()
+    removeRefreshToken()
+    window.location.href = 'https://entrydsm.kr/';
   };
 
   if (isUserLoading) {

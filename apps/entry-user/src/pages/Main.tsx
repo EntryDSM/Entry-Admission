@@ -29,7 +29,7 @@ export const Main = () => {
 
         <ContentWrapper>
           <Title>
-            <OrangeText>대덕 소프트웨어 마이스터고등학교</OrangeText>는
+            <OrangeText>대덕소프트웨어마이스터고등학교</OrangeText>는
             <br />
             IT 업계를 선도할 미래 인재를 모집하고 있어요!
           </Title>
