@@ -16,7 +16,6 @@ export const BannerSelector = ({
     { id: 'dormitory', label: '대동여지도' },
     { id: 'jobis', label: 'JOBIS' },
     { id: 'blip', label: 'BLIP' },
-    { id: 'xquare', label: 'XQUARE' },
   ];
 
   return (
