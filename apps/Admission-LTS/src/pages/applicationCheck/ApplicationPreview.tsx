@@ -60,26 +60,29 @@ export const ApplicationPreview = () => {
       receiptCode: "",
       schoolCode: middleSchoolInfo.schoolCode || "",
       userName: applicantInfo.applicantName || "",
-      applicantTel: applicantInfo.applicantNumber || "", // 수정된 필드명
+      applicantTel: guardianInfo.applicantNumber || "",
       birthday: applicantInfo?.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
       schoolRegion: applicationClassification?.regionSelection || "",
       gender: applicantInfo.gender || "",
       schoolName: middleSchoolInfo.schoolName || "",
       educationalStatus: applicationClassification?.graduationType || "",
       address: guardianInfo.address || "",
-      detailAddress: guardianInfo.addressDetail || "", // 수정된 필드명
-      parentName: guardianInfo.guardianName || "", // 수정된 필드명
-      parentRelation: guardianInfo?.relationship?.length ? guardianInfo.relationship.join('') : "", // 수정된 필드명
-      parentTel: guardianInfo?.guardianNumber || "", // 수정된 필드명
+      detailAddress: guardianInfo.addressDetail || "",
+      parentName: guardianInfo.guardianName || "",
+      parentRelation: guardianInfo?.relationship?.length ? guardianInfo.relationship.join('') : "",
+      parentTel: guardianInfo?.guardianNumber || "",
       region: applicationClassification?.regionSelection || "",
       applicationType: applicationClassification?.typeSelection || "",
       applicationRemark: applicantInfo.specialNotes || "",
       imageUrl: applicantInfo.idPhoto || "",
-      absenceDayCount: attendanceVolunteer?.absenceDayCount || activityGraduate?.absenceDayCount || "0",
-      latenessCount: attendanceVolunteer?.latenessCount || activityGraduate?.latenessCount || "0",
-      earlyLeaveCount: attendanceVolunteer?.earlyLeaveCount || activityGraduate?.earlyLeaveCount || "0",
-      lectureAbsenceCount: attendanceVolunteer.lectureAbsenceCount || activityGraduate.lectureAbsenceCount || "0",
-      volunteerTime: attendanceVolunteer?.volunteerTime || activityGraduate?.volunteerTime || "0",
+      
+      // 출결 정보 - activityGraduate에서 가져오기 (필드명 수정)
+      absenceDayCount: activityGraduate?.absence || attendanceVolunteer?.absence || "0",
+      latenessCount: activityGraduate?.tardiness || attendanceVolunteer?.tardiness || "0", 
+      earlyLeaveCount: activityGraduate?.earlyLeave || attendanceVolunteer?.earlyLeave || "0",
+      lectureAbsenceCount: activityGraduate?.classExit || attendanceVolunteer?.classExit || "0", 
+      volunteerTime: activityGraduate?.volunteer || attendanceVolunteer?.volunteer || "0",
+      
       // 3학년 성적 (thirdGraduate에서) - 1학기/2학기 모두 같은 값 사용
       koreanThirdGradeFirstSemester: thirdGraduate.kor || "",
       koreanThirdGradeSecondSemester: thirdGraduate.kor || "",
@@ -113,8 +116,8 @@ export const ApplicationPreview = () => {
       englishSecondGradeSecondSemester: secondGraduate.eng || "",
 
       applicationCase: applicationClassification?.typeSelection || "",
-      hasCompetitionPrize: "",
-      hasCertificate: "",
+      hasCompetitionPrize: activityGraduate?.dsmAlgorithm || attendanceVolunteer?.dsmAlgorithm || "",
+      hasCertificate: activityGraduate?.certificate || attendanceVolunteer?.certificate || "",
       year: applicationClassification?.graduationDate?.[0]?.toString() || "2025",
       month: applicationClassification?.graduationDate?.[1]?.toString() || "3",
       day: applicationClassification?.graduationDate?.[2]?.toString() || "1",
@@ -158,7 +161,6 @@ export const ApplicationPreview = () => {
     processApplication();
   }, [navigate]);
 
-
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
@@ -171,7 +173,6 @@ export const ApplicationPreview = () => {
       setIsDownloading(false);
     }
   };
-
 
   return (
     <Container>
@@ -377,6 +378,7 @@ const ApplicationTitle = styled.div`
   font-size: 24px;
   color: ${colors.extra.realWhite};
 `;
+
 const ApplicationContainer = styled.div`
   width: 100%;
   background-color: ${colors.gray[400]};
@@ -400,7 +402,6 @@ const ApplicationContent = styled.div`
     height: auto;
   }
 `;
-
 
 const ApplicationLoadingContainer = styled.div`
   width: 100%;
@@ -528,4 +529,3 @@ const Value = styled.span`
   border-radius: 4px;
   min-height: 20px;
 `;
-

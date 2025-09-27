@@ -166,13 +166,13 @@ export const SubmitCheck = () => {
           onChange={handleInputChange}
           placeholder='"확인했습니다"라고 작성해 주세요.'
         />
-        <Button
+        {/* <Button
           onClick={handleSubmit}
           disabled={isSubmitting || datas.message !== "확인했습니다"}
           width="300px"
         >
           {isSubmitting ? '제출 중...' : '원서 제출'}
-        </Button>
+        </Button> */}
       </Flex>
     </Flex>
   );
