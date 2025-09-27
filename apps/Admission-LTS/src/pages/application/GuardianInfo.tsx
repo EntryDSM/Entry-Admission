@@ -36,15 +36,15 @@ export const GuardianInfo = () => {
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDatas({ ...datas, postalCode: e.target.value });
+    setDatas({ postalCode: e.target.value });
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDatas({ ...datas, address: e.target.value });
+    setDatas({ address: e.target.value });
   };
 
   const handleDetailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDatas({ ...datas, addressDetail: e.target.value });
+    setDatas({ addressDetail: e.target.value });
   };
 
 
