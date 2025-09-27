@@ -8,7 +8,7 @@ import {
   AwardsSection,
   MouCompaniesSection,
   StatisticsSection,
-  WhyChooseSection,
+  // WhyChooseSection,
   GrowthTogetherSection,
   ConsultationSection,
   EmploymentChartSection,
@@ -166,7 +166,7 @@ export const Landing = () => {
         <MouCompaniesSection />
 
         {/* 대마고와 함께하는 이유 */}
-        <WhyChooseSection />
+        {/* <WhyChooseSection /> */}
 
         {/* 성장할 수 있도록 우리가 도와드려요 */}
         <GrowthTogetherSection backgroundImage={GrowToImg} />
