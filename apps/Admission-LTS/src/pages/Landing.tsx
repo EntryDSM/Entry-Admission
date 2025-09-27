@@ -112,7 +112,7 @@ export const Landing = () => {
         >
           <EntryLogo width={65} height={75} />
           <Text textAlign="center" width="450px" fontSize={32} fontWeight={700}>
-            대덕소프트웨어 마이스터고등학교 입학 원서 접수
+            대덕소프트웨어마이스터고등학교 입학 원서 접수
           </Text>
         </Flex>
         <Flex
