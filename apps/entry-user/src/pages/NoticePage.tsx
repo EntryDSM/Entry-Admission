@@ -1,24 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { NoticePinIcon, TabSection } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
+import { useGetAllNotice } from '../apis';
 
 interface NoticeItem {
   id: number;
   title: string;
-  date: string;
-  isNew: boolean;
+  createdAt: string;
+  isPinned: boolean;
+  type: 'GUIDE' | 'NOTICE'
 }
 
 const TAB_OPTIONS = [
-  { key: 'admission', label: '입학 공지사항' },
-  { key: 'orientation', label: '예비 신입생 안내' },
+  { key: 'NOTICE', label: '입학 공지사항' },
+  { key: 'GUIDE', label: '예비 신입생 안내' },
 ];
 
 export const NoticePage = () => {
-  const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>(
-    'admission'
+  const [activeTab, setActiveTab] = useState<'NOTICE' | 'GUIDE'>(
+    'NOTICE'
   );
   const navigate = useNavigate();
 
@@ -27,21 +29,26 @@ export const NoticePage = () => {
   };
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab as 'admission' | 'orientation');
+    setActiveTab(tab as 'NOTICE' | 'GUIDE');
   };
 
-  const noticeItems: NoticeItem[] = [
-    { id: 1, title: '안녕하세요', date: '2024-10-31', isNew: true },
-    { id: 2, title: '안녕하세요', date: '2024-10-31', isNew: true },
-    { id: 3, title: '안녕하세요', date: '2024-10-31', isNew: true },
-    { id: 4, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 5, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 6, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 7, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 8, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 9, title: '안녕하세요', date: '2024-10-31', isNew: false },
-    { id: 10, title: '안녕하세요', date: '2024-10-31', isNew: false },
-  ];
+  const {data, isLoading} = useGetAllNotice(activeTab);
+  const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
+
+  const formatDate = (dateString: string) => {
+    return dateString.split('T')[0]; 
+  };
+
+  useEffect(() => {
+    if (data && Array.isArray(data?.notices)) {
+    const formattedNotices = data.notices.map(notice => ({
+      ...notice,
+      createdAt: formatDate(notice.createdAt)
+    }));
+    setNoticeItems(formattedNotices);
+  }
+  }, [data]);
+
 
   return (
     <PageContainer>
@@ -66,23 +73,30 @@ export const NoticePage = () => {
             </TableHeader>
 
             <TableBody>
-              {noticeItems.map((item) => (
-                <TableRow
-                  key={item.id}
-                  onClick={() => handleNoticeClick(item.id)}
-                >
-                  <ColumnNum>{item.id}</ColumnNum>
-                  <ColumnTitle>
-                    {item.isNew && (
-                      <NewIconWrapper>
-                        <NoticePinIcon />
-                      </NewIconWrapper>
-                    )}
-                    {item.title}
-                  </ColumnTitle>
-                  <ColumnDate>{item.date}</ColumnDate>
-                </TableRow>
-              ))}
+              {isLoading ? (
+                <LoadingRow>로딩 중...</LoadingRow>
+              ) : noticeItems.length > 0 ? (
+                noticeItems.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    onClick={() => handleNoticeClick(item.id)}
+                  >
+                    {/* <ColumnNum>{item.id}</ColumnNum> */}
+                    <ColumnNum>공지</ColumnNum>
+                    <ColumnTitle>
+                      {item.isPinned && (
+                        <NewIconWrapper>
+                          <NoticePinIcon />
+                        </NewIconWrapper>
+                      )}
+                      {item.title}
+                    </ColumnTitle>
+                    <ColumnDate>{item.createdAt}</ColumnDate>
+                  </TableRow>
+                ))
+              ) : (
+                <NoDataRow>공지사항이 없습니다.</NoDataRow>
+              )}
             </TableBody>
           </TableContainer>
         </Flex>
@@ -145,6 +159,7 @@ const TableBody = styled.div`
 
 const TableRow = styled.div`
   display: flex;
+  align-items: center;
   padding: 16px 0;
   border-bottom: 1px solid ${colors.gray[200]};
   cursor: pointer;
@@ -153,6 +168,18 @@ const TableRow = styled.div`
   &:hover {
     background-color: ${colors.gray[50]};
   }
+`;
+
+const LoadingRow = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  color: ${colors.gray[400]};
+`;
+
+const NoDataRow = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  color: ${colors.gray[400]};
 `;
 
 const ColumnNum = styled.div`
