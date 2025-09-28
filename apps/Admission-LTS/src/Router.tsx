@@ -130,15 +130,15 @@ export const Router = createBrowserRouter([
                 path: 'personal-statements',
                 element: <PersonalStatements />,
               },
+              {
+                path: 'submit-check',
+                element: <SubmitCheck />,
+              },
+              {
+                path: 'application-preview',
+                element: <ApplicationPreview />,
+              },
             ],
-          },
-          {
-            path: 'submit-check',
-            element: <SubmitCheck />,
-          },
-          {
-            path: 'application-preview',
-            element: <ApplicationPreview />,
           },
         ],
       },

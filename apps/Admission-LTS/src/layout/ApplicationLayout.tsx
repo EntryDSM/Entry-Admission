@@ -90,6 +90,8 @@ export const ApplicationLayout = () => {
       setTitle('자기소개서 & 학업계획서');
     } else if(pathname.includes('application-classification')) {
       setTitle('지원자 전형 구분');
+    } else if(pathname.includes('submit-check') || pathname.includes('application-preview') ) {
+      setTitle('');
     } else {
       setTitle('성적 기입')
     }

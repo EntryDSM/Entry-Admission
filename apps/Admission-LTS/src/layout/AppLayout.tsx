@@ -56,8 +56,10 @@ export const AppLayout = () => {
     return canProceedToNext(state, currentRoute);
   };
 
+  const shouldRemoveTopPadding = currentPath.includes('/application-preview') || currentPath.includes('/submit-check');
+
   return (
-    <Main>
+    <Main $removeTopPadding={shouldRemoveTopPadding}>
       <Outlet />
       <ApplicationNav
         totalPages={routes.length}
@@ -65,15 +67,14 @@ export const AppLayout = () => {
         setCurrentPage={setCurrentPage}
         graduationType={graduationType}
         validateCurrentPage={validateCurrentPage}
-        toast={(msg) => toast.error(msg)}
       />
     </Main>
   );
 };
 
-const Main = styled.div`
+const Main = styled.div<{ $removeTopPadding?: boolean }>`
   width: 100vw;
-  padding: 40px 160px;
+  padding: ${props => props.$removeTopPadding ? '0 160px 40px' : '40px 160px'};
   min-height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
