@@ -13,7 +13,7 @@ interface IApplicationClassificationType {
 }
 
 interface IApplicantInfoType {
-  idPhoto: string | null;
+  idPhoto: File | null;
   applicantName: string;
   dateOfBirth: (string | number)[];
   specialNotes: string;
