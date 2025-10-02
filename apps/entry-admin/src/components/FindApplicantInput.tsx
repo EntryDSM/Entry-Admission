@@ -1,12 +1,30 @@
 import styled from '@emotion/styled';
 import { search } from '../assets';
 import { colors } from '@entry/design-token';
+import { useState } from 'react';
 
-export const FindApplicantInput = () => {
+interface IFindApplicantInputType {
+  onSearch: (keyword: string) => void;
+}
+
+export const FindApplicantInput = ({ onSearch }: IFindApplicantInputType) => {
+  const [keyword, setKeyword] = useState<string>('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setKeyword(value);
+    onSearch(value);
+  };
+
   return (
     <InputContainer>
       <img src={search} alt="" />
-      <input type="text" placeholder="지원자 검색" />
+      <input
+        type="text"
+        value={keyword}
+        onChange={handleChange}
+        placeholder="지원자 검색"
+      />
     </InputContainer>
   );
 };
