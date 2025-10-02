@@ -48,7 +48,6 @@ let isUserRefreshingToken = false;
 let isAdminRefreshingToken = false;
 
 const userRequestInterceptor = (config: InternalAxiosRequestConfig) => {
-  console.log("asd;fkljasd;k")
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
@@ -104,7 +103,7 @@ const userResponseInterceptor = async (error: AxiosError) => {
   if (response?.status === 403 && isUserRefreshingToken) {
     removeAccessToken();
     removeRefreshToken();
-    window.location.href = '/logout';
+    window.location.href = 'https://www.entrydsm.hs.kr/';
     return Promise.reject(error);
   }
 
@@ -152,7 +151,7 @@ const userResponseInterceptor = async (error: AxiosError) => {
       isUserRefreshingToken = false;
       removeAccessToken();
       removeRefreshToken();
-      window.location.href = '/logout';
+      window.location.href = 'https://www.entrydsm.hs.kr/';
     }
   }
 
@@ -170,7 +169,7 @@ const adminResponseInterceptor = async (error: AxiosError) => {
   if (response?.status === 403 && isAdminRefreshingToken) {
     removeAdminAccessToken();
     removeAdminRefreshToken();
-    window.location.href = '/logout';
+    window.location.href = 'https://www.entrydsm.hs.kr/';
     return Promise.reject(error);
   }
 
@@ -225,7 +224,7 @@ const adminResponseInterceptor = async (error: AxiosError) => {
       isAdminRefreshingToken = false;
       removeAdminAccessToken();
       removeAdminRefreshToken();
-      window.location.href = '/logout';
+      window.location.href = 'https://www.entrydsm.hs.kr/';
     }
   }
 
