@@ -51,6 +51,13 @@ export const ApplicantInfo = () => {
     },
   ];
 
+  const handleInputChange = (key: string) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setDatas({ ...datas, [key]: value });
+  };
+
   const handleNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -71,7 +78,7 @@ export const ApplicantInfo = () => {
   const handleImgChange = async (file: File | null) => {
     if (file) {
       postIdPhotoApi.mutate({file : file}, {
-        onSuccess: (responseData) => {
+        onSuccess: () => {
           setDatas({ ...datas, idPhoto: file });
         }
       })
@@ -98,6 +105,15 @@ export const ApplicantInfo = () => {
         inputType="text"
         onInputChange={handleNameChange}
         value={datas.applicantName}
+      />
+      <FormElement
+        width="300px"
+        type="input"
+        label="지원자 연락처"
+        inputType="phone"
+        placeholder="전화번호를 입력해주세요."
+        onInputChange={handleInputChange("applicantNumber")}
+        value={datas.applicantNumber}
       />
       <FormElement
         label={formRadioData[1].name}
