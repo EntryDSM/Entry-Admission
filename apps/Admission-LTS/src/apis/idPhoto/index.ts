@@ -12,7 +12,7 @@ export const usePostIdPhoto = () => {
       formData.append("image", data.file);
       const response = await AdmissionUserInstance.post(`${path}`, formData, {
         headers: {
-          'Content-Type': undefined,
+          "Content-Type": "multipart/form-data",
         },
       });
       return response;

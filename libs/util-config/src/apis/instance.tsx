@@ -19,7 +19,7 @@ import { Cookies } from 'react-cookie';
 export const AdmissionUserInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
+  // headers: { 'Content-Type': 'application/json' },
 });
 
 export const AdmissionAdminInstance = axios.create({
@@ -114,8 +114,8 @@ const userResponseInterceptor = async (error: AxiosError) => {
     try {
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
       if (userRefreshToken) {
-        const refreshResponse = await AdmissionUserInstance.put(
-          '/user/auth',
+        const refreshResponse = await axios.put(
+          `${import.meta.env.VITE_BASE_URL}/user/auth`,
           {},
           { headers: { 'X-Refresh-Token': userRefreshToken } }
         );
