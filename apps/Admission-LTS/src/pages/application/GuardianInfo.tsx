@@ -62,15 +62,6 @@ export const GuardianInfo = () => {
       <FormElement
         width="300px"
         type="input"
-        label="지원자 연락처"
-        inputType="phone"
-        placeholder="전화번호를 입력해주세요."
-        onInputChange={handleInputChange("applicantNumber")}
-        value={datas.applicantNumber}
-      />
-      <FormElement
-        width="300px"
-        type="input"
         label="보호자 연락처"
         inputType="phone"
         placeholder="전화번호를 입력해주세요."

@@ -14,6 +14,7 @@ interface IApplicationClassificationType {
 
 interface IApplicantInfoType {
   idPhoto: File | null;
+  applicantNumber: string;
   applicantName: string;
   dateOfBirth: (string | number)[];
   specialNotes: string;
@@ -22,7 +23,6 @@ interface IApplicantInfoType {
 
 interface IGuardianInfoType {
   guardianName: string;
-  applicantNumber: string;
   guardianNumber: string;
   gender: string;
   relationship: string[];
@@ -117,6 +117,7 @@ const initialState: ApplicationState = {
   },
   applicantInfo: {
     idPhoto: null,
+    applicantNumber: '',
     applicantName: '',
     dateOfBirth: [],
     specialNotes: '',
@@ -124,7 +125,6 @@ const initialState: ApplicationState = {
   },
   guardianInfo: {
     guardianName: '',
-    applicantNumber: '',
     guardianNumber: '',
     gender: '',
     relationship: [],

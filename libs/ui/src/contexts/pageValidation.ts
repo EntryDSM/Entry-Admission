@@ -31,8 +31,8 @@ const validateApplicationClassificationPage = (data: any) => {
 // 페이지별 필수 필드 검증
 const pageValidations: Record<string, (data: any) => string[]> = {
   '/application-classification': validateApplicationClassificationPage,
-  '/applicant-info': d => ['idPhoto','applicantName','dateOfBirth','gender'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/guardian-info': d => ['guardianName','applicantNumber','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/applicant-info': d => ['idPhoto','applicantName', 'applicantNumber','dateOfBirth','gender'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/guardian-info': d => ['guardianName','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
   '/middle-school-info': d => ['schoolName', 'studentId', 'schoolPhone','teacherName'].filter(f => isEmpty(getFieldValue(d,f))),
   '/personal-statements': d => ['personalStmt','studyPlan'].filter(f => isEmpty(getFieldValue(d,f))),
   '/first-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
