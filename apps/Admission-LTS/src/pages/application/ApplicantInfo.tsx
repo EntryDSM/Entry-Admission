@@ -77,11 +77,12 @@ export const ApplicantInfo = () => {
 
   const handleImgChange = async (file: File | null) => {
     if (file) {
-      postIdPhotoApi.mutate({file : file}, {
-        onSuccess: () => {
-          setDatas({ ...datas, idPhoto: file });
-        }
-      })
+      // postIdPhotoApi.mutate({file : file}, {
+      //   onSuccess: () => {
+      //     setDatas({ ...datas, idPhoto: file });
+      //   }
+      // })
+      setDatas({ ...datas, idPhoto: file });
     }
   };
   
