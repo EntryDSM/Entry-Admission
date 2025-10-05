@@ -5,6 +5,8 @@ import { useApplicationData, useCheckPageData, usePageData, PreviousButton, prev
 import { useEffect, useState, useRef } from 'react';
 import { BeatLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
+import { useAdmissionSubmitPost } from '../apis';
+import { convertGradeToScore } from '../hooks';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -106,19 +108,6 @@ export const ApplicationNav = ({
       const validation = validateCurrentPage(currentPage);
       if (!validation.canProceed) return toast.error(validation.message || '필수 항목을 모두 입력해주세요.');
     }
-
-    const currentPath = location.pathname;
-    if (currentPath.includes('/activity-graduate')) {
-      // 성적 검증 api 호출
-      // toast.success('sddd')
-    } else if (currentPath.includes('/activity-prospective-graduate')) {
-      // 성적 검증 api 호출
-      // toast.success('sddd')
-    } else if (currentPath.includes('/ged/attendance-volunteer')) {
-      // 성적 검증 api 호출
-      // toast.success('sddd')
-    }
-
     await saveBeforeNavigation();
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
@@ -138,16 +127,271 @@ export const ApplicationNav = ({
     setCurrentPage(targetPage);
   };
 
+  const formatDate = (arr: (number|string)[]) => {
+    const [year, month = 0, day = 0] = arr;
+
+    const y = String(year).padStart(4, "0");
+    const m = String(month).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
+
+    return `${y}-${m}-${d}`;
+  }
+
+  const typeSelectionFormat = (type: string): "COMMON" | "MEISTER" | "SOCIAL" | null => {
+    const map: Record<string, "COMMON" | "MEISTER" | "SOCIAL"> = {
+      "일반": "COMMON",
+      "마이스터 인재": "MEISTER",
+      "사회통합 인재": "SOCIAL",
+    };
+
+    return map[type] ?? null;
+  };
+
+  const graduationTypeFormat = (
+    status: string
+  ): "PROSPECTIVE_GRADUATE" | "GRADUATE" | "QUALIFICATION_EXAM" | null => {
+    const map: Record<string, "PROSPECTIVE_GRADUATE" | "GRADUATE" | "QUALIFICATION_EXAM"> = {
+      "졸업 예정": "PROSPECTIVE_GRADUATE",
+      "졸업": "GRADUATE",
+      "검정고시 (중학교 졸업 학력)": "QUALIFICATION_EXAM",
+    };
+
+    return map[status] ?? null;
+  };
+
+  
+  const submitApi = useAdmissionSubmitPost()
   const handleSubmit = async () => {
     if (!state) return;
-    try {
-      setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 4000)); //예시 api -> 연동 시 삭제
-      await performSave(state, saveToStorage, true);
-      navigate('/submitted');
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true)
+    submitApi.mutate({
+      applicantName: state.applicantInfo.applicantName,
+      applicantTel: state.applicantInfo.applicantNumber,
+      applicationType: typeSelectionFormat(state.applicationClassification.typeSelection),//포맷
+      educationalStatus: graduationTypeFormat(state.applicationClassification.graduationType),//포맷
+      birthDate: formatDate(state.applicantInfo.dateOfBirth),//date 포맷 (배열 -> YYYY-MM-DD)
+      applicantGender: state.applicantInfo.gender,
+      streetAddress: state.guardianInfo.address,
+      postalCode: state.guardianInfo.postalCode,
+      detailAddress: state.guardianInfo.addressDetail,
+      isDaejeon: state.applicationClassification.regionSelection === "대전" ? true : false,
+      parentName: state.guardianInfo.guardianName,
+      parentTel: state.guardianInfo.guardianNumber,
+      parentRelation: state.guardianInfo.relationship[0], //배열이니까 0번째 값을 넣어야함
+      guardianGender: state.guardianInfo.gender,
+      schoolCode: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolCode,
+      schoolName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolName,
+      studentId: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.studentId,
+      schoolPhone: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolPhone,
+      teacherName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.teacherName,
+      nationalMeritChild: state.applicantInfo.specialNotes === "국가 유공자" ? true : false,
+      specialAdmissionTarget: state.applicantInfo.specialNotes === "특례 입학 대상" ? true : false,
+      graduationDate: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : formatDate(state.applicationClassification.graduationDate),//날짜 포맷
+      studyPlan: state.personalStatements.studyPlan,
+      selfIntroduce: state.personalStatements.personalStmt,
+
+      //성적
+      korean_3_1:
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.kor)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.kor)
+            : null,
+      social_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.soc)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.soc)
+            : null,
+      history_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.his)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.his)
+            : null,
+      math_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.math)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.math)
+            : null,
+      science_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.sci)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.sci)
+            : null,
+      tech_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.tech)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.tech)
+            : null,
+      english_3_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.firstGraduateProspective.eng)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.secondGraduate.eng)
+            : null,
+      korean_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.kor) : null,
+      social_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.soc) : null,
+      history_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.his) : null,
+      math_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.math) : null,
+      science_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.sci) : null,
+      tech_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.tech) : null,
+      english_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.eng) : null,
+      korean_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.kor)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.kor)
+            : null,
+      social_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.soc)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.soc)
+            : null,
+      history_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.his)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.his)
+            : null,
+      math_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.math)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.math)
+            : null,
+      science_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.sci)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.sci)
+            : null,
+      tech_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.tech)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.tech)
+            : null,
+      english_2_2: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.secondGraduateProspective.eng)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.thirdGraduate.eng)
+            : null,
+      korean_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.kor)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.kor)
+            : null,
+      social_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.soc)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.soc)
+            : null,
+      history_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.his)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.his)
+            : null,
+      math_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.math)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.math)
+            : null,
+      science_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.sci)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.sci)
+            : null,
+      tech_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.tech)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.tech)
+            : null,
+      english_2_1: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? convertGradeToScore(state.thirdGraduateProspective.eng)
+          : state.applicationClassification.graduationType === "졸업"
+            ? convertGradeToScore(state.fourthGraduate.eng)
+            : null,
+      gedKorean: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.kor) : null,
+      gedSocial: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.soc) : null,
+      gedHistory: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.his) : null,
+      gedMath: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.math) : null,
+      gedScience: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.sci) : null,
+      gedTech: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.tech) : null,
+      gedEnglish: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.eng) : null,
+      //출결
+      absence: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.absence)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.absence)
+            : null,
+      tardiness: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.tardiness)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.tardiness)
+            : null,
+      earlyLeave: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.earlyLeave)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.earlyLeave)
+            : null,
+      classExit: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.classExit)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.classExit)
+            : null,
+      unexcused: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.unexcused)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.unexcused)
+            : null,
+      volunteer: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? Number(state.activityGraduateProspective.volunteer)
+          : state.applicationClassification.graduationType === "졸업"
+            ? Number(state.activityGraduate.volunteer)
+            : null,
+      algorithmAward: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? state.activityGraduateProspective.dsmAlgorithm === "O" ? true : false
+          : state.applicationClassification.graduationType === "졸업"
+            ? state.activityGraduate.dsmAlgorithm === "O" ? true : false
+            : state.attendanceVolunteer.dsmAlgorithm === "O" ? true : false,
+      infoProcessingCert: 
+        state.applicationClassification.graduationType === "졸업 예정"
+          ? state.activityGraduateProspective.certificate === "O" ? true : false
+          : state.applicationClassification.graduationType === "졸업"
+            ? state.activityGraduate.certificate === "O" ? true : false
+            : state.attendanceVolunteer.certificate === "O" ? true : false,
+    }, {
+      onSuccess: () => {
+        setIsLoading(false);
+        navigate('/submitted');
+      }
+    })
+    // try {
+    //   setIsLoading(true);
+    //   await new Promise(resolve => setTimeout(resolve, 4000)); //예시 api -> 연동 시 삭제
+    //   await performSave(state, saveToStorage, true);
+    // } finally {
+    // }
   };
 
   const isGraduationTypeSelected = Boolean(graduationType && graduationType.trim());

@@ -71,14 +71,14 @@ interface IScoreType {
 }
 
 interface IActivityType {
-  earlyLeave: string; //조퇴
-  tardiness: string; //지각
-  classExit: string; //결과
-  absence: string; //결석
+  earlyLeave: number | null; //조퇴
+  tardiness: number | null; //지각
+  classExit: number | null; //결과
+  absence: number | null; //결석
   dsmAlgorithm: 'O' | 'X' | null;
   certificate: 'O' | 'X' | null;
-  volunteer: string; //봉사시간
-  unexcused: string; //미인정
+  volunteer: number | null; //봉사시간
+  unexcused: number | null; //미인정
 }
 
 export interface ApplicationState {
@@ -193,14 +193,14 @@ const initialState: ApplicationState = {
     eng: null, //영어
   },
   activityGraduate: {
-    earlyLeave: '', //조퇴
-    tardiness: '', //지각
-    classExit: '', //결과
-    absence: '', //결석
+    earlyLeave: null, //조퇴
+    tardiness:  null, //지각
+    classExit:  null, //결과
+    absence:  null, //결석
     dsmAlgorithm: null,
     certificate: null,
-    volunteer: '', //봉사시간
-    unexcused: '', //미인정
+    volunteer:  null, //봉사시간
+    unexcused:  null, //미인정
   },
   firstGraduateProspective: {
     kor: null, // 국어
@@ -230,14 +230,14 @@ const initialState: ApplicationState = {
     eng: null, //영어
   },
   activityGraduateProspective: {
-    earlyLeave: '', //조퇴
-    tardiness: '', //지각
-    classExit: '', //결과
-    absence: '', //결석
+    earlyLeave: null, //조퇴
+    tardiness: null, //지각
+    classExit: null, //결과
+    absence: null, //결석
     dsmAlgorithm: null,
     certificate: null,
-    volunteer: '', //봉사시간
-    unexcused: '', //미인정
+    volunteer: null, //봉사시간
+    unexcused: null, //미인정
   },
 };
 
