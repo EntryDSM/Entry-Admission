@@ -1,5 +1,5 @@
-export const convertGradeToScore = (grade: string): number => {
-  const upperGrade = grade.toUpperCase();
+export const convertGradeToScore = (grade: string | null): number => {
+  const upperGrade = grade?.toUpperCase();
   
   switch (upperGrade) {
     case 'A':

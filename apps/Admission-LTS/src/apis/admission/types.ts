@@ -1,181 +1,69 @@
-interface IProspectiveGraduateRequest {
-  application: {
-    applicationType: string,//"GENERAL"
-    educationalStatus: string,//"GRADUATE_EXPECTED"
-    region: string,//"DAEJEON"
-    typeSelection: string,
-    regionSelection: string,
-    graduationType: string,
-    graduationDate: string,
-    idPhoto: string,
-    applicantName: string,
-    applicantGender: string,
-    dateOfBirth: string,
-    specialNotes: string,
-    guardianName: string,
-    applicantNumber: string,
-    guardianNumber: string,
-    guardianGender: string,
-    relationship: string,
-    address: string,
-    addressDetail: string,
-    postalCode: string,
-    schoolName: string,
-    studentId: string,
-    schoolPhone: string,
-    teacherName: string,
-    schoolCode: string, //api 상 안 추가되어 있음 현재는
-    personalStmt: string,
-    studyPlan: string,
-  },
-  scores : {
-    grade3_1: {
-      korean_3_1: number;
-      social_3_1: number;
-      history_3_1: number;
-      science_3_1: number;
-      tech_3_1: number;
-      math_3_1: number;
-      english_3_1: number;
-    },
-    grade2_2: {
-      korean_2_2: number;
-      social_2_2: number;
-      history_2_2: number;
-      science_2_2: number;
-      tech_2_2: number;
-      math_2_2: number;
-      english_2_2: number;
-    },
-    grade2_1: {
-      korean_2_1: number;
-      social_2_1: number;
-      history_2_1: number;
-      science_2_1: number;
-      tech_2_1: number;
-      math_2_1: number;
-      english_2_1: number;
-    },
-    attendanceService: {
-      absence: number; //결석
-      tardiness: number; //지각
-      earlyLeave: number; //조퇴
-      classExit: number; //결과
-      volunteer: number; //봉사시간
-      algorithmAward: boolean;
-      certificate: boolean;
-      unexcused: number; //미인정
-    }
-  }
+export interface IAdmissionRequest {
+  applicantName: string, //applicant-info, 지원자 성명
+  applicantTel: string, //applicant-info, 지원자 연락처
+  applicationType: string | null, //application-classification, 전형 선택 
+  educationalStatus: string | null, //application-classification, 졸업 구분
+  birthDate: string, //applicant-info, 생년월일
+  applicantGender: string, //applicant-info, 지원자 성별
+  streetAddress: string, //guardian-info, 기본주소
+  postalCode: string, //guardian-info, 우편번호
+  detailAddress: string, //guardian-info, 상세주소
+  isDaejeon: boolean, //application-classification, 지역 선택
+  parentName: string, //guardian-info, 보호자 성명
+  parentTel: string, //guardian-info, 보호자 연락처
+  parentRelation: string, //guardian-info, 지원자와의 관계
+  guardianGender: string, //guardian-info, 성별
+  schoolCode: string | null, //middle-school-info, 학교 코드
+  schoolName: string | null, //middle-school-info, 학교 이름
+  studentId: number | null, //middle-school-info, 중학교 학번
+  schoolPhone: string | null, //middle-school-info, 중학교 전화번호 
+  teacherName: string | null, //middle-school-info, 중학교 교사 성명
+  nationalMeritChild: boolean, //applicant-info, 국가 유공자 체크
+  specialAdmissionTarget: boolean, //applicant-info, 특례입학 대상
+  graduationDate: string | null, //application-classification, 졸업 예정 연월
+  studyPlan: string, //personal-statements, 학업계획서
+  selfIntroduce: string, //personal-statements, 자기소개
+  korean_3_1: number | null,
+  social_3_1: number | null,
+  history_3_1: number | null,
+  math_3_1: number | null,
+  science_3_1: number | null,
+  tech_3_1: number | null,
+  english_3_1: number | null,
+  korean_3_2: number | null,
+  social_3_2: number | null,
+  history_3_2: number | null,
+  math_3_2: number | null,
+  science_3_2: number | null,
+  tech_3_2: number | null,
+  english_3_2: number | null,
+  korean_2_2: number | null,
+  social_2_2: number | null,
+  history_2_2: number | null,
+  math_2_2: number | null,
+  science_2_2: number | null,
+  tech_2_2: number | null,
+  english_2_2: number | null,
+  korean_2_1: number | null,
+  social_2_1: number | null,
+  history_2_1: number | null,
+  math_2_1: number | null,
+  science_2_1: number | null,
+  tech_2_1: number | null,
+  english_2_1: number | null,
+  gedKorean: number | null,
+  gedSocial: number | null,
+  gedHistory: number | null,
+  gedMath: number | null,
+  gedScience: number | null,
+  gedTech: number | null,
+  gedEnglish: number | null,
+  absence: number | null, //결석
+  tardiness: number | null, //지각
+  earlyLeave: number | null, //조퇴
+  classExit: number | null, //결과
+  unexcused: number | null, //미인정
+  volunteer: number | null, //봉사
+  algorithmAward: boolean,
+  infoProcessingCert: boolean
 }
-
-
-interface IGraduateRequest {
-  userId: string;
-  typeSelection: string,
-  regionSelection: string,
-  graduationType: string,
-  graduationDate: string,
-  idPhoto: string,
-  applicantName: string,
-  dateOfBirth: string,
-  specialNotes: string,
-  applicantGender: string,
-  guardianName: string,
-  applicantNumber: string,
-  guardianNumber: string,
-  guardianGender: string,
-  relationship: string,
-  postalCode: string,
-  address: string,
-  addressDetail: string,
-  schoolName: string,
-  schoolCode: string,
-  studentId: string,
-  schoolPhone: string,
-  teacherName: string,
-  personalStmt: string,
-  studyPlan: string,
-  scores: {
-    kor3_2: number;
-    soc3_2: number;
-    his3_2: number;
-    sci3_2: number;
-    tech3_2: number;
-    math3_2: number;
-    eng3_2: number;
-
-    kor3_1: number;
-    soc3_1: number;
-    his3_1: number;
-    sci3_1: number;
-    tech3_1: number;
-    math3_1: number;
-    eng3_1: number;
-    
-    kor2_2: number;
-    soc2_2: number;
-    his2_2: number;
-    sci2_2: number;
-    tech2_2: number;
-    math2_2: number;
-    eng2_2: number;
-
-    kor2_1: number;
-    soc2_1: number;
-    his2_1: number;
-    sci2_1: number;
-    tech2_1: number;
-    math2_1: number;
-    eng2_1: number;
-
-    earlyLeave: number; //조퇴
-    tardiness: number; //지각
-    classExit: number; //결과
-    absence: number; //결석
-    dsmAlgorithm: 'O' | 'X'; //점수로 계산할 시 수정
-    certificate: 'O' | 'X';
-    volunteer: number; //봉사시간
-    unexcused: number; //미인정
-  };
-}
-
-
-
-interface IGedRequest {
-  userId: string;
-  typeSelection: string,
-  regionSelection: string,
-  graduationType: string,
-  graduationDate: string,
-  idPhoto: string,
-  applicantName: string,
-  dateOfBirth: string,
-  specialNotes: string,
-  applicantGender: string,
-  guardianName: string,
-  applicantNumber: string,
-  guardianNumber: string,
-  guardianGender: string,
-  relationship: string,
-  postalCode: string,
-  address: string,
-  addressDetail: string,
-  personalStmt: string,
-  studyPlan: string,
-  scores: {
-    gedKor: number;
-    gedSoc: number;
-    gedHis: number;
-    gedSci: number;
-    gedTech: number;
-    gedMath: number;
-    gedEng: number;
-  
-    dsmAlgorithm: 'O' | 'X'; //점수로 계산할 시 수정
-    certificate: 'O' | 'X';
-  };
-}
-
-
-export type IAdmissionRequest = IProspectiveGraduateRequest | IGraduateRequest | IGedRequest;
