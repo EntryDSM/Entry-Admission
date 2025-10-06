@@ -1,19 +1,22 @@
 import styled from '@emotion/styled';
-import { colors } from '@entry/design-token';
+import { colors, Flex } from '@entry/design-token';
 import { DownloadIcon } from '@entry/ui';
 import ADMISSION_OVERVIEW from '../assets/ADMISSION_OVERVIEW.svg';
 
 export const AdmissionOverviewPage = () => {
   return (
     <PageContainer>
-      <Title>신입생 전형 요강</Title>
-      <SubTitle>2025학년도 신입생 전형 일정</SubTitle>
-      <TableContainer>
-        <TableImage
-          src={ADMISSION_OVERVIEW}
-          alt="2025학년도 신입생 전형 일정표"
-        />
-      </TableContainer>
+      <Flex width='100%' height='fit-content' isColumn gap={32}>
+        <Flex width='fit-content' height='fit-content' isColumn gap={12}>
+          <Title>신입생 전형 요강</Title>
+          <SubTitle>2025학년도 신입생 전형 일정</SubTitle>
+        </Flex>
+        <TableContainer>
+          <TableImage
+            src={ADMISSION_OVERVIEW}
+            alt="2025학년도 신입생 전형 일정표"
+          />
+        </TableContainer>
       <AttachmentSection>
         <AttachmentTable>
           <AttachmentRow>
@@ -27,16 +30,15 @@ export const AdmissionOverviewPage = () => {
           </AttachmentRow>
         </AttachmentTable>
       </AttachmentSection>
+      </Flex>
     </PageContainer>
   );
 };
 
 const PageContainer = styled.div`
   width: 100%;
-  min-height: calc(100vh + 200px);
   background-color: white;
-  position: relative;
-  padding-bottom: 150px;
+  padding: 70px 100px;
 `;
 
 const Title = styled.h1`
@@ -44,39 +46,24 @@ const Title = styled.h1`
   font-weight: 700;
   margin: 0;
   color: inherit;
-  position: absolute;
-  top: 44px;
-  left: 190px;
 `;
 
 const SubTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
   color: ${colors.orange[800]};
-  margin: 0;
-  position: absolute;
-  top: 221px;
-  left: calc(50% - 521.5px);
 `;
 
 const TableContainer = styled.div`
-  position: absolute;
-  top: 261px;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
 `;
 
 const TableImage = styled.img`
-  width: 1043px;
-  height: 370px;
+  width: 100%;
 `;
 
 const AttachmentSection = styled.div`
-  position: absolute;
-  top: 671px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1043px;
+  width: 100%;
 `;
 
 const AttachmentTable = styled.div`
