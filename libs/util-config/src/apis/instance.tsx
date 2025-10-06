@@ -73,6 +73,7 @@ const handleUserTokenRefresh = () => {
       setRefreshToken(data.refreshToken);
       resolve(data.accessToken);
     } catch (err) {
+      console.error('[USER_TOKEN_REFRESH] Failed:', err);
       removeAccessToken();
       removeRefreshToken();
       window.location.href = 'https://auth.entrydsm.kr';
@@ -120,6 +121,7 @@ const handleAdminTokenRefresh = () => {
       setAdminRefreshToken(data.refreshToken);
       resolve(data.accessToken);
     } catch (err) {
+      console.error('[ADMIN_TOKEN_REFRESH] Failed:', err);
       removeAdminAccessToken();
       removeAdminRefreshToken();
       window.location.href = 'https://auth.entrydsm.kr';
@@ -141,17 +143,28 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   const baseUrl = url.split('?')[0];
   const endpoint = `${method} ${baseUrl}`;
 
+  console.log('[USER_REQUEST_INTERCEPTOR] URL:', url);
+  console.log('[USER_REQUEST_INTERCEPTOR] Method:', method);
+  console.log('[USER_REQUEST_INTERCEPTOR] Base URL:', baseUrl);
+  console.log('[USER_REQUEST_INTERCEPTOR] Endpoint:', endpoint);
+  console.log('[USER_REQUEST_INTERCEPTOR] Skip auth URLs:', skipAuthUrls);
+  console.log('[USER_REQUEST_INTERCEPTOR] Should skip auth:', skipAuthUrls.includes(endpoint));
+
   if (skipAuthUrls.includes(endpoint)) {
+    console.log('[USER_REQUEST_INTERCEPTOR] Skipping authentication for:', endpoint);
     return config;
   }
 
+  console.log('[USER_REQUEST_INTERCEPTOR] Proceeding with authentication for:', endpoint);
   let token = getAccessToken() || cookies.get('accessToken');
 
   if (!token) {
+    console.log('[USER_REQUEST_INTERCEPTOR] No token found, attempting refresh');
     try {
       token = await handleUserTokenRefresh();
+      console.log('[USER_REQUEST_INTERCEPTOR] Token refresh successful');
     } catch (error) {
-      console.error('Token refresh failed in request interceptor', error);
+      console.error('[USER_REQUEST_INTERCEPTOR] Token refresh failed:', error);
       return Promise.reject(new axios.Cancel('Token refresh failed'));
     }
   }
@@ -169,17 +182,28 @@ const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   const baseUrl = url.split('?')[0];
   const endpoint = `${method} ${baseUrl}`;
 
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] URL:', url);
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Method:', method);
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Base URL:', baseUrl);
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Endpoint:', endpoint);
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Skip auth URLs:', skipAuthUrls);
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Should skip auth:', skipAuthUrls.includes(endpoint));
+
   if (skipAuthUrls.includes(endpoint)) {
+    console.log('[ADMIN_REQUEST_INTERCEPTOR] Skipping authentication for:', endpoint);
     return config;
   }
 
+  console.log('[ADMIN_REQUEST_INTERCEPTOR] Proceeding with authentication for:', endpoint);
   let token = getAdminAccessToken() || cookies.get('adminAccessToken');
 
   if (!token) {
+    console.log('[ADMIN_REQUEST_INTERCEPTOR] No token found, attempting refresh');
     try {
       token = await handleAdminTokenRefresh();
+      console.log('[ADMIN_REQUEST_INTERCEPTOR] Token refresh successful');
     } catch (error) {
-      console.error('Admin token refresh failed in request interceptor', error);
+      console.error('[ADMIN_REQUEST_INTERCEPTOR] Token refresh failed:', error);
       return Promise.reject(new axios.Cancel('Token refresh failed'));
     }
   }
@@ -194,44 +218,64 @@ AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
+
+  console.log('[USER_RESPONSE_INTERCEPTOR] Error occurred');
+  console.log('[USER_RESPONSE_INTERCEPTOR] Response status:', response?.status);
+  console.log('[USER_RESPONSE_INTERCEPTOR] Config:', config?.url, config?.method);
+
   if (!config || (response?.status !== 401 && response?.status !== 403)) {
+    console.log('[USER_RESPONSE_INTERCEPTOR] Not handling this error (status is not 401/403 or no config)');
     return Promise.reject(error);
   }
 
   const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
 
   if (retryConfig._retry) {
+    console.log('[USER_RESPONSE_INTERCEPTOR] Already retried, rejecting');
     return Promise.reject(error);
   }
   retryConfig._retry = true;
 
+  console.log('[USER_RESPONSE_INTERCEPTOR] Attempting token refresh and retry');
   try {
     const newAccessToken = await handleUserTokenRefresh();
     retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
+    console.log('[USER_RESPONSE_INTERCEPTOR] Retrying request with new token');
     return await AdmissionUserInstance(retryConfig);
   } catch (err) {
+    console.error('[USER_RESPONSE_INTERCEPTOR] Retry failed:', err);
     return Promise.reject(err);
   }
 };
 
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
+
+  console.log('[ADMIN_RESPONSE_INTERCEPTOR] Error occurred');
+  console.log('[ADMIN_RESPONSE_INTERCEPTOR] Response status:', response?.status);
+  console.log('[ADMIN_RESPONSE_INTERCEPTOR] Config:', config?.url, config?.method);
+
   if (!config || (response?.status !== 401 && response?.status !== 403)) {
+    console.log('[ADMIN_RESPONSE_INTERCEPTOR] Not handling this error (status is not 401/403 or no config)');
     return Promise.reject(error);
   }
 
   const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
 
   if (retryConfig._retry) {
+    console.log('[ADMIN_RESPONSE_INTERCEPTOR] Already retried, rejecting');
     return Promise.reject(error);
   }
   retryConfig._retry = true;
 
+  console.log('[ADMIN_RESPONSE_INTERCEPTOR] Attempting token refresh and retry');
   try {
     const newAccessToken = await handleAdminTokenRefresh();
     retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
+    console.log('[ADMIN_RESPONSE_INTERCEPTOR] Retrying request with new token');
     return await AdmissionAdminInstance(retryConfig);
   } catch (err) {
+    console.error('[ADMIN_RESPONSE_INTERCEPTOR] Retry failed:', err);
     return Promise.reject(err);
   }
 };
