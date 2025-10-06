@@ -36,6 +36,7 @@ const skipAuthUrls = [
   'POST /user',
   'POST /user/verify/popup',
   'GET /user/verify/info',
+  'GET /notice',
 ];
 
 let isUserRefreshingToken = false;
