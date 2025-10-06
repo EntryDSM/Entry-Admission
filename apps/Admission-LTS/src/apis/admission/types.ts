@@ -4,7 +4,7 @@ export interface IAdmissionRequest {
   applicationType: string | null, //application-classification, 전형 선택 
   educationalStatus: string | null, //application-classification, 졸업 구분
   birthDate: string, //applicant-info, 생년월일
-  applicantGender: string, //applicant-info, 지원자 성별
+  applicantGender: string | null, //applicant-info, 지원자 성별
   streetAddress: string, //guardian-info, 기본주소
   postalCode: string, //guardian-info, 우편번호
   detailAddress: string, //guardian-info, 상세주소
@@ -12,7 +12,7 @@ export interface IAdmissionRequest {
   parentName: string, //guardian-info, 보호자 성명
   parentTel: string, //guardian-info, 보호자 연락처
   parentRelation: string, //guardian-info, 지원자와의 관계
-  guardianGender: string, //guardian-info, 성별
+  guardianGender: string | null, //guardian-info, 성별
   schoolCode: string | null, //middle-school-info, 학교 코드
   schoolName: string | null, //middle-school-info, 학교 이름
   studentId: number | null, //middle-school-info, 중학교 학번
