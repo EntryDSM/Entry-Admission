@@ -28,6 +28,7 @@ const useScrollY = () => {
 
 export const NoPathHeader = () => {
   const scrollPosition = useScrollY();
+  const navigate = useNavigate();
 
   return (
     <NoPathHeaderContainer scrollPosition={scrollPosition}>
@@ -36,6 +37,7 @@ export const NoPathHeader = () => {
         alignItems="center"
         height="fit-content"
         width="fit-content"
+        onClick={() => navigate('/')}
       >
         <EntryLogo />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
@@ -243,7 +245,7 @@ export const AuthHeader = ({ isAdmin }: IAuthHeaderType) => {
 
   return (
     <AuthHeaderContainer>
-      <LogoContainer onClick={() => navigate('/')}>
+      <LogoContainer onClick={() => window.location.href = "https://entrydsm.kr/"}>
         <EntryLogo isAdmin={isAdmin} />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
           EntryDSM
