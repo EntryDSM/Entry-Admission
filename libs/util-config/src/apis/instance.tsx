@@ -137,7 +137,10 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  const endpoint = `${method} ${url}`;
+  // 쿼리 파라미터 제거
+  const baseUrl = url.split('?')[0];
+  const endpoint = `${method} ${baseUrl}`;
+
   if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
@@ -162,7 +165,10 @@ const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  const endpoint = `${method} ${url}`;
+  // 쿼리 파라미터 제거
+  const baseUrl = url.split('?')[0];
+  const endpoint = `${method} ${baseUrl}`;
+
   if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
