@@ -159,6 +159,17 @@ export const ApplicationNav = ({
     return map[status] ?? null;
   };
 
+  const genderFormat = (
+    status: string
+  ): "MALE" | "FEMALE" | null => {
+    const map: Record<string, "MALE" | "FEMALE"> = {
+      "남성": "MALE",
+      "여성": "FEMALE",
+    };
+
+    return map[status] ?? null;
+  };
+
   
   const submitApi = useAdmissionSubmitPost()
   const handleSubmit = async () => {
@@ -170,7 +181,7 @@ export const ApplicationNav = ({
       applicationType: typeSelectionFormat(state.applicationClassification.typeSelection),//포맷
       educationalStatus: graduationTypeFormat(state.applicationClassification.graduationType),//포맷
       birthDate: formatDate(state.applicantInfo.dateOfBirth),//date 포맷 (배열 -> YYYY-MM-DD)
-      applicantGender: state.applicantInfo.gender,
+      applicantGender: genderFormat(state.applicantInfo.gender),
       streetAddress: state.guardianInfo.address,
       postalCode: state.guardianInfo.postalCode,
       detailAddress: state.guardianInfo.addressDetail,
@@ -178,7 +189,7 @@ export const ApplicationNav = ({
       parentName: state.guardianInfo.guardianName,
       parentTel: state.guardianInfo.guardianNumber,
       parentRelation: state.guardianInfo.relationship[0], //배열이니까 0번째 값을 넣어야함
-      guardianGender: state.guardianInfo.gender,
+      guardianGender: genderFormat(state.guardianInfo.gender),
       schoolCode: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolCode,
       schoolName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolName,
       studentId: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.studentId,
