@@ -262,6 +262,7 @@ const ButtonGroup = styled.div`
   margin-top: 24px;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 `;
 
 const QuestionsTitle = styled.h2`

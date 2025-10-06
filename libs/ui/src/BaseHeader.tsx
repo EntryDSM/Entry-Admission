@@ -223,6 +223,11 @@ export const CommonHeader = () => {
               {data.name}
             </SideNavContent>
           ))}
+          {isLoggedIn && (
+          <SideNavContent onClick={() => navClick('/mypage')}>
+              마이페이지
+            </SideNavContent>
+          )}
         </SideNavContainer>
       )}
     </HeaderContainer>
