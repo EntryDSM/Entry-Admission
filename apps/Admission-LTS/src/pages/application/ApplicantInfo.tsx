@@ -3,7 +3,8 @@ import { Flex } from '@entry/design-token';
 import { FormElement } from '../../components';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
-import { uploadImage, usePostIdPhoto } from '../../apis';
+// import { uploadImage, usePostIdPhoto } from '../../apis';
+import { usePostIdPhoto } from '../../apis';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');

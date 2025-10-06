@@ -5,7 +5,8 @@
       "Bash(npm run:*)",
       "Bash(npx nx build:*)",
       "Bash(curl:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(yarn nx build:*)"
     ],
     "deny": [],
     "ask": []

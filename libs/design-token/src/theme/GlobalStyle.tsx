@@ -1,5 +1,5 @@
 import { Global, css } from '@emotion/react';
-import 'pretendard/dist/web/static/pretendard.css';
+// import 'pretendard/dist/web/static/pretendard.css';
 
 const style = css`
   * {

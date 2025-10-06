@@ -2,7 +2,8 @@ import { colors, Flex, Skeleton, Text } from '@entry/design-token';
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Button, useApplicationData } from '@entry/ui';
-import { downloadApplicationPDF, submitApplication, ApplicationData } from '../../apis';
+// import { downloadApplicationPDF, submitApplication, ApplicationData } from '../../apis';
+import { ApplicationData } from '../../apis';
 import { useNavigate } from 'react-router-dom';
 
 export const ApplicationPreview = () => {
@@ -132,46 +133,49 @@ export const ApplicationPreview = () => {
 
   useEffect(() => {
     const processApplication = async () => {
-      try {
-        // 1단계: 원서 데이터 수집
-        setLoadingStage('원서 데이터 수집 중...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const applicationData = getAllApplicationData();
+      // try {
+      //   // 1단계: 원서 데이터 수집
+      //   setLoadingStage('원서 데이터 수집 중...');
+      //   await new Promise(resolve => setTimeout(resolve, 500));
+      //   const applicationData = getAllApplicationData();
 
-        // 2단계: 원서 접수
-        setLoadingStage('원서 접수 중...');
-        const submittedData = await submitApplication(applicationData);
-        console.log('원서 접수 성공');
+      //   // 2단계: 원서 접수
+      //   setLoadingStage('원서 접수 중...');
+      //   const submittedData = await submitApplication(applicationData);
+      //   console.log('원서 접수 성공');
 
-        // 3단계: 미리보기 준비
-        setLoadingStage('미리보기 준비 중...');
-        setApplicationData(submittedData.applicationData || submittedData);
-        console.log('설정된 applicationData:', submittedData.applicationData || submittedData);
+      //   // 3단계: 미리보기 준비
+      //   setLoadingStage('미리보기 준비 중...');
+      //   setApplicationData(submittedData.applicationData || submittedData);
+      //   console.log('설정된 applicationData:', submittedData.applicationData || submittedData);
 
-        setLoadingStage('완료');
-      } catch (error) {
-        console.error('원서 처리 실패:', error);
-        alert('원서 처리에 실패했습니다. 다시 시도해주세요.');
-        navigate('/submit-check');
-      } finally {
-        setIsLoading(false);
-      }
+      //   setLoadingStage('완료');
+      // } catch (error) {
+      //   console.error('원서 처리 실패:', error);
+      //   alert('원서 처리에 실패했습니다. 다시 시도해주세요.');
+      //   navigate('/submit-check');
+      // } finally {
+      //   setIsLoading(false);
+      // }
+      setIsLoading(false);
+      alert('원서 미리보기 기능이 일시적으로 비활성화되었습니다.');
     };
 
     processApplication();
   }, [navigate]);
 
   const handleDownloadPDF = async () => {
-    setIsDownloading(true);
-    try {
-      await downloadApplicationPDF();
-      console.log('PDF 다운로드 성공');
-    } catch (error) {
-      console.error('PDF 다운로드 실패:', error);
-      alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsDownloading(false);
-    }
+    // setIsDownloading(true);
+    // try {
+    //   await downloadApplicationPDF();
+    //   console.log('PDF 다운로드 성공');
+    // } catch (error) {
+    //   console.error('PDF 다운로드 실패:', error);
+    //   alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
+    // } finally {
+    //   setIsDownloading(false);
+    // }
+    alert('PDF 다운로드 기능이 일시적으로 비활성화되었습니다.');
   };
 
   return (
