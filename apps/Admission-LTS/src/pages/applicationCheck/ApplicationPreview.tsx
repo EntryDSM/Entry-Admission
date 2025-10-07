@@ -1,14 +1,15 @@
 import { colors, Flex, Skeleton, Text } from '@entry/design-token';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { usePdfPreviewPost } from '../../apis';
 import { useApplicationData } from '@entry/ui';
 import { convertGradeToScore } from '../../hooks';
+import { toast } from 'react-toastify';
 
 export const ApplicationPreview = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-
+  const hasFetched = useRef(false);
 
   const formatDate = (arr: (number|string)[]) => {
     const [year, month = 0, day = 0] = arr;
@@ -57,8 +58,22 @@ export const ApplicationPreview = () => {
   const { saveToStorage, state } = useApplicationData();
 
   useEffect(() => {
-    setIsLoading(true)
-    pdfPreviewApi.mutate({
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchPdf = async () => {
+      try {
+        setIsLoading(true);
+        
+        const data = await pdfPreviewApi.mutateAsync({
           applicantName: state.applicantInfo.applicantName,
           applicantTel: state.applicantInfo.applicantNumber,
           applicationType: typeSelectionFormat(state.applicationClassification.typeSelection),//포맷
@@ -274,18 +289,20 @@ export const ApplicationPreview = () => {
               : state.applicationClassification.graduationType === "졸업"
                 ? state.activityGraduate.certificate === "O" ? true : false
                 : state.attendanceVolunteer.certificate === "O" ? true : false,
-        }, {
-          onSuccess: (data) => {
-            const blob = new Blob([data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            setPdfUrl(url);
-            setIsLoading(false);
-          }
-        })
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+        });
+
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        setPdfUrl(url);
+        setIsLoading(false);
+      } catch (error) {
+        toast.error('pdf 생성에 실패하였습니다.')
+        setIsLoading(false);
+      }
     };
-  },[])
+
+    fetchPdf();
+  }, [])
 
   return (
     <Container>
