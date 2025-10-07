@@ -7,10 +7,10 @@ export const ScoreSecond = () => {
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
   const [subjectGrades, setSubjectGrades] = usePageData('secondGraduate');
 
-  // 성적 변경 시 디버깅
-  useEffect(() => {
-    console.log('ScoreSecond - subjectGrades 변경됨:', subjectGrades);
-  }, [subjectGrades]);
+  // // 성적 변경 시 디버깅
+  // useEffect(() => {
+  //   console.log('ScoreSecond - subjectGrades 변경됨:', subjectGrades);
+  // }, [subjectGrades]);
 
   return (
     <Flex width="100%" height="100%" isColumn={true}>

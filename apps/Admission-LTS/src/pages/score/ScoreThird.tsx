@@ -8,10 +8,10 @@ export const ScoreThird = () => {
 
   const [subjectGrades, setSubjectGrades] = usePageData('thirdGraduate');
 
-  // 성적 변경 시 디버깅
-  useEffect(() => {
-    console.log('ScoreThird - subjectGrades 변경됨:', subjectGrades);
-  }, [subjectGrades]);
+  // // 성적 변경 시 디버깅
+  // useEffect(() => {
+  //   console.log('ScoreThird - subjectGrades 변경됨:', subjectGrades);
+  // }, [subjectGrades]);
 
   return (
     <Flex width="100%" height="100%" isColumn={true}>
