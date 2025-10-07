@@ -1,361 +1,323 @@
 import { colors, Flex, Skeleton, Text } from '@entry/design-token';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
-import { Button, useApplicationData } from '@entry/ui';
-// import { downloadApplicationPDF, submitApplication, ApplicationData } from '../../apis';
-import { ApplicationData } from '../../apis';
-import { useNavigate } from 'react-router-dom';
+import { usePdfPreviewPost } from '../../apis';
+import { useApplicationData } from '@entry/ui';
+import { convertGradeToScore } from '../../hooks';
 
 export const ApplicationPreview = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  const [applicationData, setApplicationData] = useState<ApplicationData | null>(null);
-  const [loadingStage, setLoadingStage] = useState<string>('원서 데이터 수집 중...');
-  const navigate = useNavigate();
-  const { state, clearAllData } = useApplicationData(); // 전체 상태 가져오기
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  // useApplicationData에서 모든 페이지 데이터를 가져와서 API 형식으로 변환
-  const getAllApplicationData = (): ApplicationData => {
-    console.log('전체 state:', state);
 
-    // useApplicationData에서 데이터 가져오기
-    const applicationClassification = state.applicationClassification || {};
-    const applicantInfo = state.applicantInfo || {};
-    const guardianInfo = state.guardianInfo || {};
-    const middleSchoolInfo = state.middleSchoolInfo || {};
-    const personalStatements = state.personalStatements || {};
+  const formatDate = (arr: (number|string)[]) => {
+    const [year, month = 0, day = 0] = arr;
 
-    // 성적 관련 데이터들
-    const firstGraduate = state.firstGraduate || {};
-    const secondGraduate = state.secondGraduate || {};
-    const thirdGraduate = state.thirdGraduate || {};
-    const fourthGraduate = state.fourthGraduate || {};
+    const y = String(year).padStart(4, "0");
+    const m = String(month).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
 
-    // 활동 관련 데이터들
-    const activityGraduate = state.activityGraduate || {};
-    const attendanceVolunteer = state.attendanceVolunteer || {};
+    return `${y}-${m}-${d}`;
+  }
 
-    console.log('applicationClassification:', applicationClassification);
-    console.log('applicantInfo:', applicantInfo);
-    console.log('guardianInfo:', guardianInfo);
-    console.log('middleSchoolInfo:', middleSchoolInfo);
-    console.log('personalStatements:', personalStatements);
-
-    // 성적 데이터 디버깅
-    console.log('성적 데이터 디버깅:');
-    console.log('firstGraduate:', firstGraduate);
-    console.log('secondGraduate:', secondGraduate);
-    console.log('thirdGraduate:', thirdGraduate);
-    console.log('fourthGraduate:', fourthGraduate);
-
-    // 성적 데이터 상세 디버깅
-    console.log('thirdGraduate.kor:', thirdGraduate.kor);
-    console.log('thirdGraduate.math:', thirdGraduate.math);
-    console.log('thirdGraduate.eng:', thirdGraduate.eng);
-    console.log('secondGraduate.kor:', secondGraduate.kor);
-    console.log('secondGraduate.math:', secondGraduate.math);
-    console.log('secondGraduate.eng:', secondGraduate.eng);
-
-    return {
-      entranceYear: "2025",
-      receiptCode: "",
-      schoolCode: middleSchoolInfo.schoolCode || "",
-      userName: applicantInfo.applicantName || "",
-      applicantTel: guardianInfo.applicantNumber || "",
-      birthday: applicantInfo?.dateOfBirth ? applicantInfo.dateOfBirth.join('-') : "",
-      schoolRegion: applicationClassification?.regionSelection || "",
-      gender: applicantInfo.gender || "",
-      schoolName: middleSchoolInfo.schoolName || "",
-      educationalStatus: applicationClassification?.graduationType || "",
-      address: guardianInfo.address || "",
-      detailAddress: guardianInfo.addressDetail || "",
-      parentName: guardianInfo.guardianName || "",
-      parentRelation: guardianInfo?.relationship?.length ? guardianInfo.relationship.join('') : "",
-      parentTel: guardianInfo?.guardianNumber || "",
-      region: applicationClassification?.regionSelection || "",
-      applicationType: applicationClassification?.typeSelection || "",
-      applicationRemark: applicantInfo.specialNotes || "",
-      imageUrl: applicantInfo.idPhoto || "",
-      
-      // 출결 정보 - activityGraduate에서 가져오기 (필드명 수정)
-      absenceDayCount: activityGraduate?.absence || attendanceVolunteer?.absence || "0",
-      latenessCount: activityGraduate?.tardiness || attendanceVolunteer?.tardiness || "0", 
-      earlyLeaveCount: activityGraduate?.earlyLeave || attendanceVolunteer?.earlyLeave || "0",
-      lectureAbsenceCount: activityGraduate?.classExit || attendanceVolunteer?.classExit || "0", 
-      volunteerTime: activityGraduate?.volunteer || attendanceVolunteer?.volunteer || "0",
-      
-      // 3학년 성적 (thirdGraduate에서) - 1학기/2학기 모두 같은 값 사용
-      koreanThirdGradeFirstSemester: thirdGraduate.kor || "",
-      koreanThirdGradeSecondSemester: thirdGraduate.kor || "",
-      socialThirdGradeFirstSemester: thirdGraduate.soc || "",
-      socialThirdGradeSecondSemester: thirdGraduate.soc || "",
-      historyThirdGradeFirstSemester: thirdGraduate.his || "",
-      historyThirdGradeSecondSemester: thirdGraduate.his || "",
-      mathThirdGradeFirstSemester: thirdGraduate.math || "",
-      mathThirdGradeSecondSemester: thirdGraduate.math || "",
-      scienceThirdGradeFirstSemester: thirdGraduate.sci || "",
-      scienceThirdGradeSecondSemester: thirdGraduate.sci || "",
-      techAndHomeThirdGradeFirstSemester: thirdGraduate.tech || "",
-      techAndHomeThirdGradeSecondSemester: thirdGraduate.tech || "",
-      englishThirdGradeFirstSemester: thirdGraduate.eng || "",
-      englishThirdGradeSecondSemester: thirdGraduate.eng || "",
-
-      // 2학년 성적 (secondGraduate에서) - 1학기/2학기 모두 같은 값 사용
-      koreanSecondGradeFirstSemester: secondGraduate.kor || "",
-      koreanSecondGradeSecondSemester: secondGraduate.kor || "",
-      socialSecondGradeFirstSemester: secondGraduate.soc || "",
-      socialSecondGradeSecondSemester: secondGraduate.soc || "",
-      historySecondGradeFirstSemester: secondGraduate.his || "",
-      historySecondGradeSecondSemester: secondGraduate.his || "",
-      mathSecondGradeFirstSemester: secondGraduate.math || "",
-      mathSecondGradeSecondSemester: secondGraduate.math || "",
-      scienceSecondGradeFirstSemester: secondGraduate.sci || "",
-      scienceSecondGradeSecondSemester: secondGraduate.sci || "",
-      techAndHomeSecondGradeFirstSemester: secondGraduate.tech || "",
-      techAndHomeSecondGradeSecondSemester: secondGraduate.tech || "",
-      englishSecondGradeFirstSemester: secondGraduate.eng || "",
-      englishSecondGradeSecondSemester: secondGraduate.eng || "",
-
-      applicationCase: applicationClassification?.typeSelection || "",
-      hasCompetitionPrize: activityGraduate?.dsmAlgorithm || attendanceVolunteer?.dsmAlgorithm || "",
-      hasCertificate: activityGraduate?.certificate || attendanceVolunteer?.certificate || "",
-      year: applicationClassification?.graduationDate?.[0]?.toString() || "2025",
-      month: applicationClassification?.graduationDate?.[1]?.toString() || "3",
-      day: applicationClassification?.graduationDate?.[2]?.toString() || "1",
-      veteransNumber: applicantInfo.veteransNumber || "",
-      teacherName: middleSchoolInfo.teacherName || "",
-      teacherTel: middleSchoolInfo.schoolPhone || "",
-      examCode: "",
-      selfIntroduction: personalStatements.personalStmt || "",
-      studyPlan: personalStatements.studyPlan || ""
+  const typeSelectionFormat = (type: string): "COMMON" | "MEISTER" | "SOCIAL" | null => {
+    const map: Record<string, "COMMON" | "MEISTER" | "SOCIAL"> = {
+      "일반": "COMMON",
+      "마이스터 인재": "MEISTER",
+      "사회통합 인재": "SOCIAL",
     };
+
+    return map[type] ?? null;
   };
+
+  const graduationTypeFormat = (
+    status: string
+  ): "PROSPECTIVE_GRADUATE" | "GRADUATE" | "QUALIFICATION_EXAM" | null => {
+    const map: Record<string, "PROSPECTIVE_GRADUATE" | "GRADUATE" | "QUALIFICATION_EXAM"> = {
+      "졸업 예정": "PROSPECTIVE_GRADUATE",
+      "졸업": "GRADUATE",
+      "검정고시 (중학교 졸업 학력)": "QUALIFICATION_EXAM",
+    };
+
+    return map[status] ?? null;
+  };
+
+  const genderFormat = (
+    status: string
+  ): "MALE" | "FEMALE" | null => {
+    const map: Record<string, "MALE" | "FEMALE"> = {
+      "남성": "MALE",
+      "여성": "FEMALE",
+    };
+
+    return map[status] ?? null;
+  };
+
+  const pdfPreviewApi = usePdfPreviewPost()
+  const { saveToStorage, state } = useApplicationData();
 
   useEffect(() => {
-    const processApplication = async () => {
-      // try {
-      //   // 1단계: 원서 데이터 수집
-      //   setLoadingStage('원서 데이터 수집 중...');
-      //   await new Promise(resolve => setTimeout(resolve, 500));
-      //   const applicationData = getAllApplicationData();
-
-      //   // 2단계: 원서 접수
-      //   setLoadingStage('원서 접수 중...');
-      //   const submittedData = await submitApplication(applicationData);
-      //   console.log('원서 접수 성공');
-
-      //   // 3단계: 미리보기 준비
-      //   setLoadingStage('미리보기 준비 중...');
-      //   setApplicationData(submittedData.applicationData || submittedData);
-      //   console.log('설정된 applicationData:', submittedData.applicationData || submittedData);
-
-      //   setLoadingStage('완료');
-      // } catch (error) {
-      //   console.error('원서 처리 실패:', error);
-      //   alert('원서 처리에 실패했습니다. 다시 시도해주세요.');
-      //   navigate('/submit-check');
-      // } finally {
-      //   setIsLoading(false);
-      // }
-      setIsLoading(false);
-      alert('원서 미리보기 기능이 일시적으로 비활성화되었습니다.');
+    setIsLoading(true)
+    pdfPreviewApi.mutate({
+          applicantName: state.applicantInfo.applicantName,
+          applicantTel: state.applicantInfo.applicantNumber,
+          applicationType: typeSelectionFormat(state.applicationClassification.typeSelection),//포맷
+          educationalStatus: graduationTypeFormat(state.applicationClassification.graduationType),//포맷
+          birthDate: formatDate(state.applicantInfo.dateOfBirth),//date 포맷 (배열 -> YYYY-MM-DD)
+          applicantGender: genderFormat(state.applicantInfo.gender),
+          streetAddress: state.guardianInfo.address,
+          postalCode: state.guardianInfo.postalCode,
+          detailAddress: state.guardianInfo.addressDetail,
+          isDaejeon: state.applicationClassification.regionSelection === "대전" ? true : false,
+          parentName: state.guardianInfo.guardianName,
+          parentTel: state.guardianInfo.guardianNumber,
+          parentRelation: state.guardianInfo.relationship[0], //배열이니까 0번째 값을 넣어야함
+          guardianGender: genderFormat(state.guardianInfo.gender),
+          schoolCode: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolCode,
+          schoolName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolName,
+          studentId: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.studentId,
+          schoolPhone: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolPhone,
+          teacherName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.teacherName,
+          nationalMeritChild: state.applicantInfo.specialNotes === "국가 유공자" ? true : false,
+          specialAdmissionTarget: state.applicantInfo.specialNotes === "특례 입학 대상" ? true : false,
+          graduationDate: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : formatDate(state.applicationClassification.graduationDate),//날짜 포맷
+          studyPlan: state.personalStatements.studyPlan,
+          selfIntroduce: state.personalStatements.personalStmt,
+    
+          //성적
+          korean_3_1:
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.kor)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.kor)
+                : null,
+          social_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.soc)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.soc)
+                : null,
+          history_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.his)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.his)
+                : null,
+          math_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.math)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.math)
+                : null,
+          science_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.sci)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.sci)
+                : null,
+          tech_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.tech)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.tech)
+                : null,
+          english_3_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.firstGraduateProspective.eng)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.secondGraduate.eng)
+                : null,
+          korean_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.kor) : null,
+          social_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.soc) : null,
+          history_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.his) : null,
+          math_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.math) : null,
+          science_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.sci) : null,
+          tech_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.tech) : null,
+          english_3_2: state.applicationClassification.graduationType === "졸업" ? convertGradeToScore(state.firstGraduate.eng) : null,
+          korean_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.kor)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.kor)
+                : null,
+          social_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.soc)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.soc)
+                : null,
+          history_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.his)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.his)
+                : null,
+          math_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.math)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.math)
+                : null,
+          science_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.sci)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.sci)
+                : null,
+          tech_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.tech)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.tech)
+                : null,
+          english_2_2: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.secondGraduateProspective.eng)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.thirdGraduate.eng)
+                : null,
+          korean_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.kor)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.kor)
+                : null,
+          social_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.soc)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.soc)
+                : null,
+          history_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.his)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.his)
+                : null,
+          math_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.math)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.math)
+                : null,
+          science_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.sci)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.sci)
+                : null,
+          tech_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.tech)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.tech)
+                : null,
+          english_2_1: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? convertGradeToScore(state.thirdGraduateProspective.eng)
+              : state.applicationClassification.graduationType === "졸업"
+                ? convertGradeToScore(state.fourthGraduate.eng)
+                : null,
+          gedKorean: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.kor) : null,
+          gedSocial: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.soc) : null,
+          gedHistory: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.his) : null,
+          gedMath: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.math) : null,
+          gedScience: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.sci) : null,
+          gedTech: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.tech) : null,
+          gedEnglish: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.eng) : null,
+          //출결
+          absence: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.absence)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.absence)
+                : null,
+          tardiness: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.tardiness)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.tardiness)
+                : null,
+          earlyLeave: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.earlyLeave)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.earlyLeave)
+                : null,
+          classExit: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.classExit)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.classExit)
+                : null,
+          unexcused: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.unexcused)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.unexcused)
+                : null,
+          volunteer: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? Number(state.activityGraduateProspective.volunteer)
+              : state.applicationClassification.graduationType === "졸업"
+                ? Number(state.activityGraduate.volunteer)
+                : null,
+          algorithmAward: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? state.activityGraduateProspective.dsmAlgorithm === "O" ? true : false
+              : state.applicationClassification.graduationType === "졸업"
+                ? state.activityGraduate.dsmAlgorithm === "O" ? true : false
+                : state.attendanceVolunteer.dsmAlgorithm === "O" ? true : false,
+          infoProcessingCert: 
+            state.applicationClassification.graduationType === "졸업 예정"
+              ? state.activityGraduateProspective.certificate === "O" ? true : false
+              : state.applicationClassification.graduationType === "졸업"
+                ? state.activityGraduate.certificate === "O" ? true : false
+                : state.attendanceVolunteer.certificate === "O" ? true : false,
+        }, {
+          onSuccess: (data) => {
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            setPdfUrl(url);
+            setIsLoading(false);
+          }
+        })
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
     };
-
-    processApplication();
-  }, [navigate]);
-
-  const handleDownloadPDF = async () => {
-    // setIsDownloading(true);
-    // try {
-    //   await downloadApplicationPDF();
-    //   console.log('PDF 다운로드 성공');
-    // } catch (error) {
-    //   console.error('PDF 다운로드 실패:', error);
-    //   alert('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
-    // } finally {
-    //   setIsDownloading(false);
-    // }
-    alert('PDF 다운로드 기능이 일시적으로 비활성화되었습니다.');
-  };
+  },[])
 
   return (
     <Container>
-      <Flex width="100%" height="fit-content" justifyContent="space-between" alignItems="center">
-        <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
-          <Text fontSize={20} fontWeight={400} color={colors.gray[400]}>
-            대덕소프트웨어마이스터고등학교
-          </Text>
-          <Text fontSize={32} fontWeight={600}>
-            지원서 미리보기
-          </Text>
-        </Flex>
-        <Flex width="fit-content" height="fit-content" gap={12}>
-          <Button
-            onClick={() => {
-              clearAllData();
-              window.location.reload();
-            }}
-            width="150px"
-            variant="outline"
-          >
-            데이터 초기화
-          </Button>
-          <Button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading || isLoading}
-            width="150px"
-          >
-            {isDownloading ? '다운로드 중...' : 'PDF 다운로드'}
-          </Button>
-        </Flex>
+      <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
+        <Text fontSize={20} fontWeight={400} color={colors.gray[400]}>
+          대덕소프트웨어마이스터고등학교
+        </Text>
+        <Text fontSize={32} fontWeight={600}>
+          지원서 미리보기
+        </Text>
       </Flex>
       {isLoading ? (
         <ApplicationLoadingContainer>
-          <LoadingContent>
-            <LoadingSpinner />
-            <LoadingText>
-              <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
-                원서 처리 중
-              </Text>
-              <Text fontSize={16} color={colors.gray[400]}>
-                {loadingStage}
-              </Text>
-            </LoadingText>
-            <ProgressSteps>
-              <ProgressStep active={loadingStage.includes('수집')}>
-                <StepNumber active={loadingStage.includes('수집')}>1</StepNumber>
-                <StepLabel>데이터 수집</StepLabel>
-              </ProgressStep>
-              <ProgressStep active={loadingStage.includes('접수')}>
-                <StepNumber active={loadingStage.includes('접수')}>2</StepNumber>
-                <StepLabel>원서 접수</StepLabel>
-              </ProgressStep>
-              <ProgressStep active={loadingStage.includes('준비') || loadingStage.includes('완료')}>
-                <StepNumber active={loadingStage.includes('준비') || loadingStage.includes('완료')}>3</StepNumber>
-                <StepLabel>미리보기 준비</StepLabel>
-              </ProgressStep>
-            </ProgressSteps>
-          </LoadingContent>
+          <Text fontSize={20} color={colors.gray[400]}>
+            지원서 페이지를 로딩중입니다..
+          </Text>
         </ApplicationLoadingContainer>
       ) : (
         <Flex width="100%" height="fit-content" isColumn={true}>
           <ApplicationTitle>입학원서 미리보기</ApplicationTitle>
           <ApplicationContainer>
             <ApplicationContent>
-              {applicationData ? (
-                <ApplicationForm>
-                  <FormSection>
-                    <SectionTitle>지원자 정보</SectionTitle>
-                    <FormRow>
-                      <FormField>
-                        <Label>성명</Label>
-                        <Value>{applicationData.userName}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>성별</Label>
-                        <Value>{applicationData.gender}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>생년월일</Label>
-                        <Value>{applicationData.birthday}</Value>
-                      </FormField>
-                    </FormRow>
-                    <FormRow>
-                      <FormField>
-                        <Label>전화번호</Label>
-                        <Value>{applicationData.applicantTel}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>주소</Label>
-                        <Value>{applicationData.address} {applicationData.detailAddress}</Value>
-                      </FormField>
-                    </FormRow>
-                  </FormSection>
-
-                  <FormSection>
-                    <SectionTitle>학교 정보</SectionTitle>
-                    <FormRow>
-                      <FormField>
-                        <Label>학교명</Label>
-                        <Value>{applicationData.schoolName}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>지역</Label>
-                        <Value>{applicationData.schoolRegion}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>졸업구분</Label>
-                        <Value>{applicationData.educationalStatus}</Value>
-                      </FormField>
-                    </FormRow>
-                  </FormSection>
-
-                  <FormSection>
-                    <SectionTitle>보호자 정보</SectionTitle>
-                    <FormRow>
-                      <FormField>
-                        <Label>보호자명</Label>
-                        <Value>{applicationData.parentName}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>관계</Label>
-                        <Value>{applicationData.parentRelation}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>전화번호</Label>
-                        <Value>{applicationData.parentTel}</Value>
-                      </FormField>
-                    </FormRow>
-                  </FormSection>
-
-                  <FormSection>
-                    <SectionTitle>성적 정보</SectionTitle>
-                    <FormRow>
-                      <FormField>
-                        <Label>3학년 국어</Label>
-                        <Value>{applicationData.koreanThirdGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>3학년 수학</Label>
-                        <Value>{applicationData.mathThirdGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>3학년 영어</Label>
-                        <Value>{applicationData.englishThirdGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                    </FormRow>
-                    <FormRow>
-                      <FormField>
-                        <Label>2학년 국어</Label>
-                        <Value>{applicationData.koreanSecondGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>2학년 수학</Label>
-                        <Value>{applicationData.mathSecondGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>2학년 영어</Label>
-                        <Value>{applicationData.englishSecondGradeFirstSemester || '미입력'}</Value>
-                      </FormField>
-                    </FormRow>
-                  </FormSection>
-
-                  <FormSection>
-                    <SectionTitle>지원 정보</SectionTitle>
-                    <FormRow>
-                      <FormField>
-                        <Label>전형구분</Label>
-                        <Value>{applicationData.applicationType}</Value>
-                      </FormField>
-                      <FormField>
-                        <Label>지원연도</Label>
-                        <Value>{applicationData.entranceYear}</Value>
-                      </FormField>
-                    </FormRow>
-                  </FormSection>
-                </ApplicationForm>
+              {pdfUrl ? (
+                <iframe
+                  src={pdfUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 'none' }}
+                  title="지원서 PDF 미리보기"
+                />
               ) : (
-                <Text>원서 데이터를 불러올 수 없습니다.</Text>
+                <Text color={colors.gray[400]}>PDF를 불러올 수 없습니다.</Text>
               )}
             </ApplicationContent>
           </ApplicationContainer>
@@ -382,7 +344,6 @@ const ApplicationTitle = styled.div`
   font-size: 24px;
   color: ${colors.extra.realWhite};
 `;
-
 const ApplicationContainer = styled.div`
   width: 100%;
   background-color: ${colors.gray[400]};
@@ -399,137 +360,12 @@ const ApplicationContent = styled.div`
   aspect-ratio: 210 / 297;
   background-color: ${colors.extra.realWhite};
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-
-  @media (max-width: 1024px) {
-    max-width: 100%;
-    aspect-ratio: auto;
-    height: auto;
-  }
 `;
 
-const ApplicationLoadingContainer = styled.div`
+const ApplicationLoadingContainer = styled(Skeleton)`
   width: 100%;
-  height: 600px;
+  height: 1500px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, ${colors.gray[100]} 0%, ${colors.gray[50]} 100%);
-  border-radius: 12px;
-`;
-
-const LoadingContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 40px;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 60px;
-  height: 60px;
-  border: 4px solid ${colors.gray[200]};
-  border-top: 4px solid ${colors.orange[800]};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-const LoadingText = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-`;
-
-const ProgressSteps = styled.div`
-  display: flex;
-  gap: 24px;
-  align-items: center;
-`;
-
-const ProgressStep = styled.div<{ active: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  opacity: ${props => props.active ? 1 : 0.4};
-  transition: opacity 0.3s ease;
-`;
-
-const StepNumber = styled.div<{ active: boolean }>`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: ${props => props.active ? colors.orange[800] : colors.gray[300]};
-  color: ${colors.extra.realWhite};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-`;
-
-const StepLabel = styled.span`
-  font-size: 12px;
-  color: ${colors.gray[400]};
-  font-weight: 500;
-`;
-
-const ApplicationForm = styled.div`
-  width: 100%;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-`;
-
-const FormSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 18px;
-  font-weight: 600;
-  color: ${colors.gray[500]};
-  margin: 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid ${colors.orange[800]};
-`;
-
-const FormRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-`;
-
-const FormField = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 200px;
-  flex: 1;
-`;
-
-const Label = styled.label`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${colors.gray[400]};
-`;
-
-const Value = styled.span`
-  font-size: 16px;
-  color: ${colors.gray[500]};
-  padding: 8px 12px;
-  background-color: ${colors.gray[100]};
-  border-radius: 4px;
-  min-height: 20px;
 `;
