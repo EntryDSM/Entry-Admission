@@ -1,6 +1,7 @@
 import { colors, Flex, Text } from '@entry/design-token';
 import { InputContent, useCheckPageData, Button, useApplicationData } from '@entry/ui';
-import { submitApplication, confirmApplication, ApplicationData } from '../apis';
+// import { submitApplication, confirmApplication, ApplicationData } from '../apis';
+import { ApplicationData } from '../apis';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -106,31 +107,32 @@ export const SubmitCheck = () => {
   };
 
   const handleSubmit = async () => {
-    if (datas.message !== "확인했습니다") {
-      alert('제출을 위해서는 "확인했습니다"라고 정확히 입력해주세요.');
-      return;
-    }
+    // if (datas.message !== "확인했습니다") {
+    //   alert('제출을 위해서는 "확인했습니다"라고 정확히 입력해주세요.');
+    //   return;
+    // }
 
-    setIsSubmitting(true);
-    try {
-      const applicationData = getAllApplicationData();
+    // setIsSubmitting(true);
+    // try {
+    //   const applicationData = getAllApplicationData();
 
-      // 원서 접수
-      await submitApplication(applicationData);
-      console.log('원서 접수 성공');
+    //   // 원서 접수
+    //   await submitApplication(applicationData);
+    //   console.log('원서 접수 성공');
 
-      // 원서 확정
-      await confirmApplication();
-      console.log('원서 확정 성공');
+    //   // 원서 확정
+    //   await confirmApplication();
+    //   console.log('원서 확정 성공');
 
-      // 제출 완료 페이지로 이동
-      navigate('/submitted');
-    } catch (error) {
-      console.error('원서 제출 실패:', error);
-      alert('원서 제출에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    //   // 제출 완료 페이지로 이동
+    //   navigate('/submitted');
+    // } catch (error) {
+    //   console.error('원서 제출 실패:', error);
+    //   alert('원서 제출에 실패했습니다. 다시 시도해주세요.');
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
+    alert('원서 제출 기능이 일시적으로 비활성화되었습니다.');
   };
 
   return (

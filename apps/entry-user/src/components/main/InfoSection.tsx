@@ -10,9 +10,8 @@ interface NoticeItem {
   title: string;
   createdAt: string;
   isPinned: boolean;
-  type: 'GUIDE' | 'NOTICE'
+  type: 'GUIDE' | 'NOTICE';
 }
-
 
 export const InfoSection = () => {
   const navigate = useNavigate();
@@ -23,23 +22,32 @@ export const InfoSection = () => {
     hasDownload: true,
   };
 
-  const {data, isLoading} = useGetAllNotice('NOTICE');
+  // pdf 다운로드
+  const downloadPdfBtn = () => {
+    const link = document.createElement('a');
+    link.href =
+      '/2026학년도 대덕소프트웨어마이스터고등학교 신입생 입학전형요강.pdf';
+    link.download =
+      '2026학년도 대덕소프트웨어마이스터고등학교 신입생 입학전형요강.pdf';
+    link.click();
+  };
+
+  const { data, isLoading } = useGetAllNotice('NOTICE');
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
 
   const formatDate = (dateString: string) => {
-      return dateString.split('T')[0]; 
-    };
-  
+    return dateString.split('T')[0];
+  };
+
   useEffect(() => {
-      if (data && Array.isArray(data?.notices)) {
-      const formattedNotices = data.notices.map(notice => ({
+    if (data && Array.isArray(data?.notices)) {
+      const formattedNotices = data.notices.map((notice: any) => ({
         ...notice,
-        createdAt: formatDate(notice.createdAt)
+        createdAt: formatDate(notice.createdAt),
       }));
       setNoticeItems(formattedNotices);
     }
-    }, [data]);
-
+  }, [data]);
 
   // const notices = [
   //   {
@@ -81,17 +89,26 @@ export const InfoSection = () => {
               <NoticeIconImg src={mainNotice.icon} alt="공지 아이콘" />
               <MainNoticeTitle>{mainNotice.title}</MainNoticeTitle>
             </NoticeContent>
-            <DownloadIcon src={downloadIcon} alt="다운로드" />
+            <DownloadIcon
+              onClick={downloadPdfBtn}
+              src={downloadIcon}
+              alt="다운로드"
+            />
           </MainNoticeCard>
           {noticeItems.map((notice, index) => (
-            <NoticeItem key={index} onClick={() => navigate(`/notice/${notice.id}`)}>
+            <NoticeItem
+              key={index}
+              onClick={() => navigate(`/notice/${notice.id}`)}
+            >
               <NoticeContent>
                 <NoticeInfo>
                   <NoticeTitle>
                     {notice.title}
                     {/* {notice.badge && <BadgeHot>{notice.badge}</BadgeHot>} */}
                   </NoticeTitle>
-                  {notice.createdAt && <NoticeDate>{notice.createdAt}</NoticeDate>}
+                  {notice.createdAt && (
+                    <NoticeDate>{notice.createdAt}</NoticeDate>
+                  )}
                 </NoticeInfo>
               </NoticeContent>
               <ArrowIcon src={noticeMoveArrowIcon} alt="이동" />
@@ -333,14 +350,14 @@ const NoticeDate = styled.div`
   }
 `;
 
-const BadgeHot = styled.span`
-  background: ${colors.orange[800]};
-  color: white;
-  padding: 2px 7px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
-`;
+// const BadgeHot = styled.span`
+//   background: ${colors.orange[800]};
+//   color: white;
+//   padding: 2px 7px;
+//   border-radius: 3px;
+//   font-size: 10px;
+//   font-weight: 600;
+// `;
 
 const DownloadIcon = styled.img`
   width: 18px;

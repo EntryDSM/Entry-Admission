@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModal, useModal } from '@entry/ui';
-import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, TestInstance, removeAccessToken, removeRefreshToken } from '@entry/util-config';
+import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeAccessToken, removeRefreshToken } from '@entry/util-config';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
@@ -67,26 +67,27 @@ export const MyPage = () => {
   };
 
   const handleDownloadApplication = async () => {
-    try {
-      const response = await TestInstance.get('/application/pdf', {
-        responseType: 'blob',
-      });
+    // try {
+    //   const response = await TestInstance.get('/application/pdf', {
+    //     responseType: 'blob',
+    //   });
 
-      // Blob으로 파일 다운로드 처리
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', '입학원서.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+    //   // Blob으로 파일 다운로드 처리
+    //   const url = window.URL.createObjectURL(new Blob([response.data]));
+    //   const link = document.createElement('a');
+    //   link.href = url;
+    //   link.setAttribute('download', '입학원서.pdf');
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   link.remove();
+    //   window.URL.revokeObjectURL(url);
 
-      toast.success('원서가 다운로드되었습니다.');
-    } catch (error) {
-      toast.error('원서 다운로드 중 오류가 발생했습니다.');
-      console.error('원서 다운로드 에러:', error);
-    }
+    //   toast.success('원서가 다운로드되었습니다.');
+    // } catch (error) {
+    //   toast.error('원서 다운로드 중 오류가 발생했습니다.');
+    //   console.error('원서 다운로드 에러:', error);
+    // }
+    toast.info('원서 다운로드 기능이 일시적으로 비활성화되었습니다.');
   };
 
   const handleChangePassword = () => {

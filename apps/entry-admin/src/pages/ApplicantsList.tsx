@@ -169,6 +169,7 @@ export const ApplicantsList = () => {
   const [applicantsList, setApplicantsList] = useState<IApplicantType[]>(
     ApplicantsListMockData
   );
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   const [filters, setFilters] = useState<{
     region: Record<RegionKey, boolean>;
@@ -226,8 +227,11 @@ export const ApplicantsList = () => {
     );
   };
 
-  // 필터링 로직 (업데이트된 applicantsList 사용)
+  // 필터링 로직 (검색까지 포함)
   const filteredApplicants = applicantsList.filter((a) => {
+    // 검색 키워드 검사 (이름 기준)
+    const matchKeyword = a.name.includes(searchKeyword);
+
     const regionActive = Object.values(filters.region).some(Boolean);
     const admissionActive = Object.values(filters.admission).some(Boolean);
     const statusActive = Object.values(filters.status).some(Boolean);
@@ -248,7 +252,7 @@ export const ApplicantsList = () => {
       (filters.status.received && a.received) ||
       (filters.status.submitted && a.submitted);
 
-    return regionOk && admissionOk && statusOk;
+    return matchKeyword && regionOk && admissionOk && statusOk;
   });
 
   const totalPage = Math.ceil(filteredApplicants.length / itemPerPage) || 1;
@@ -263,7 +267,7 @@ export const ApplicantsList = () => {
   return (
     <Container>
       <HeadContent>
-        <FindApplicantInput />
+        <FindApplicantInput onSearch={setSearchKeyword} />
         <ButtonContiner>
           <Button
             color={colors.extra.realWhite}

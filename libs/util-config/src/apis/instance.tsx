@@ -23,13 +23,7 @@ export const AdmissionUserInstance = axios.create({
 });
 
 export const AdmissionAdminInstance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL ,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const TestInstance = axios.create({
-  baseURL: "https://t1.ncloud.sbs" ,
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -42,201 +36,208 @@ const skipAuthUrls = [
   'POST /user',
   'POST /user/verify/popup',
   'GET /user/verify/info',
+  'GET /notice',
+  'GET /schedule',
 ];
 
 let isUserRefreshingToken = false;
 let isAdminRefreshingToken = false;
+let userRefreshTokenPromise: Promise<string> | null = null;
+let adminRefreshTokenPromise: Promise<string> | null = null;
 
-const userRequestInterceptor = (config: InternalAxiosRequestConfig) => {
+// Helper function for user token refresh
+const handleUserTokenRefresh = () => {
+  if (userRefreshTokenPromise) {
+    return userRefreshTokenPromise;
+  }
+
+  isUserRefreshingToken = true;
+  userRefreshTokenPromise = new Promise(async (resolve, reject) => {
+    try {
+      const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
+      if (!userRefreshToken) {
+        throw new Error('No refresh token');
+      }
+
+      const refreshResponse = await AdmissionUserInstance.put(
+        '/user/auth',
+        {},
+        { headers: { 'X-Refresh-Token': userRefreshToken } }
+      );
+
+      if (refreshResponse.status !== 200) {
+        throw new Error(`Refresh failed with status: ${refreshResponse.status}`);
+      }
+
+      const { data } = refreshResponse;
+      setAccessToken(data.accessToken);
+      setRefreshToken(data.refreshToken);
+      resolve(data.accessToken);
+    } catch (err) {
+      removeAccessToken();
+      removeRefreshToken();
+      window.location.href = 'https://auth.entrydsm.kr';
+      reject(err);
+    } finally {
+      isUserRefreshingToken = false;
+      userRefreshTokenPromise = null;
+    }
+  });
+  return userRefreshTokenPromise;
+};
+
+// Helper function for admin token refresh
+const handleAdminTokenRefresh = () => {
+  if (adminRefreshTokenPromise) {
+    return adminRefreshTokenPromise;
+  }
+
+  isAdminRefreshingToken = true;
+  adminRefreshTokenPromise = new Promise(async (resolve, reject) => {
+    try {
+      const adminRefreshToken = getAdminRefreshToken() || cookies.get('adminRefreshToken');
+      if (!adminRefreshToken) {
+        throw new Error('No refresh token');
+      }
+
+      const refreshResponse = await AdmissionAdminInstance.put(
+        '/admin/auth',
+        {},
+        {
+          headers: {
+            'X-Refresh-Token': adminRefreshToken,
+            'Request-User-Id': getAdminId(),
+            'Request-User-Role': 'ADMIN',
+          },
+        }
+      );
+
+      if (refreshResponse.status !== 200) {
+        throw new Error(`Admin refresh failed with status: ${refreshResponse.status}`);
+      }
+
+      const { data } = refreshResponse;
+      setAdminAccessToken(data.accessToken);
+      setAdminRefreshToken(data.refreshToken);
+      resolve(data.accessToken);
+    } catch (err) {
+      removeAdminAccessToken();
+      removeAdminRefreshToken();
+      window.location.href = 'https://auth.entrydsm.kr';
+      reject(err);
+    } finally {
+      isAdminRefreshingToken = false;
+      adminRefreshTokenPromise = null;
+    }
+  });
+  return adminRefreshTokenPromise;
+};
+
+const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  const endpoint = `${method} ${url}`;
+  // 쿼리 파라미터 제거
+  const baseUrl = url.split('?')[0];
+  const endpoint = `${method} ${baseUrl}`;
+
   if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
 
-  const token = getAccessToken() || cookies.get('accessToken');
-  console.log('[UserRequestInterceptor] Token found:', !!token, 'for URL:', config.baseURL + url);
+  let token = getAccessToken() || cookies.get('accessToken');
 
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-    console.log('[UserRequestInterceptor] Authorization header set');
-  } else {
-    console.warn('[UserRequestInterceptor] No token available');
+  if (!token) {
+    try {
+      token = await handleUserTokenRefresh();
+    } catch (error) {
+      console.error('Token refresh failed in request interceptor', error);
+      return Promise.reject(new axios.Cancel('Token refresh failed'));
+    }
   }
 
+  config.headers['Authorization'] = `Bearer ${token}`;
   return config;
 };
 
-const adminRequestInterceptor = (config: InternalAxiosRequestConfig) => {
+const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
 
-  const endpoint = `${method} ${url}`;
+  // 쿼리 파라미터 제거
+  const baseUrl = url.split('?')[0];
+  const endpoint = `${method} ${baseUrl}`;
+
   if (skipAuthUrls.includes(endpoint)) {
     return config;
   }
 
-  const token = getAdminAccessToken() || cookies.get('adminAccessToken');
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
+  let token = getAdminAccessToken() || cookies.get('adminAccessToken');
+
+  if (!token) {
+    try {
+      token = await handleAdminTokenRefresh();
+    } catch (error) {
+      console.error('Admin token refresh failed in request interceptor', error);
+      return Promise.reject(new axios.Cancel('Token refresh failed'));
+    }
   }
+
+  config.headers['Authorization'] = `Bearer ${token}`;
 
   return config;
 };
 
-TestInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
-  if (!config) return Promise.reject(error);
-
-  const retryConfig = config as InternalAxiosRequestConfig & {
-    _retry?: boolean;
-  };
-
-  if (response?.status === 403 && isUserRefreshingToken) {
-    removeAccessToken();
-    removeRefreshToken();
-    window.location.href = 'https://www.entrydsm.hs.kr/';
+  if (!config || (response?.status !== 401 && response?.status !== 403)) {
     return Promise.reject(error);
   }
 
-  if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
-    retryConfig._retry = true;
-    isUserRefreshingToken = true;
+  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    try {
-      const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
-      if (userRefreshToken) {
-        const refreshResponse = await AdmissionUserInstance.put(
-          '/user/auth',
-          {},
-          { headers: { 'X-Refresh-Token': userRefreshToken } }
-        );
-
-        if (refreshResponse.status !== 200) {
-          throw new Error(`Refresh failed with status: ${refreshResponse.status}`);
-        }
-
-        const { data } = refreshResponse;
-        setAccessToken(data.accessToken);
-        setRefreshToken(data.refreshToken);
-
-        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        isUserRefreshingToken = false;
-
-        try {
-          const instanceToUse = config.baseURL?.includes('localhost:3449')
-            ? TestInstance
-            : AdmissionUserInstance;
-
-          const retryResponse = await instanceToUse(retryConfig);
-          return retryResponse;
-        } catch (retryError: any) {
-          if (retryError.response?.status === 401 || retryError.response?.status === 403) {
-            throw retryError;
-          }
-          throw retryError;
-        }
-      }
-
-      throw new Error('No refresh token');
-    } catch (err) {
-      isUserRefreshingToken = false;
-      removeAccessToken();
-      removeRefreshToken();
-      window.location.href = 'https://www.entrydsm.hs.kr/';
-    }
+  if (retryConfig._retry) {
+    return Promise.reject(error);
   }
+  retryConfig._retry = true;
 
-  return Promise.reject(error);
+  try {
+    const newAccessToken = await handleUserTokenRefresh();
+    retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
+    return await AdmissionUserInstance(retryConfig);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
-  if (!config) return Promise.reject(error);
-
-  const retryConfig = config as InternalAxiosRequestConfig & {
-    _retry?: boolean;
-  };
-
-  if (response?.status === 403 && isAdminRefreshingToken) {
-    removeAdminAccessToken();
-    removeAdminRefreshToken();
-    window.location.href = 'https://www.entrydsm.hs.kr/';
+  if (!config || (response?.status !== 401 && response?.status !== 403)) {
     return Promise.reject(error);
   }
 
-  if ((response?.status === 401 || response?.status === 403) && !retryConfig._retry) {
-    console.log(`[AdminResponseInterceptor] ${response.status} detected, trying refresh token`);
-    retryConfig._retry = true;
-    isAdminRefreshingToken = true;
+  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    try {
-      const adminRefreshToken = getAdminRefreshToken() || cookies.get('adminRefreshToken');
-      if (adminRefreshToken) {
-        console.log('[AdminResponseInterceptor] Admin token refresh started');
-        const refreshResponse = await AdmissionAdminInstance.put(
-          '/admin/auth',
-          {},
-          {
-            headers: {
-              'X-Refresh-Token': adminRefreshToken,
-              'Request-User-Id': getAdminId(),
-              'Request-User-Role': 'ADMIN',
-            },
-          }
-        );
-
-        if (refreshResponse.status !== 200) {
-          throw new Error(`Admin refresh failed with status: ${refreshResponse.status}`);
-        }
-
-        const { data } = refreshResponse;
-        setAdminAccessToken(data.accessToken);
-        setAdminRefreshToken(data.refreshToken);
-
-        retryConfig.headers['Authorization'] = `Bearer ${data.accessToken}`;
-        isAdminRefreshingToken = false;
-
-        try {
-          const retryResponse = await AdmissionAdminInstance(retryConfig);
-          return retryResponse;
-        } catch (retryError: any) {
-          if (retryError.response?.status === 401 || retryError.response?.status === 403) {
-            console.error('[AdminResponseInterceptor] Still unauthorized after refresh, logging out');
-            throw retryError;
-          }
-          throw retryError;
-        }
-      }
-
-      console.warn('[AdminResponseInterceptor] No refresh token found');
-      throw new Error('No refresh token');
-    } catch (err) {
-      console.error('[AdminResponseInterceptor] Token refresh failed', err);
-      isAdminRefreshingToken = false;
-      removeAdminAccessToken();
-      removeAdminRefreshToken();
-      window.location.href = 'https://www.entrydsm.hs.kr/';
-    }
+  if (retryConfig._retry) {
+    return Promise.reject(error);
   }
+  retryConfig._retry = true;
 
-  return Promise.reject(error);
+  try {
+    const newAccessToken = await handleAdminTokenRefresh();
+    retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
+    return await AdmissionAdminInstance(retryConfig);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
 AdmissionUserInstance.interceptors.response.use(
-  (response) => response,
-  userResponseInterceptor
-);
-
-TestInstance.interceptors.response.use(
   (response) => response,
   userResponseInterceptor
 );

@@ -13,18 +13,36 @@ import {
   ArrowIcon,
 } from '../assets';
 import React from 'react';
+import { useGetAllSchedule } from '../apis';
+
+// 날짜 포맷 변환 함수 (yyyy-MM-ddTHH:mm:ss -> MM/DD)
+const formatDateToMMDD = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${month}/${day}`;
+};
+
+// D-day 계산 함수
+const calculateDday = (dateString: string) => {
+  if (!dateString) return null;
+  const targetDate = new Date(dateString);
+  const today = new Date();
+
+  // 시간 제거하고 날짜만 비교
+  targetDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const diffTime = targetDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
+};
 
 const mockData = {
-  applicationPeriod: '03/15~03/19',
   admissionRate: '12명 /64명',
   competitionRate: '2.8 : 1',
-  firstRoundDeadline: '5일',
-  processSchedule: [
-    { step: '원서 제출', date: '10/22~10/30' },
-    { step: '1차 발표', date: '11/05' },
-    { step: '2차 전형', date: '11/10~11/15' },
-    { step: '최종 합격자 발표', date: '11/25' }
-  ],
   applicationTypes: [
     { type: '일반 전형', count: '11/64', percentage: '12.00%', color: '#1DB954' },
     { type: '마이스터 전형', count: '11/64', percentage: '12.00%', color: '#FF7A00' },
@@ -55,24 +73,106 @@ const mockData = {
 };
 
 export const StatisticsLandingPage = () => {
+  const { data: scheduleData, isLoading } = useGetAllSchedule();
+
+  // 스케줄 데이터에서 날짜 찾기
+  const findDate = (type: string) =>
+    scheduleData?.schedules?.find((s: any) => s.type === type)?.date || '';
+
+  const startDate = findDate('START_DATE');
+  const endDate = findDate('END_DATE');
+  const firstAnnouncement = findDate('FIRST_ANNOUNCEMENT');
+  const interview = findDate('INTERVIEW');
+  const finalAnnouncement = findDate('SECOND_ANNOUNCEMENT');
+
+  // 원서 제출 기간 포맷
+  const applicationPeriod = isLoading
+    ? ''
+    : startDate && endDate
+      ? `${formatDateToMMDD(startDate)}~${formatDateToMMDD(endDate)}`
+      : '--/--~--/--';
+
+  // 전형 일정
+  const processSchedule = [
+    { step: '원서 제출', date: isLoading ? '' : applicationPeriod },
+    { step: '1차 발표', date: isLoading ? '' : firstAnnouncement ? formatDateToMMDD(firstAnnouncement) : '--/--' },
+    { step: '2차 전형', date: isLoading ? '' : interview ? formatDateToMMDD(interview) : '--/--' },
+    { step: '최종 합격자 발표', date: isLoading ? '' : finalAnnouncement ? formatDateToMMDD(finalAnnouncement) : '--/--' }
+  ];
+
+  // 각 단계별 마감일 계산
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 각 단계 완료 여부 확인
+  const endDateTime = endDate ? new Date(endDate) : null;
+  const firstAnnouncementTime = firstAnnouncement ? new Date(firstAnnouncement) : null;
+  const interviewTime = interview ? new Date(interview) : null;
+  const finalAnnouncementTime = finalAnnouncement ? new Date(finalAnnouncement) : null;
+
+  if (endDateTime) endDateTime.setHours(0, 0, 0, 0);
+  if (firstAnnouncementTime) firstAnnouncementTime.setHours(0, 0, 0, 0);
+  if (interviewTime) interviewTime.setHours(0, 0, 0, 0);
+  if (finalAnnouncementTime) finalAnnouncementTime.setHours(0, 0, 0, 0);
+
+  const isStep1Complete = endDateTime ? endDateTime <= today : false; // 원서 제출 마감
+  const isStep2Complete = firstAnnouncementTime ? firstAnnouncementTime <= today : false; // 1차 발표
+  const isStep3Complete = interviewTime ? interviewTime <= today : false; // 2차 전형
+  const isStep4Complete = finalAnnouncementTime ? finalAnnouncementTime <= today : false; // 최종 발표
+
+  // 현재 진행 중인 단계의 마감일 계산
+  let currentDeadline = '';
+  let currentDeadlineDate = '';
+
+  if (!isStep1Complete && endDate) {
+    // 1차: 원서 제출 마감
+    const dday = calculateDday(endDate);
+    currentDeadlineDate = endDate;
+    currentDeadline = dday === null ? '--일' : dday > 0 ? `${dday}일` : dday === 0 ? '오늘' : '마감';
+  } else if (!isStep2Complete && firstAnnouncement) {
+    // 2차: 1차 발표일
+    const dday = calculateDday(firstAnnouncement);
+    currentDeadlineDate = firstAnnouncement;
+    currentDeadline = dday === null ? '--일' : dday > 0 ? `${dday}일` : dday === 0 ? '오늘' : '마감';
+  } else if (!isStep3Complete && interview) {
+    // 3차: 2차 전형일
+    const dday = calculateDday(interview);
+    currentDeadlineDate = interview;
+    currentDeadline = dday === null ? '--일' : dday > 0 ? `${dday}일` : dday === 0 ? '오늘' : '마감';
+  } else if (!isStep4Complete && finalAnnouncement) {
+    // 4차: 최종 발표일
+    const dday = calculateDday(finalAnnouncement);
+    currentDeadlineDate = finalAnnouncement;
+    currentDeadline = dday === null ? '--일' : dday > 0 ? `${dday}일` : dday === 0 ? '오늘' : '마감';
+  } else {
+    currentDeadline = '--일';
+  }
+
+  const displayDeadline = isLoading ? '' : currentDeadline;
+  const ddayValue = currentDeadlineDate ? calculateDday(currentDeadlineDate) : null;
+
   return (
     <Container>
       <ProcessTitle>전형 일정</ProcessTitle>
       <ProcessSection>
         <ProcessSteps>
-          {mockData.processSchedule.map((item, index) => (
+          {processSchedule.map((item, index) => (
             <React.Fragment key={index}>
               <ProcessItem>
                 <StepIcon>
-                  {index === 0 && <OneIcon />}
-                  {index === 1 && <TwoIcon />}
-                  {index === 2 && <ThreeIcon />}
-                  {index === 3 && <FourIcon />}
+                  {index === 0 && <OneIcon isActive={isStep1Complete} />}
+                  {index === 1 && <TwoIcon isActive={isStep2Complete} />}
+                  {index === 2 && <ThreeIcon isActive={isStep3Complete} />}
+                  {index === 3 && <FourIcon isActive={isStep4Complete} />}
                 </StepIcon>
                 <StepLabel>{item.step}</StepLabel>
-                <StepDate>{item.date}</StepDate>
+                {isLoading ? (
+                  <SkeletonDate />
+                ) : (
+                  <StepDate>{item.date}</StepDate>
+                )}
               </ProcessItem>
-              {index < mockData.processSchedule.length - 1 && (
+              {index < processSchedule.length - 1 && (
                 <ArrowContainer>
                   <ArrowIcon />
                 </ArrowContainer>
@@ -86,7 +186,7 @@ export const StatisticsLandingPage = () => {
         <StatCard>
           <StatContent>
             <StatTitle>원서 제출 기간</StatTitle>
-            <StatValue>{mockData.applicationPeriod}</StatValue>
+            {isLoading ? <SkeletonValue /> : <StatValue>{applicationPeriod}</StatValue>}
           </StatContent>
           <StatIcon>
             <ApplicationPeriodIcon />
@@ -115,8 +215,27 @@ export const StatisticsLandingPage = () => {
 
         <StatCard>
           <StatContent>
-            <StatTitle>1차 전형 마감일</StatTitle>
-            <StatValue><StatSubtitle>앞으로</StatSubtitle> {mockData.firstRoundDeadline}</StatValue>
+            <StatTitle>
+              {!isStep1Complete && endDate
+                ? '1차 전형 마감일'
+                : !isStep2Complete && firstAnnouncement
+                  ? '2차 전형 마감일'
+                  : !isStep3Complete && interview
+                    ? '입학절차 마감일'
+                    : !isStep4Complete && finalAnnouncement
+                      ? '입학절차 마감일'
+                      : '전형 마감일'}
+            </StatTitle>
+            {isLoading ? (
+              <SkeletonValue />
+            ) : (
+              <StatValue>
+                {ddayValue !== null && ddayValue > 0 && (
+                  <StatSubtitle>앞으로 </StatSubtitle>
+                )}
+                {displayDeadline}
+              </StatValue>
+            )}
           </StatContent>
           <StatIcon>
             <FirstRoundDeadlineIcon />
@@ -523,4 +642,45 @@ const MapLegendCount = styled.div`
   font-size: 32px;
   font-weight: 600;
   color: ${colors.gray[500]};
+`;
+
+const SkeletonDate = styled.div`
+  width: 80px;
+  height: 20px;
+  background-color: ${colors.gray[200]};
+  border-radius: 4px;
+  margin-bottom: 20px;
+  animation: skeleton-loading 1.5s infinite ease-in-out;
+
+  @keyframes skeleton-loading {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }
+`;
+
+const SkeletonValue = styled.div`
+  width: 120px;
+  height: 32px;
+  background-color: ${colors.gray[200]};
+  border-radius: 4px;
+  animation: skeleton-loading 1.5s infinite ease-in-out;
+
+  @keyframes skeleton-loading {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
+  }
 `;

@@ -14,5 +14,5 @@ export const deleteUser = async (userData: IDeleteUserRequestType): Promise<void
 
 // 비밀번호 변경 API
 export const changePassword = async (userData: IChangePasswordRequestType): Promise<void> => {
-  await AdmissionUserInstance.patch('/auth/user/password', userData);
+  await AdmissionUserInstance.patch('/user/password', userData);
 };

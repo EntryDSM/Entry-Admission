@@ -1,4 +1,4 @@
-import { TestInstance } from '@entry/util-config';
+// import { TestInstance } from '@entry/util-config';
 
 export interface ApplicationData {
   entranceYear: string;
@@ -67,60 +67,60 @@ export interface ApplicationData {
   studyPlan: string;
 }
 
-// 원서 접수/수정 (Upsert)
-export const submitApplication = async (data: ApplicationData) => {
-  const response = await TestInstance.post('/application', data);
-  return response.data;
-};
+// // 원서 접수/수정 (Upsert)
+// export const submitApplication = async (data: ApplicationData) => {
+//   const response = await TestInstance.post('/application', data);
+//   return response.data;
+// };
 
-// 원서 확정
-export const confirmApplication = async () => {
-  const response = await TestInstance.patch('/application/confirm');
-  return response.data;
-};
+// // 원서 확정
+// export const confirmApplication = async () => {
+//   const response = await TestInstance.patch('/application/confirm');
+//   return response.data;
+// };
 
-// 원서 확정 취소
-export const cancelApplication = async () => {
-  const response = await TestInstance.patch('/application/cancel');
-  return response.data;
-};
+// // 원서 확정 취소
+// export const cancelApplication = async () => {
+//   const response = await TestInstance.patch('/application/cancel');
+//   return response.data;
+// };
 
-// 원서 PDF 미리보기용 URL 생성
-export const getApplicationPDFUrl = async (): Promise<string> => {
-  const response = await TestInstance.get('/application/pdf', {
-    responseType: 'blob',
-  });
+// // 원서 PDF 미리보기용 URL 생성
+// export const getApplicationPDFUrl = async (): Promise<string> => {
+//   const response = await TestInstance.get('/application/pdf', {
+//     responseType: 'blob',
+//   });
 
-  // Blob URL 생성하여 반환
-  return window.URL.createObjectURL(new Blob([response.data]));
-};
+//   // Blob URL 생성하여 반환
+//   return window.URL.createObjectURL(new Blob([response.data]));
+// };
 
-// 원서 PDF 다운로드
-export const downloadApplicationPDF = async () => {
-  const response = await TestInstance.get('/application/pdf', {
-    responseType: 'blob',
-  });
+// // 원서 PDF 다운로드
+// export const downloadApplicationPDF = async () => {
+//   const response = await TestInstance.get('/application/pdf', {
+//     responseType: 'blob',
+//   });
 
-  // Blob으로 파일 다운로드 처리
-  const url = window.URL.createObjectURL(new Blob([response.data]));
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', '입학원서.pdf');
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.URL.revokeObjectURL(url);
-};
+//   // Blob으로 파일 다운로드 처리
+//   const url = window.URL.createObjectURL(new Blob([response.data]));
+//   const link = document.createElement('a');
+//   link.href = url;
+//   link.setAttribute('download', '입학원서.pdf');
+//   document.body.appendChild(link);
+//   link.click();
+//   link.remove();
+//   window.URL.revokeObjectURL(url);
+// };
 
-// 이미지 업로드
-export const uploadImage = async (file: File) => {
-  const formData = new FormData();
-  formData.append('image', file);
+// // 이미지 업로드
+// export const uploadImage = async (file: File) => {
+//   const formData = new FormData();
+//   formData.append('image', file);
 
-  const response = await TestInstance.post('/upload-image', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
-};
+//   const response = await TestInstance.post('/upload-image', formData, {
+//     headers: {
+//       'Content-Type': 'multipart/form-data',
+//     },
+//   });
+//   return response.data;
+// };

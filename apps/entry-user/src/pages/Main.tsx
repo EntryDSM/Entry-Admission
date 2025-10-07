@@ -4,6 +4,7 @@ import { ApplicationTimeline, FaqSection, InfoSection } from '../components';
 import { school } from '../assets';
 import { getAccessToken } from '@entry/util-config';
 import { useSchedule } from '../hooks/useSchedule';
+import { toast } from 'react-toastify';
 
 export const Main = () => {
   const isLoggedIn = !!getAccessToken();
@@ -17,9 +18,18 @@ export const Main = () => {
       : false;
 
   const handleApplyClick = () => {
-    if (!isLoggedIn || !isTrueSchedule) return;
-    window.location.href = 'https://admission.entrydsm.kr';
+    if (!isLoggedIn) {
+      toast.error('로그인 후 지원이 가능합니다.');
+      return;
+    } else if (!isTrueSchedule) {
+      toast.error('아직 지원 기간이 아닙니다.');
+      return;
+    } else {
+      window.location.href = 'https://admission.entrydsm.kr';
+    }
   };
+
+  const canApply = isLoggedIn && isTrueSchedule;
 
   return (
     <>
@@ -36,7 +46,7 @@ export const Main = () => {
 
           <TimelineSection>
             <ApplicationTimeline />
-            <ApplyButton onClick={handleApplyClick} disabled={!isLoggedIn}>
+            <ApplyButton onClick={handleApplyClick} $disabled={!canApply}>
               지원하기
             </ApplyButton>
           </TimelineSection>
@@ -140,10 +150,11 @@ const TimelineSection = styled.div`
   }
 `;
 
-const ApplyButton = styled.button`
+const ApplyButton = styled.button<{ $disabled?: boolean }>`
   width: 210px;
   margin-top: 60px;
-  background-color: ${colors.orange[800]};
+  background-color: ${({ $disabled }) =>
+    $disabled ? colors.orange[500] : colors.orange[800]};
   color: white;
   border: none;
   border-radius: 16px;
@@ -154,8 +165,8 @@ const ApplyButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${colors.orange[850]};
-    transform: translateY(-2px);
+    background-color: ${({ $disabled }) =>
+      $disabled ? colors.orange[500] : colors.orange[850]};
   }
 
   &:active {
@@ -164,7 +175,6 @@ const ApplyButton = styled.button`
 
   &:disabled {
     background-color: ${colors.orange[500]};
-    cursor: not-allowed;
     transform: none;
   }
 

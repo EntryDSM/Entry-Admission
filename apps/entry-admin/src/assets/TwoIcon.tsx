@@ -1,7 +1,7 @@
-export const TwoIcon = () => {
+export const TwoIcon = ({ isActive = false }: { isActive?: boolean }) => {
   return (
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="64" height="64" rx="32" fill="#D6D6D6"/>
+<rect width="64" height="64" rx="32" fill={isActive ? "#1DB954" : "#D6D6D6"}/>
 <path d="M24 43V40.5L31.8438 32.5938C34.3125 30 35.5625 28.5625 35.5625 26.5938C35.5625 24.375 33.75 22.9375 31.375 22.9375C28.875 22.9375 27.25 24.5312 27.25 26.9375H24C23.9688 22.8125 27.125 20.0625 31.4375 20.0625C35.8125 20.0625 38.8125 22.8125 38.8438 26.5C38.8125 29.0312 37.625 31.0312 33.375 35.2188L28.7812 39.875V40.0625H39.2188V43H24Z" fill="white"/>
 </svg>
 );
