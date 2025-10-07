@@ -4,7 +4,12 @@ import { Button } from './Button';
 import styled from '@emotion/styled';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useUserInfo, getAccessToken } from '@entry/util-config';
+import {
+  useUserInfo,
+  getAccessToken,
+  removeAccessToken,
+  removeRefreshToken,
+} from '@entry/util-config';
 
 // 공통 스크롤 감지 훅
 const useScrollY = () => {
@@ -66,6 +71,12 @@ export const AdminHeader = () => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    removeAccessToken();
+    removeRefreshToken();
+    window.location.href = 'https://entrydsm.kr/';
+  };
+
   return (
     <HeaderContainer scrollPosition={scrollPosition}>
       <Flex
@@ -102,7 +113,7 @@ export const AdminHeader = () => {
             </NavContent>
           ))}
         </Flex>
-        <Btn>로그아웃</Btn>
+        <Btn onClick={handleLogout}>로그아웃</Btn>
         <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
       </Flex>
       {isSideClick && (
@@ -194,7 +205,12 @@ export const CommonHeader = () => {
             >
               마이페이지
             </NavContent>
-            <Text isSpan fontSize={18} fontWeight={500} color={colors.gray[500]}>
+            <Text
+              isSpan
+              fontSize={18}
+              fontWeight={500}
+              color={colors.gray[500]}
+            >
               {userInfo?.name || '사용자'}
               <Text
                 isSpan
@@ -226,7 +242,7 @@ export const CommonHeader = () => {
             </SideNavContent>
           ))}
           {isLoggedIn && (
-          <SideNavContent onClick={() => navClick('/mypage')}>
+            <SideNavContent onClick={() => navClick('/mypage')}>
               마이페이지
             </SideNavContent>
           )}
@@ -245,7 +261,9 @@ export const AuthHeader = ({ isAdmin }: IAuthHeaderType) => {
 
   return (
     <AuthHeaderContainer>
-      <LogoContainer onClick={() => window.location.href = "https://entrydsm.kr/"}>
+      <LogoContainer
+        onClick={() => (window.location.href = 'https://entrydsm.kr/')}
+      >
         <EntryLogo isAdmin={isAdmin} />
         <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
           EntryDSM

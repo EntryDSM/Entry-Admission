@@ -1,66 +1,79 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
-import { toast } from 'react-toastify';
+import { IApplicationType } from '../apis/application/types';
+import { usePatchPrintsArrived, usePatchPrintsNotArrived } from '../apis';
+import { useCallback } from 'react';
 
-interface IApplicantType {
-  number: number;
-  name: string;
-  region: string;
-  admission: string;
-  received: boolean;
-  submitted: boolean;
-  onClick?: () => void;
-  onReceivedChange?: (received: boolean) => void;
-  onSubmittedChange?: (submitted: boolean) => void;
-}
+type IApplicationComponentType = IApplicationType & {
+  onClick: () => void;
+};
 
 export const Applicant = ({
-  number,
-  name,
-  region,
-  admission,
-  received,
-  submitted,
+  applicationId,
+  receiptCode,
+  applicantName,
+  applicationType,
+  educationalStatus,
+  isDaejeon,
+  isArrived,
   onClick,
-  onReceivedChange,
-  onSubmittedChange,
-}: IApplicantType) => {
-  const handleReceivedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onReceivedChange?.(e.target.checked);
-    toast.success('원서 도착 상태가 변경되었습니다.');
-  };
+}: IApplicationComponentType) => {
+  const { mutate: patchArrived } = usePatchPrintsArrived();
+  const { mutate: patchNotArrived } = usePatchPrintsNotArrived();
 
-  const handleSubmittedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSubmittedChange?.(e.target.checked);
-    toast.success('최종 제출 상태가 변경되었습니다.');
-  };
+  const handleCheckBoxClick = useCallback(
+    (e: React.MouseEvent<HTMLInputElement>) => {
+      e.stopPropagation();
+
+      if (!receiptCode) return;
+
+      if (isArrived) {
+        patchNotArrived(receiptCode);
+      } else {
+        patchArrived(receiptCode);
+      }
+    },
+    [isArrived, receiptCode, patchArrived, patchNotArrived]
+  );
 
   return (
-    <Container onClick={onClick}>
+    <Container key={applicationId} onClick={onClick}>
       <LeftContent>
-        <Content>{number}</Content>
-        <Content>{name}</Content>
-        <Content className="tablet-hidden">{region}</Content>
-        <Content className="mobile-hidden">{admission}</Content>
-      </LeftContent>
-      <RightContent>
+        <Content>{receiptCode || '-'}</Content>
+        <Content>{applicantName}</Content>
+        <Content className="tablet-hidden">
+          {isDaejeon ? '대전' : '전국'}
+        </Content>
+        <Content className="mobile-hidden">
+          {applicationType === 'SOCIAL'
+            ? '사회통합'
+            : applicationType === 'MEISTER'
+            ? '마이스터전형'
+            : applicationType === 'COMMON'
+            ? '일반'
+            : '-'}
+        </Content>
+        <Content>
+          {educationalStatus === 'PROSPECTIVE_GRADUATE'
+            ? '졸업 예정'
+            : educationalStatus === 'GRADUATE'
+            ? '졸업'
+            : educationalStatus === 'QUALIFICATION_EXAM'
+            ? '검정고시'
+            : '-'}
+        </Content>
         <CheckboxContent className="mobile-hidden">
           <StyledCheckbox
             type="checkbox"
-            checked={received}
-            onChange={handleReceivedChange}
-            onClick={(e) => e.stopPropagation()}
+            checked={!!isArrived}
+            onClick={handleCheckBoxClick}
+            readOnly
           />
         </CheckboxContent>
-        <CheckboxContent>
-          <StyledCheckbox
-            type="checkbox"
-            checked={submitted}
-            onChange={handleSubmittedChange}
-            onClick={(e) => e.stopPropagation()}
-          />
+        <CheckboxContent className="mobile-hidden">
+          {isArrived ? '완료' : '미완료'}
         </CheckboxContent>
-      </RightContent>
+      </LeftContent>
     </Container>
   );
 };
@@ -71,7 +84,7 @@ const Container = styled.div`
   border-top: 1px solid ${colors.gray[300]};
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   cursor: pointer;
 
   @media (max-width: 768px) {
@@ -94,84 +107,105 @@ const Container = styled.div`
 const LeftContent = styled.div`
   display: flex;
   align-items: center;
+  width: 100%;
+
+  > div {
+    text-align: center;
+    flex-shrink: 0;
+  }
 
   > div:nth-of-type(1) {
-    width: 80px;
-    text-align: center;
+    width: 100px;
   } /* 접수 번호 */
   > div:nth-of-type(2) {
-    width: 80px;
-    text-align: center;
+    width: 100px;
   } /* 이름 */
   > div:nth-of-type(3) {
-    width: 80px;
-    text-align: center;
+    width: 100px;
   } /* 지역 */
   > div:nth-of-type(4) {
-    width: 150px;
-    text-align: center;
+    width: 140px;
   } /* 전형 */
+  > div:nth-of-type(5) {
+    width: 120px;
+  } /* 학력 */
+  > div:nth-of-type(6) {
+    width: 120px;
+  } /* 원서 도착 */
+  > div:nth-of-type(7) {
+    width: 120px;
+  } /* 최종 제출 */
 
   @media (max-width: 1200px) {
     > div:nth-of-type(1) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(2) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(3) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(4) {
       width: 120px;
     }
-  }
-
-  @media (max-width: 768px) {
-    > div:nth-of-type(1) {
-      width: 60px;
+    > div:nth-of-type(5) {
+      width: 100px;
     }
-    > div:nth-of-type(2) {
-      width: 60px;
+    > div:nth-of-type(6) {
+      width: 100px;
     }
-    > div:nth-of-type(3) {
-      width: 60px;
-    }
-    > div:nth-of-type(4) {
+    > div:nth-of-type(7) {
       width: 100px;
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     > div:nth-of-type(1) {
-      width: 50px;
+      width: 70px;
     }
     > div:nth-of-type(2) {
-      width: 50px;
+      width: 70px;
     }
     > div:nth-of-type(3) {
-      width: 50px;
+      width: 70px;
+    }
+    > div:nth-of-type(4) {
+      width: 100px;
+    }
+    > div:nth-of-type(5) {
+      width: 80px;
+    }
+    > div:nth-of-type(6) {
+      width: 80px;
+    }
+    > div:nth-of-type(7) {
+      width: 80px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    > div:nth-of-type(1) {
+      width: 60px;
+    }
+    > div:nth-of-type(2) {
+      width: 60px;
+    }
+    > div:nth-of-type(3) {
+      width: 60px;
     }
     > div:nth-of-type(4) {
       width: 80px;
     }
-  }
-`;
-
-const RightContent = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-left: 30%;
-  flex: 1;
-
-  @media (max-width: 1200px) {
-  }
-
-  @media (max-width: 768px) {
-  }
-
-  @media (max-width: 600px) {
+    > div:nth-of-type(5) {
+      width: 70px;
+    }
+    > div:nth-of-type(6) {
+      width: 70px;
+    }
+    > div:nth-of-type(7) {
+      width: 70px;
+    }
   }
 `;
 
@@ -179,6 +213,9 @@ const Content = styled.div`
   font-size: 16px;
   color: ${colors.gray[400]};
   padding: 32px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   @media (max-width: 1200px) {
     padding: 24px 0;
@@ -200,22 +237,22 @@ const Content = styled.div`
 `;
 
 const CheckboxContent = styled.div`
-  width: 120px;
-  text-align: center;
   padding: 32px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: ${colors.gray[400]};
 
   @media (max-width: 1200px) {
-    width: 100px;
     padding: 24px 0;
   }
 
   @media (max-width: 768px) {
-    width: 80px;
     padding: 20px 0;
   }
 
   @media (max-width: 600px) {
-    width: 70px;
     padding: 16px 0;
   }
 

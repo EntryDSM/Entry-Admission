@@ -2,28 +2,25 @@ import { useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { cancel } from '../assets';
-
-interface IApplicantType {
-  number: number;
-  name: string;
-  region: string;
-  admission: string;
-  received: boolean;
-  submitted: boolean;
-}
+import { useGetApplicationDetail } from '../apis';
 
 interface IApplicantDetailModalType {
-  applicant: IApplicantType | null;
+  applicationId: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export const ApplicantDetailModal = ({
-  applicant,
+  applicationId,
   isOpen,
   onClose,
 }: IApplicantDetailModalType) => {
   const scrollPositionRef = useRef(0);
+  const {
+    data: application,
+    isLoading,
+    isError,
+  } = useGetApplicationDetail(applicationId);
 
   useEffect(() => {
     if (isOpen) {
@@ -39,7 +36,35 @@ export const ApplicantDetailModal = ({
     }
   }, [isOpen]);
 
-  if (!isOpen || !applicant) return null;
+  const statusMap: Record<string, string> = {
+    NOT_APPLIED: '미지원',
+    WRITING: '원서 작성 중',
+    SUBMITTED: '지원 완료',
+    WAITING_DOCUMENTS: '서류 도착 대기',
+    DOCUMENTS_RECEIVED: '서류 접수 완료',
+    SCREENING_IN_PROGRESS: '전형 진행 중',
+    RESULT_ANNOUNCED: '합격 여부 확인',
+  };
+
+  if (!isOpen || !applicationId) return null;
+
+  if (isLoading)
+    return (
+      <ModalOverlay>
+        <ModalContent>
+          <LoadingText>원서 정보를 불러오는 중입니다...</LoadingText>
+        </ModalContent>
+      </ModalOverlay>
+    );
+
+  if (isError)
+    return (
+      <ModalOverlay>
+        <ModalContent>
+          <ErrorText>원서 정보를 불러오는 중 오류가 발생했습니다.</ErrorText>
+        </ModalContent>
+      </ModalOverlay>
+    );
 
   return (
     <ModalOverlay onClick={onClose}>
@@ -50,27 +75,78 @@ export const ApplicantDetailModal = ({
 
         <ModalHeader>
           <ApplicantImage>
-            <ProfilePlaceholder />
+            {application?.photoUrl ? (
+              <img
+                src={application.photoUrl}
+                alt="지원자 사진"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <ProfilePlaceholder />
+            )}
           </ApplicantImage>
+
           <ApplicantInfo>
             <ApplicantNumber>
-              접수 번호 <NumberBadge>{applicant.number}번</NumberBadge>
+              접수 번호
+              <NumberBadge>{application?.receiptCode ?? '-'}</NumberBadge>
             </ApplicantNumber>
+
             <InfoRow>
               <InfoLabel>이름</InfoLabel>
-              <InfoValue>{applicant.name}</InfoValue>
+              <InfoValue>{application?.applicantName ?? '-'}</InfoValue>
             </InfoRow>
+
+            <InfoRow>
+              <InfoLabel>생년월일</InfoLabel>
+              <InfoValue>{application?.birthDate ?? '-'}</InfoValue>
+            </InfoRow>
+
             <InfoRow>
               <InfoLabel>지역</InfoLabel>
-              <InfoValue>{applicant.region}</InfoValue>
+              <InfoValue>{application?.isDaejeon ? '대전' : '전국'}</InfoValue>
             </InfoRow>
+
             <InfoRow>
               <InfoLabel>전형</InfoLabel>
-              <InfoValue>{applicant.admission}</InfoValue>
+              <InfoValue>
+                {application?.applicationType === 'SOCIAL'
+                  ? '사회통합'
+                  : application?.applicationType === 'MEISTER'
+                  ? '마이스터전형'
+                  : application?.applicationType === 'COMMON'
+                  ? '일반'
+                  : '-'}
+              </InfoValue>
             </InfoRow>
+
+            <InfoRow>
+              <InfoLabel>학력</InfoLabel>
+              <InfoValue>
+                {application?.educationalStatus === 'PROSPECTIVE_GRADUATE'
+                  ? '졸업 예정'
+                  : application?.educationalStatus === 'GRADUATE'
+                  ? '졸업'
+                  : application?.educationalStatus === 'QUALIFICATION_EXAM'
+                  ? '검정고시'
+                  : '-'}
+              </InfoValue>
+            </InfoRow>
+
             <InfoRow>
               <InfoLabel>성적</InfoLabel>
-              <ScoreValue>100/170</ScoreValue>
+              <ScoreValue>
+                {application?.scores?.totalScore ?? 0}/170
+              </ScoreValue>
+            </InfoRow>
+
+            <InfoRow>
+              <InfoLabel>상태</InfoLabel>
+              <InfoValue>
+                {application?.status
+                  ? statusMap[application.status] ?? application.status
+                  : '-'}
+              </InfoValue>
             </InfoRow>
           </ApplicantInfo>
         </ModalHeader>
@@ -78,14 +154,30 @@ export const ApplicantDetailModal = ({
         <ModalSection>
           <SectionTitle>자기소개서</SectionTitle>
           <SectionContent>
-            자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서자기소개서
+            {application?.selfIntroduce ?? '작성된 자기소개서가 없습니다.'}
           </SectionContent>
         </ModalSection>
 
         <ModalSection>
           <SectionTitle>학업 계획서</SectionTitle>
           <SectionContent>
-            홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동홍길동
+            {application?.studyPlan ?? '작성된 학업 계획서가 없습니다.'}
+          </SectionContent>
+        </ModalSection>
+
+        <ModalSection>
+          <SectionTitle>점수 상세</SectionTitle>
+          <SectionContent>
+            <ScoreRow>
+              과목 점수: {application?.scores?.subjectScore ?? 0}
+            </ScoreRow>
+            <ScoreRow>
+              출결 점수: {application?.scores?.attendanceScore ?? 0}
+            </ScoreRow>
+            <ScoreRow>
+              봉사 점수: {application?.scores?.volunteerScore ?? 0}
+            </ScoreRow>
+            <ScoreRow>가산점: {application?.scores?.bonusScore ?? 0}</ScoreRow>
           </SectionContent>
         </ModalSection>
       </ModalContent>
@@ -124,7 +216,7 @@ const ModalContent = styled.div`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 16px;
+  top: 20px;
   right: 20px;
   background: none;
   border: none;
@@ -132,6 +224,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   color: ${colors.gray[400]};
   z-index: 10;
+  padding: 4px;
 
   &:hover {
     color: ${colors.gray[500]};
@@ -141,12 +234,12 @@ const CloseButton = styled.button`
 const ModalHeader = styled.div`
   display: flex;
   gap: 32px;
-  padding: 32px;
+  padding: 60px 32px 32px 32px;
 
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 16px;
-    padding: 20px;
+    padding: 60px 20px 20px 20px;
   }
 `;
 
@@ -164,7 +257,6 @@ const ProfilePlaceholder = styled.div`
   height: 100%;
   background-color: ${colors.gray[200]};
   border-radius: 8px;
-  position: relative;
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" fill="%23D1D5DB"><rect width="240" height="180" fill="%23F3F4F6"/><circle cx="120" cy="70" r="25" fill="%23D1D5DB"/><path d="M70 140 Q70 115 120 115 Q170 115 170 140 L170 180 L70 180 Z" fill="%23D1D5DB"/></svg>');
   background-size: cover;
   background-position: center;
@@ -176,7 +268,6 @@ const ApplicantInfo = styled.div`
   flex-direction: column;
   gap: 35px;
   min-width: 0;
-  margin-right: 40%;
 `;
 
 const ApplicantNumber = styled.div`
@@ -203,7 +294,7 @@ const InfoRow = styled.div`
 `;
 
 const InfoLabel = styled.div`
-  width: 60px;
+  width: 80px;
   color: ${colors.gray[500]};
   font-size: 18px;
   font-weight: 500;
@@ -246,5 +337,25 @@ const SectionTitle = styled.h3`
 const SectionContent = styled.div`
   line-height: 1.6;
   color: ${colors.gray[400]};
+  font-size: 18px;
+`;
+
+const ScoreRow = styled.div`
+  margin-bottom: 6px;
+  font-size: 16px;
+  color: ${colors.gray[500]};
+`;
+
+const LoadingText = styled.div`
+  padding: 60px;
+  text-align: center;
+  color: ${colors.gray[400]};
+  font-size: 18px;
+`;
+
+const ErrorText = styled.div`
+  padding: 60px;
+  text-align: center;
+  color: red;
   font-size: 18px;
 `;

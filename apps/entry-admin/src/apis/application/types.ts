@@ -1,0 +1,95 @@
+// 원서 전체 조회 타입
+export interface IApplicationAllListRequest {
+  applicationType: 'COMMON' | 'MEISTER' | 'SOCIAL';
+  educationalStatus: 'PROSPECTIVE_GRADUATE' | 'GRADUATE' | 'QUALIFICATION_EXAM';
+  isDaejeon: boolean;
+  page: number;
+  size: number;
+}
+
+// 원서 전체 조회
+export interface IApplicationAllListResponse {
+  success: boolean;
+  data: {
+    applications: IApplicationType[];
+    total: number;
+    page: number;
+    size: number;
+    totalPages: number;
+  };
+}
+
+// 원서 전체 조회 Applicant
+export interface IApplicationType {
+  applicationId: string;
+  receiptCode: number;
+  applicantName: string;
+  applicationType: string;
+  educationalStatus: string;
+  status: string;
+  submittedAt: string;
+  isDaejeon: boolean;
+  isArrived: boolean;
+}
+
+// 원서 상세 조회 타입
+export interface IApplicationDetailRequest {
+  applicationId: string;
+}
+
+export interface IApplicationDetailResponse {
+  success: boolean;
+  data: {
+    applicationId: string;
+    userId: string;
+    receiptCode: number;
+    applicantName: string;
+    applicantTel: string;
+    parentName: string;
+    parentTel: string;
+    birthDate: string;
+    applicationType: string;
+    educationalStatus: string;
+    status: string;
+    submittedAt: string;
+    reviewedAt: string;
+    createdAt: string;
+    updatedAt: string;
+    photoUrl: string;
+    studyPlan: string;
+    selfIntroduce: string;
+    isDaejeon: boolean;
+    scores: {
+      totalScore: number;
+      subjectScore: number;
+      attendanceScore: number;
+      volunteerScore: number;
+      bonusScore: number;
+    };
+  };
+}
+
+// 상세 정보
+export interface IApplicationDetail {
+  applicationId: string;
+  userId: string;
+  receiptCode: number;
+  applicantName: string;
+  applicantTel: string;
+  parentName: string;
+  parentTel: string;
+  birthDate: string;
+  applicationType: string;
+  educationalStatus: string;
+  status: string;
+  submittedAt: string;
+  reviewedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+//원서 학교 도착 여부 업데이트
+interface IPatchApplicationArrivalType {
+  applicationId: string;
+  isArrived: boolean;
+}
