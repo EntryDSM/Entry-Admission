@@ -38,7 +38,7 @@ export const TextAreaContent = ({
         placeholder={placeholder}
       />
       <Text fontSize={12} color={colors.gray[400]}>
-        {inputCount}/1500
+        {inputCount}/1600
       </Text>
     </Flex>
   );
