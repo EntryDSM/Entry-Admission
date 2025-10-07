@@ -97,6 +97,7 @@ export const ApplicantInfo = () => {
         label="증명 사진"
         onFileChange={handleImgChange}
         imgUrl={datas.idPhoto}
+        explanation='증명사진은 3×4cm 규격이어야 합니다.'
       />
       <FormElement
         width="300px"
