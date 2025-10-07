@@ -46,8 +46,6 @@ export const AdmissionsQuota = () => {
     }));
   };
 
-  console.log(datas)
-
   // datas 변경 시 totalMember 자동 계산
   useEffect(() => {
     const general = datas.daejeonGeneral + datas.nationalGeneral;

@@ -23,8 +23,6 @@ export const FormulaCalculator = () => {
     educationalStatus: ''
   });
 
-  console.log(variableData)
-
   const [activeTab, setActiveTab] = useState<
     'COMMON' | 'MEISTER' | 'SOCIAL'
   >('COMMON'); //type send

@@ -337,9 +337,9 @@ export const ApplicationDataProvider: React.FC<{
   const saveToStorage = useCallback(async () => {
     try {
       await saveToIndexedDB(state);
-      console.log('데이터가 임시저장되었습니다.');
+      // console.log('데이터가 임시저장되었습니다.');
     } catch (error) {
-      console.error('임시저장 실패:', error);
+      // console.error('임시저장 실패:', error);
     }
   }, [state]);
 
@@ -348,10 +348,10 @@ export const ApplicationDataProvider: React.FC<{
       const savedData = await loadFromIndexedDB();
       if (savedData) {
         dispatch({ type: 'LOAD_FROM_STORAGE', payload: savedData });
-        console.log('저장된 데이터를 불러왔습니다.');
+        // console.log('저장된 데이터를 불러왔습니다.');
       }
     } catch (error) {
-      console.error('데이터 로드 실패:', error);
+      // console.error('데이터 로드 실패:', error);
     }
   }, []);
 
