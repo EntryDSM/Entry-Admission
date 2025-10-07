@@ -1,7 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AdmissionAdminInstance } from '@entry/util-config';
-import { toast } from 'react-toastify';
-import { IUpdateScheduleRequest } from './types';
+import { useQuery } from '@tanstack/react-query';
+import { AdmissionUserInstance } from '@entry/util-config';
 
 const path = "/schedule"
 
@@ -10,7 +8,7 @@ export const useGetSchedule = (type : string) => {
   return useQuery({
     queryKey: ['schedule', type],
     queryFn: async () => {
-      const { data } = await AdmissionAdminInstance.get(`${path}?type=${type}`);
+      const { data } = await AdmissionUserInstance.get(`${path}?type=${type}`);
       return data;
     },
   });
@@ -21,25 +19,8 @@ export const useGetAllSchedule = () => {
   return useQuery({
     queryKey: ['schedule'],
     queryFn: async () => {
-      const { data } = await AdmissionAdminInstance.get(`${path}/all`);
+      const { data } = await AdmissionUserInstance.get(`${path}/all`);
       return data;
     },
   });
 };
-
-export const useUpdateSchedule = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async(data: IUpdateScheduleRequest) => {
-      const response = await AdmissionAdminInstance.patch(`${path}`, data);
-      return response.data;
-    }, 
-    onSuccess: () => {
-      toast.success('수정이 완료되었습니다.')
-      queryClient.invalidateQueries({ queryKey: ['schedule'] }); //수정된 전체 일정 재로딩
-    },
-    onError: (error) => {
-      toast.error('에러가 발생하였습니다.')
-    }
-  })
-}
