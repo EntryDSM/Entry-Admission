@@ -151,7 +151,7 @@ export const ApplicantsList = () => {
     [filters, currentPage, searchKeyword]
   );
 
-  const { data, refetch } = useGetApplicationAllList(filterParams);
+  const { data, isLoading, refetch } = useGetApplicationAllList(filterParams);
 
   useEffect(() => {
     if (data?.data.applications) {
@@ -283,21 +283,25 @@ export const ApplicantsList = () => {
       </ApplicantsTitle>
 
       <ApplicantsAllList>
-        {filteredApplicants.map((applicant) => (
-          <Applicant
-            key={applicant.applicationId}
-            applicationId={applicant.applicationId}
-            receiptCode={applicant.receiptCode}
-            applicationType={applicant.applicationType}
-            applicantName={applicant.applicantName}
-            educationalStatus={applicant.educationalStatus}
-            status={applicant.status}
-            submittedAt={applicant.submittedAt}
-            isDaejeon={applicant.isDaejeon}
-            isArrived={applicant.isArrived}
-            onClick={() => handleApplicantClick(applicant)}
-          />
-        ))}
+        {isLoading ? (
+          <LoadingContent>지원자 조회 데이터 기다리는 중...</LoadingContent>
+        ) : (
+          filteredApplicants.map((applicant) => (
+            <Applicant
+              key={applicant.applicationId}
+              applicationId={applicant.applicationId}
+              receiptCode={applicant.receiptCode}
+              applicationType={applicant.applicationType}
+              applicantName={applicant.applicantName}
+              educationalStatus={applicant.educationalStatus}
+              status={applicant.status}
+              submittedAt={applicant.submittedAt}
+              isDaejeon={applicant.isDaejeon}
+              isArrived={applicant.isArrived}
+              onClick={() => handleApplicantClick(applicant)}
+            />
+          ))
+        )}
       </ApplicantsAllList>
 
       {selectedApplicant && (
@@ -535,4 +539,12 @@ const Title = styled.div`
 
 const ApplicantsAllList = styled.div`
   width: 100%;
+`;
+
+const LoadingContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${colors.gray[400]};
+  margin-top: 80px;
 `;
