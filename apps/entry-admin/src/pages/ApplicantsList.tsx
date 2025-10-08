@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import {
   Applicant,
@@ -9,140 +9,20 @@ import {
 } from '../components';
 import { colors } from '@entry/design-token';
 import { Button, useModal } from '@entry/ui';
+import {
+  IApplicationAllListRequest,
+  IApplicationType,
+} from '../apis/application/types';
+import {
+  useDownloadAdmissionTicketExcel,
+  useDownloadApplicantCodesExcel,
+  useDownloadApplicationInfoExcel,
+  useDownloadCheckListExcel,
+  useGetApplicationAllList,
+  usePostExamNumber,
+} from '../apis';
 
-interface IApplicantType {
-  number: number;
-  name: string;
-  region: string;
-  admission: string;
-  received: boolean;
-  submitted: boolean;
-}
-
-const ApplicantsListMockData = [
-  {
-    number: 1,
-    name: '홍길동',
-    region: '대전',
-    admission: '마이스터 인재 전형',
-    received: true,
-    submitted: false,
-  },
-  {
-    number: 2,
-    name: '김철수',
-    region: '전국',
-    admission: '일반 전형',
-    received: true,
-    submitted: true,
-  },
-  {
-    number: 3,
-    name: '박영희',
-    region: '대전',
-    admission: '사회통합 전형',
-    received: false,
-    submitted: false,
-  },
-  {
-    number: 4,
-    name: '이민수',
-    region: '전국',
-    admission: '마이스터 인재 전형',
-    received: true,
-    submitted: false,
-  },
-  {
-    number: 5,
-    name: '정수진',
-    region: '대전',
-    admission: '일반 전형',
-    received: true,
-    submitted: true,
-  },
-  {
-    number: 6,
-    name: '최영준',
-    region: '전국',
-    admission: '사회통합 전형',
-    received: false,
-    submitted: false,
-  },
-  {
-    number: 7,
-    name: '강민지',
-    region: '대전',
-    admission: '마이스터 인재 전형',
-    received: true,
-    submitted: false,
-  },
-  {
-    number: 8,
-    name: '윤서준',
-    region: '전국',
-    admission: '일반 전형',
-    received: true,
-    submitted: true,
-  },
-  {
-    number: 9,
-    name: '임하은',
-    region: '대전',
-    admission: '사회통합 전형',
-    received: false,
-    submitted: false,
-  },
-  {
-    number: 10,
-    name: '장도현',
-    region: '전국',
-    admission: '마이스터 인재 전형',
-    received: true,
-    submitted: false,
-  },
-  {
-    number: 11,
-    name: '조예린',
-    region: '대전',
-    admission: '일반 전형',
-    received: true,
-    submitted: true,
-  },
-  {
-    number: 12,
-    name: '신우혁',
-    region: '전국',
-    admission: '사회통합 전형',
-    received: false,
-    submitted: false,
-  },
-  {
-    number: 13,
-    name: '김나영',
-    region: '대전',
-    admission: '마이스터 인재 전형',
-    received: true,
-    submitted: false,
-  },
-  {
-    number: 14,
-    name: '이준호',
-    region: '전국',
-    admission: '일반 전형',
-    received: true,
-    submitted: true,
-  },
-  {
-    number: 15,
-    name: '박서연',
-    region: '대전',
-    admission: '사회통합 전형',
-    received: false,
-    submitted: false,
-  },
-];
-
-type FilterGroupType = 'region' | 'admission' | 'status';
+type FilterGroupType = 'region' | 'admission' | 'status' | 'education';
 
 const regionOptions = [
   { key: 'daejeon', label: '대전', isNationwide: false },
@@ -155,36 +35,44 @@ const admissionOptions = [
   { key: 'social', label: '사회통합 전형' },
 ] as const;
 
-const statusOptions = [
-  { key: 'received', label: '원서 도착' },
-  { key: 'submitted', label: '최종 제출' },
+const statusOptions = [{ key: 'received', label: '원서 도착' }] as const;
+
+const educationOptions = [
+  { key: 'prospective', label: '졸업 예정' },
+  { key: 'graduate', label: '졸업' },
+  { key: 'exam', label: '검정고시' },
 ] as const;
 
 type RegionKey = (typeof regionOptions)[number]['key'];
 type AdmissionKey = (typeof admissionOptions)[number]['key'];
 type StatusKey = (typeof statusOptions)[number]['key'];
+type EducationKey = (typeof educationOptions)[number]['key'];
 
 export const ApplicantsList = () => {
-  // 지원자 리스트 상태 관리
-  const [applicantsList, setApplicantsList] = useState<IApplicantType[]>(
-    ApplicantsListMockData
-  );
+  const [applicantsList, setApplicantsList] = useState<IApplicationType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-
+  const [selectedApplicant, setSelectedApplicant] =
+    useState<IApplicationType | null>(null);
   const [filters, setFilters] = useState<{
     region: Record<RegionKey, boolean>;
     admission: Record<AdmissionKey, boolean>;
     status: Record<StatusKey, boolean>;
+    education: Record<EducationKey, boolean>;
   }>({
     region: { daejeon: false, nationwide: false },
     admission: { general: false, meister: false, social: false },
-    status: { received: false, submitted: false },
+    status: { received: false },
+    education: { prospective: false, graduate: false, exam: false },
   });
 
+  const { mutate: downloadExcel } = useDownloadCheckListExcel();
+  const { mutate: downloadApplicationInfo } = useDownloadApplicationInfoExcel();
+  const { mutate: downloadApplicantCodes } = useDownloadApplicantCodesExcel();
+  const { mutate: downloadAdmissionTicket } = useDownloadAdmissionTicketExcel();
+
+  const { mutate: postExamNumber } = usePostExamNumber();
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemPerPage = 10;
-  const [selectedApplicant, setSelectedApplicant] =
-    useState<IApplicantType | null>(null);
   const { isOpen, open, close } = useModal();
 
   const handleCheckBoxChange = <
@@ -204,61 +92,87 @@ export const ApplicantsList = () => {
     setCurrentPage(1);
   };
 
-  const handleApplicantClick = (applicant: IApplicantType) => {
+  const handleApplicantClick = (applicant: IApplicationType) => {
     setSelectedApplicant(applicant);
     open();
   };
 
-  // received 상태 업데이트
-  const handleReceivedChange = (number: number, received: boolean) => {
-    setApplicantsList((prev) =>
-      prev.map((applicant) =>
-        applicant.number === number ? { ...applicant, received } : applicant
-      )
-    );
+  const getFilterParams = (): IApplicationAllListRequest => {
+    const admissionMap: Record<
+      AdmissionKey,
+      IApplicationAllListRequest['applicationType']
+    > = {
+      general: 'COMMON',
+      meister: 'MEISTER',
+      social: 'SOCIAL',
+    };
+
+    const educationMap: Record<
+      EducationKey,
+      IApplicationAllListRequest['educationalStatus']
+    > = {
+      prospective: 'PROSPECTIVE_GRADUATE',
+      graduate: 'GRADUATE',
+      exam: 'QUALIFICATION_EXAM',
+    };
+
+    const selectedAdmissions = Object.entries(filters.admission)
+      .filter(([, v]) => v)
+      .map(([k]) => k as AdmissionKey);
+
+    const selectedEducation = Object.entries(filters.education)
+      .filter(([, v]) => v)
+      .map(([k]) => k as EducationKey);
+
+    const params: Partial<IApplicationAllListRequest> = {
+      page: 0,
+      size: 20,
+    };
+
+    if (selectedAdmissions.length === 1) {
+      params.applicationType = admissionMap[selectedAdmissions[0]];
+    }
+
+    if (selectedEducation.length === 1) {
+      params.educationalStatus = educationMap[selectedEducation[0]];
+    }
+
+    const isDaejeonSelected = filters.region.daejeon;
+    const isNationwideSelected = filters.region.nationwide;
+    if (isDaejeonSelected !== isNationwideSelected) {
+      params.isDaejeon = isDaejeonSelected;
+    }
+
+    return params as IApplicationAllListRequest;
   };
 
-  // submitted 상태 업데이트
-  const handleSubmittedChange = (number: number, submitted: boolean) => {
-    setApplicantsList((prev) =>
-      prev.map((applicant) =>
-        applicant.number === number ? { ...applicant, submitted } : applicant
-      )
-    );
-  };
+  const filterParams = useMemo(
+    () => getFilterParams(),
+    [filters, currentPage, searchKeyword]
+  );
 
-  // 필터링 로직 (검색까지 포함)
-  const filteredApplicants = applicantsList.filter((a) => {
-    // 검색 키워드 검사 (이름 기준)
-    const matchKeyword = a.name.includes(searchKeyword);
+  const { data, refetch } = useGetApplicationAllList(filterParams);
 
-    const regionActive = Object.values(filters.region).some(Boolean);
-    const admissionActive = Object.values(filters.admission).some(Boolean);
-    const statusActive = Object.values(filters.status).some(Boolean);
+  useEffect(() => {
+    if (data?.data.applications) {
+      setApplicantsList(data.data.applications);
+    }
+  }, [data]);
 
-    const regionOk =
-      !regionActive ||
-      (filters.region.daejeon && a.region === '대전') ||
-      (filters.region.nationwide && a.region === '전국');
+  useEffect(() => {
+    refetch();
+  }, [filterParams]);
 
-    const admissionOk =
-      !admissionActive ||
-      (filters.admission.general && a.admission === '일반 전형') ||
-      (filters.admission.meister && a.admission === '마이스터 인재 전형') ||
-      (filters.admission.social && a.admission === '사회통합 전형');
+  // 검색 필터
+  const filteredApplicants = applicantsList
+    .filter((a) =>
+      a.applicantName
+        .toLocaleLowerCase()
+        .includes(searchKeyword.toLocaleLowerCase())
+    )
+    .sort((a, b) => a.receiptCode - b.receiptCode);
 
-    const statusOk =
-      !statusActive ||
-      (filters.status.received && a.received) ||
-      (filters.status.submitted && a.submitted);
-
-    return matchKeyword && regionOk && admissionOk && statusOk;
-  });
-
-  const totalPage = Math.ceil(filteredApplicants.length / itemPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemPerPage;
-  const endIndex = startIndex + itemPerPage;
-  const currentApplicants = filteredApplicants.slice(startIndex, endIndex);
+  const totalPage = data?.data.totalPages ?? 1;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -274,12 +188,35 @@ export const ApplicantsList = () => {
             backgroundColor={colors.green[400]}
             hoverBackgroundColor={colors.green[500]}
             children="수험번호 업데이트"
+            onClick={() => postExamNumber()}
           />
           <Button
             color={colors.extra.realWhite}
             backgroundColor={colors.green[400]}
             hoverBackgroundColor={colors.green[500]}
-            children="Excel로 내보내기"
+            children="지원서 점검표 출력"
+            onClick={() => downloadExcel()}
+          />
+          <Button
+            color={colors.extra.realWhite}
+            backgroundColor={colors.green[400]}
+            hoverBackgroundColor={colors.green[500]}
+            children="전형 자료 출력"
+            onClick={() => downloadApplicationInfo()}
+          />
+          <Button
+            color={colors.extra.realWhite}
+            backgroundColor={colors.green[400]}
+            hoverBackgroundColor={colors.green[500]}
+            children="1차 합격자 번호 목록 출력"
+            onClick={() => downloadApplicantCodes()}
+          />
+          <Button
+            color={colors.extra.realWhite}
+            backgroundColor={colors.green[400]}
+            hoverBackgroundColor={colors.green[500]}
+            children="수험표 출력"
+            onClick={() => downloadAdmissionTicket()}
           />
         </ButtonContiner>
       </HeadContent>
@@ -318,6 +255,17 @@ export const ApplicantsList = () => {
               />
             ))}
           </Section>
+
+          <Section>
+            {educationOptions.map((item) => (
+              <CheckBox
+                key={item.key}
+                label={item.label}
+                isChecked={filters.education[item.key]}
+                onChange={() => handleCheckBoxChange('education', item.key)}
+              />
+            ))}
+          </Section>
         </LabelContainer>
       </FilterControl>
 
@@ -326,39 +274,35 @@ export const ApplicantsList = () => {
         <LeftTitle>
           <Title>접수 번호</Title>
           <Title>이름</Title>
-          <Title className="tablet-hidden">지역</Title>
-          <Title className="mobile-hidden">전형</Title>
+          <Title>지역</Title>
+          <Title>전형</Title>
+          <Title>학력</Title>
+          <Title>원서 도착</Title>
+          <Title>최종 제출</Title>
         </LeftTitle>
-        <RightTitle>
-          <Title className="mobile-hidden">원서 도착 상태</Title>
-          <Title>최종 제출 여부</Title>
-        </RightTitle>
       </ApplicantsTitle>
 
       <ApplicantsAllList>
-        {currentApplicants.map((applicant) => (
+        {filteredApplicants.map((applicant) => (
           <Applicant
-            key={applicant.number}
-            number={applicant.number}
-            name={applicant.name}
-            region={applicant.region}
-            admission={applicant.admission}
-            received={applicant.received}
-            submitted={applicant.submitted}
+            key={applicant.applicationId}
+            applicationId={applicant.applicationId}
+            receiptCode={applicant.receiptCode}
+            applicationType={applicant.applicationType}
+            applicantName={applicant.applicantName}
+            educationalStatus={applicant.educationalStatus}
+            status={applicant.status}
+            submittedAt={applicant.submittedAt}
+            isDaejeon={applicant.isDaejeon}
+            isArrived={applicant.isArrived}
             onClick={() => handleApplicantClick(applicant)}
-            onReceivedChange={(received) =>
-              handleReceivedChange(applicant.number, received)
-            }
-            onSubmittedChange={(submitted) =>
-              handleSubmittedChange(applicant.number, submitted)
-            }
           />
         ))}
       </ApplicantsAllList>
 
       {selectedApplicant && (
         <ApplicantDetailModal
-          applicant={selectedApplicant}
+          applicationId={selectedApplicant.applicationId}
           isOpen={isOpen}
           onClose={close}
         />
@@ -376,7 +320,7 @@ export const ApplicantsList = () => {
 
 const ButtonContiner = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
 `;
 
@@ -415,26 +359,26 @@ const FilterControl = styled.div`
 `;
 
 const LabelContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
   width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  height: 24px;
+  max-width: 1200px;
+  align-items: start;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    height: auto;
-    gap: 12px;
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   #admission {
-    border-inline: 1px solid ${colors.gray[300]};
-    padding-right: 8px;
-
-    @media (max-width: 768px) {
-      border: none;
-      padding-right: 0;
-    }
+    border-inline: none;
+    padding: 0;
   }
 `;
 
@@ -478,40 +422,84 @@ const ApplicantsTitle = styled.div`
 const LeftTitle = styled.div`
   display: flex;
   align-items: center;
+  width: 100%;
+
+  > div {
+    text-align: center;
+    flex-shrink: 0;
+  }
 
   > div:nth-of-type(1) {
-    width: 80px;
-    text-align: center;
-  }
+    width: 100px;
+  } /* 접수 번호 */
   > div:nth-of-type(2) {
-    width: 80px;
-    text-align: center;
-  }
+    width: 100px;
+  } /* 이름 */
   > div:nth-of-type(3) {
-    width: 80px;
-    text-align: center;
-  }
+    width: 100px;
+  } /* 지역 */
   > div:nth-of-type(4) {
-    width: 150px;
-    text-align: center;
-  }
+    width: 140px;
+  } /* 전형 */
+  > div:nth-of-type(5) {
+    width: 120px;
+  } /* 학력 */
+  > div:nth-of-type(6) {
+    width: 120px;
+  } /* 원서 도착 */
+  > div:nth-of-type(7) {
+    width: 120px;
+  } /* 최종 제출 */
 
   @media (max-width: 1200px) {
     > div:nth-of-type(1) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(2) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(3) {
-      width: 70px;
+      width: 90px;
     }
     > div:nth-of-type(4) {
       width: 120px;
     }
+    > div:nth-of-type(5) {
+      width: 100px;
+    }
+    > div:nth-of-type(6) {
+      width: 100px;
+    }
+    > div:nth-of-type(7) {
+      width: 100px;
+    }
   }
 
   @media (max-width: 768px) {
+    > div:nth-of-type(1) {
+      width: 70px;
+    }
+    > div:nth-of-type(2) {
+      width: 70px;
+    }
+    > div:nth-of-type(3) {
+      width: 70px;
+    }
+    > div:nth-of-type(4) {
+      width: 100px;
+    }
+    > div:nth-of-type(5) {
+      width: 80px;
+    }
+    > div:nth-of-type(6) {
+      width: 80px;
+    }
+    > div:nth-of-type(7) {
+      width: 80px;
+    }
+  }
+
+  @media (max-width: 600px) {
     > div:nth-of-type(1) {
       width: 60px;
     }
@@ -522,52 +510,15 @@ const LeftTitle = styled.div`
       width: 60px;
     }
     > div:nth-of-type(4) {
-      width: 100px;
-    }
-  }
-
-  @media (max-width: 600px) {
-    > div:nth-of-type(1) {
-      width: 50px;
-    }
-    > div:nth-of-type(2) {
-      width: 50px;
-    }
-    > div:nth-of-type(3) {
-      width: 50px;
-    }
-    > div:nth-of-type(4) {
       width: 80px;
     }
-  }
-`;
-
-const RightTitle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-left: 30%;
-  flex: 1;
-
-  > div {
-    width: 120px;
-    text-align: center;
-  }
-
-  @media (max-width: 1200px) {
-    > div {
-      width: 100px;
+    > div:nth-of-type(5) {
+      width: 70px;
     }
-  }
-
-  @media (max-width: 768px) {
-    > div {
-      width: 80px;
+    > div:nth-of-type(6) {
+      width: 70px;
     }
-  }
-
-  @media (max-width: 600px) {
-    > div {
+    > div:nth-of-type(7) {
       width: 70px;
     }
   }
