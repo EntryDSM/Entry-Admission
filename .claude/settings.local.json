@@ -6,7 +6,8 @@
       "Bash(npx nx build:*)",
       "Bash(curl:*)",
       "Bash(cat:*)",
-      "Bash(yarn nx build:*)"
+      "Bash(yarn nx build:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

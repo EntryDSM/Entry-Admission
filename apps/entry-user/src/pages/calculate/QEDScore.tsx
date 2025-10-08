@@ -54,6 +54,10 @@ export const QEDScore = () => {
     safeSetScoreData({ ...safeScoreData, math: value });
   };
 
+  const handleEnglishChange = (value: string) => {
+    safeSetScoreData({ ...safeScoreData, english: value });
+  };
+
   return (
     <Container>
       <Column>
@@ -88,6 +92,14 @@ export const QEDScore = () => {
           title="기술 · 가정"
           value={safeScoreData?.technology || ''}
           onChange={handleTechnologyChange}
+          suffix="점"
+          defaultCount={100}
+        />
+        <AttendanceForm
+          width={'100%'}
+          title="영어"
+          value={safeScoreData?.english || ''}
+          onChange={handleEnglishChange}
           suffix="점"
           defaultCount={100}
         />

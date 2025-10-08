@@ -12,6 +12,7 @@ interface IScoreType {
   math: string | null;
   sci: string | null;
   tech: string | null;
+  eng: string | null;
   [key: string]: string | null;
 }
 
@@ -32,6 +33,7 @@ interface IQEScoreType {
   science: string;
   technology: string;
   math: string;
+  english: string;
 }
 
 interface CalculationState {
@@ -66,6 +68,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   primarySecond: {
     kor: null,
@@ -74,6 +77,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   primaryFirst: {
     kor: null,
@@ -82,6 +86,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   primaryActivity: {
     absences: '',
@@ -100,6 +105,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   graduatedThird1: {
     kor: null,
@@ -108,6 +114,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   graduatedSecond2: {
     kor: null,
@@ -116,6 +123,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   graduatedSecond1: {
     kor: null,
@@ -124,6 +132,7 @@ const initialState: CalculationState = {
     math: null,
     sci: null,
     tech: null,
+    eng: null,
   },
   graduatedActivity: {
     absences: '',
@@ -142,6 +151,7 @@ const initialState: CalculationState = {
     science: '',
     technology: '',
     math: '',
+    english: '',
   },
   qeActivity: {
     absences: '',
