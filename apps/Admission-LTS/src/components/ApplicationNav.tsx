@@ -367,12 +367,12 @@ export const ApplicationNav = ({
           : state.applicationClassification.graduationType === "졸업"
             ? Number(state.activityGraduate.classExit)
             : null,
-      unexcused: 
-        state.applicationClassification.graduationType === "졸업 예정"
-          ? Number(state.activityGraduateProspective.unexcused)
-          : state.applicationClassification.graduationType === "졸업"
-            ? Number(state.activityGraduate.unexcused)
-            : null,
+      // unexcused: 
+      //   state.applicationClassification.graduationType === "졸업 예정"
+      //     ? Number(state.activityGraduateProspective.unexcused)
+      //     : state.applicationClassification.graduationType === "졸업"
+      //       ? Number(state.activityGraduate.unexcused)
+      //       : null,
       volunteer: 
         state.applicationClassification.graduationType === "졸업 예정"
           ? Number(state.activityGraduateProspective.volunteer)
@@ -395,6 +395,10 @@ export const ApplicationNav = ({
       onSuccess: () => {
         setIsLoading(false);
         navigate('/submitted');
+        window.indexedDB.deleteDatabase('ApplicationFormDB'); //db 초기화
+      },
+      onError: () => {
+        window.indexedDB.deleteDatabase('ApplicationFormDB'); //db 초기화
       }
     })
     // try {

@@ -62,7 +62,7 @@ export interface IAdmissionRequest {
   tardiness: number | null, //지각
   earlyLeave: number | null, //조퇴
   classExit: number | null, //결과
-  unexcused: number | null, //미인정
+  // unexcused: number | null, //미인정
   volunteer: number | null, //봉사
   algorithmAward: boolean,
   infoProcessingCert: boolean
