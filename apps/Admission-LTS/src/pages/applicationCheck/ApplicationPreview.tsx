@@ -266,11 +266,7 @@ export const ApplicationPreview = () => {
                 ? Number(state.activityGraduate.classExit)
                 : null,
           unexcused: 
-            state.applicationClassification.graduationType === "졸업 예정"
-              ? Number(state.activityGraduateProspective.unexcused)
-              : state.applicationClassification.graduationType === "졸업"
-                ? Number(state.activityGraduate.unexcused)
-                : null,
+            null,
           volunteer: 
             state.applicationClassification.graduationType === "졸업 예정"
               ? Number(state.activityGraduateProspective.volunteer)

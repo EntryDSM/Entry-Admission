@@ -47,7 +47,7 @@ export const ActivityProspectiveGraduate = () => {
           <Flex width='fit-content' height='fit-content' gap={8} alignItems='center'>
             <Caution/>
             <Text fontSize={16} fontWeight={300} color={colors.orange[700]}>
-              출석은 1,2,3학년 전체 합산하되, 졸업 예정은 3학년 1학기까지, 미인정 지각·조퇴·결과는 3회당 결석 1일로 환산하여 전체 합산합니다.
+              출석은 1,2,3학년 전체 합산합니다.
             </Text>
           </Flex>
         </Flex>
@@ -60,7 +60,7 @@ export const ActivityProspectiveGraduate = () => {
         >
           <AttendanceForm
             width={'48%'}
-            title="결석"
+            title="미인정 결석"
             defaultCount={10}
             onChange={absenceChange}
             value={datas.absence}
@@ -68,7 +68,7 @@ export const ActivityProspectiveGraduate = () => {
           />
           <AttendanceForm
             width={'48%'}
-            title="조퇴"
+            title="미인정 조퇴"
             defaultCount={10}
             onChange={earlyLeaveChange}
             value={datas.earlyLeave}
@@ -76,7 +76,7 @@ export const ActivityProspectiveGraduate = () => {
           />
           <AttendanceForm
             width={'48%'}
-            title="지각"
+            title="미인정 지각"
             defaultCount={10}
             onChange={tardinessChange}
             value={datas.tardiness}
@@ -84,20 +84,20 @@ export const ActivityProspectiveGraduate = () => {
           />
           <AttendanceForm
             width={'48%'}
-            title="결과"
+            title="미인정 결과"
             defaultCount={10}
             value={datas.classExit}
             suffix="회"
             onChange={classExitChange}
           />
-          <AttendanceForm
+          {/* <AttendanceForm
             width={'48%'}
             title="미인정"
             defaultCount={10}
             value={datas.unexcused}
             suffix="회"
             onChange={unexcusedChange}
-          />
+          /> */}
         </Flex>
       </Flex>
       <Flex isColumn={true} gap={24} width="fit-content" height="fit-content">
