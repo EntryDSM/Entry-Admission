@@ -153,57 +153,51 @@ export const MyPage = () => {
 
         {applicationStatus && (
           <ApplicationStatusSection>
-            <StatusTitle>지원 정보</StatusTitle>
-            <StatusGrid>
-              <StatusItem>
-                <StatusLabel>수험번호</StatusLabel>
-                <StatusValue>{applicationStatus.receiptCode || '미부여'}</StatusValue>
-              </StatusItem>
-              <StatusItem>
-                <StatusLabel>제출 상태</StatusLabel>
-                <StatusValue>
-                  <StatusBadge isSubmitted={applicationStatus.isSubmitted}>
-                    {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
-                  </StatusBadge>
+            <StatusTitle>지원 상태</StatusTitle>
+            <StatusBox>
+              <ApplicationType>일반 전형</ApplicationType>
+              <Divider />
+              <StatusInfo>
+                <StatusLabel>지원서 상태 : </StatusLabel>
+                <StatusValue isSubmitted={applicationStatus.isSubmitted}>
+                  {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
                 </StatusValue>
-              </StatusItem>
-              <StatusItem>
-                <StatusLabel>서류 도착</StatusLabel>
-                <StatusValue>
-                  <StatusBadge isSubmitted={applicationStatus.isPrintedArrived}>
-                    {applicationStatus.isPrintedArrived ? '도착 완료' : '미도착'}
-                  </StatusBadge>
-                </StatusValue>
-              </StatusItem>
-            </StatusGrid>
+              </StatusInfo>
+            </StatusBox>
           </ApplicationStatusSection>
         )}
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
-            <Button onClick={handleDownloadApplication}>원서 다운로드</Button>
+            <Button 
+              backgroundColor={colors.orange[800]}
+              color="#FFFFFF"
+              borderColor={colors.orange[800]}
+              hoverBackgroundColor={colors.orange[800]}
+              onClick={handleDownloadApplication}
+            >
+              원서 다운로드
+            </Button>
             <Button
               backgroundColor={colors.gray[50]}
               color={colors.orange[800]}
               borderColor={colors.orange[800]}
               hoverBackgroundColor="transparent"
-              onClick={handleApplicationSubmit}
+              onClick={() => resultModal.open()}
             >
-              원서 접수하기
+              발표 결과 확인
             </Button>
           </Flex>
           <Button
-            backgroundColor={colors.gray[100]}
-            color={colors.gray[400]}
-            borderColor={colors.gray[300]}
-            hoverBackgroundColor={colors.gray[100]}
+            backgroundColor={colors.gray[50]}
+            color={colors.extra.error}
+            borderColor={colors.extra.error}
+            hoverBackgroundColor="transparent"
             onClick={() => setCancelApplicationOpen(true)}
           >
-            원서 작성 제출 취소
+            원서 최종 제출 취소
           </Button>
         </ButtonGroup>
-
-        <EmptyQuestionsArea />
 
         <SettingsTitle>설정</SettingsTitle>
 
@@ -222,7 +216,7 @@ export const MyPage = () => {
           </SettingsRow>
 
           <SettingsRow>
-            <SettingsLabel>제정</SettingsLabel>
+            <SettingsLabel>계정</SettingsLabel>
             <SettingsButtonGroup>
               <Button
                 backgroundColor={colors.gray[50]}
@@ -335,19 +329,11 @@ const ButtonGroup = styled.div`
   flex-wrap: wrap;
 `;
 
-const QuestionsTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 600;
-  color: inherit;
-  margin: 137px 0 0 0;
-`;
-
-
 const SettingsTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
   color: inherit;
-  margin: 142px 0 0 0;
+  margin: 80px 0 0 0;
 `;
 
 const SettingsSection = styled.div`
@@ -373,65 +359,55 @@ const SettingsButtonGroup = styled.div`
   gap: 12px;
 `;
 
-const EmptyQuestionsArea = styled.div`
-  width: 100%;
-  height: 200px;
-  background-color: white;
-  border: 1px solid white;
-  border-radius: 8px;
-  margin-top: 40px;
-`;
-
 const ApplicationStatusSection = styled.div`
-  margin-top: 32px;
-  padding: 24px;
-  background-color: ${colors.gray[50]};
-  border-radius: 12px;
-  border: 1px solid ${colors.gray[200]};
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const StatusTitle = styled.h3`
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
   color: ${colors.gray[500]};
-  margin: 0 0 16px 0;
+  margin: 0;
 `;
 
-const StatusGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const StatusItem = styled.div`
+const StatusBox = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 20px 40px;
+  background-color: ${colors.gray[100]};
+  border-radius: 12px;
+`;
+
+const ApplicationType = styled.span`
+  font-size: 20px;
+  font-weight: 500;
+  color: ${colors.gray[500]};
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: ${colors.gray[300]};
+`;
+
+const StatusInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const StatusLabel = styled.span`
-  font-size: 14px;
-  color: ${colors.gray[400]};
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
+  color: ${colors.gray[500]};
 `;
 
-const StatusValue = styled.span`
-  font-size: 16px;
-  color: ${colors.gray[600]};
+const StatusValue = styled.span<{ isSubmitted: boolean }>`
+  font-size: 24px;
   font-weight: 600;
-`;
-
-const StatusBadge = styled.span<{ isSubmitted: boolean }>`
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  background-color: ${({ isSubmitted }) =>
-    isSubmitted ? '#dcfce7' : '#fee2e2'};
-  color: ${({ isSubmitted }) => (isSubmitted ? '#16a34a' : '#dc2626')};
+  color: ${({ isSubmitted }) => (isSubmitted ? colors.orange[800] : colors.gray[400])};
 `;
