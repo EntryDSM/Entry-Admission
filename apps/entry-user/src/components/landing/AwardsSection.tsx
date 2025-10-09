@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import {
-  Award1,
   Activity1,
   Activity2,
   Activity3,
