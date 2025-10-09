@@ -181,7 +181,11 @@ export const MyPage = () => {
             <StatusInfo>
               <StatusLabel>지원서 상태 : </StatusLabel>
               <StatusValue isSubmitted={applicationStatus?.isSubmitted || false}>
-                {applicationStatus ? (applicationStatus.isSubmitted ? '제출 완료' : '미제출') : '미지원'}
+                {applicationStatus 
+                  ? (applicationStatus.isPrintedArrived 
+                      ? '제출 완료 및 원서 학교 도착' 
+                      : (applicationStatus.isSubmitted ? '제출 완료' : '미제출'))
+                  : '미지원'}
               </StatusValue>
             </StatusInfo>
           </StatusBox>
