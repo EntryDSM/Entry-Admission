@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
 import { Button, AuthInput } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
+import { useCreateNotice, NoticeType } from '../apis';
 
 interface AttachmentFile {
   id: string;
@@ -14,15 +15,19 @@ export const NoticeCreate = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    category: 'admission' as 'admission' | 'orientation',
+    category: 'NOTICE' as NoticeType,
     content: '',
+    isPinned: false,
   });
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
 
+  const { mutate: createNotice, isPending } = useCreateNotice();
+
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const value = field === 'isPinned' ? (e.target as HTMLInputElement).checked : e.target.value;
     setFormData(prev => ({
       ...prev,
-      [field]: e.target.value
+      [field]: value
     }));
   };
 
@@ -52,12 +57,23 @@ export const NoticeCreate = () => {
       return;
     }
 
-    console.log('Create notice:', {
-      ...formData,
-      attachments: attachments.map(att => ({ name: att.name, file: att.file }))
-    });
+    // TODO: 파일 업로드 후 fileName 받아오기
+    const attachFileNames = attachments.map(att => att.name);
 
-    navigate('/notice');
+    createNotice(
+      {
+        title: formData.title,
+        content: formData.content,
+        isPinned: formData.isPinned,
+        type: formData.category,
+        attachFileName: attachFileNames.length > 0 ? attachFileNames : undefined,
+      },
+      {
+        onSuccess: () => {
+          navigate('/notice');
+        },
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -78,13 +94,26 @@ export const NoticeCreate = () => {
         <FormContainer>
           <FormRow>
             <FormLabel>카테고리</FormLabel>
-            <Select 
-              value={formData.category} 
+            <Select
+              value={formData.category}
               onChange={handleInputChange('category')}
             >
-              <option value="admission">입학 공지사항</option>
-              <option value="orientation">예비 신입생 안내</option>
+              <option value="NOTICE">입학 공지사항</option>
+              <option value="GUIDE">예비 신입생 안내</option>
             </Select>
+          </FormRow>
+
+          <FormRow>
+            <CheckboxRow>
+              <CheckboxLabel>
+                <input
+                  type="checkbox"
+                  checked={formData.isPinned}
+                  onChange={handleInputChange('isPinned')}
+                />
+                <span>상단 고정</span>
+              </CheckboxLabel>
+            </CheckboxRow>
           </FormRow>
 
           <FormRow>
@@ -147,6 +176,7 @@ export const NoticeCreate = () => {
             backgroundColor="#9ca3af"
             hoverBackgroundColor="#6b7280"
             onClick={handleCancel}
+            disabled={isPending}
           >
             취소
           </Button>
@@ -154,8 +184,9 @@ export const NoticeCreate = () => {
             backgroundColor="#22c55e"
             hoverBackgroundColor="#16a34a"
             onClick={handleSubmit}
+            disabled={isPending}
           >
-            작성 완료
+            {isPending ? '작성 중...' : '작성 완료'}
           </Button>
         </ButtonSection>
       </Flex>
@@ -306,4 +337,28 @@ const ButtonSection = styled.div`
   gap: 12px;
   justify-content: flex-end;
   width: 100%;
+`;
+
+const CheckboxRow = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: ${colors.gray[400]};
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  span {
+    user-select: none;
+  }
 `;

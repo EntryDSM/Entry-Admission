@@ -3,63 +3,39 @@ import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
 import { Button, TabSection } from '@entry/ui';
 import { useNavigate } from 'react-router-dom';
-
-interface NoticeItem {
-  id: number;
-  title: string;
-  category: 'admission' | 'orientation';
-  date: string;
-}
+import { useGetNoticeList, useDeleteNotice, NoticeType } from '../apis';
 
 const TAB_OPTIONS = [
-  { key: 'admission', label: '입학 공지사항' },
-  { key: 'orientation', label: '예비 신입생 안내' },
-];
-
-const mockNotices: NoticeItem[] = [
-  {
-    id: 1,
-    title: '2025학년도 신입생 오리엔테이션 안내',
-    category: 'admission',
-    date: '2024-10-31',
-  },
-  {
-    id: 2,
-    title: '입학 관련 서류 제출 안내',
-    category: 'admission',
-    date: '2024-10-30',
-  },
-  {
-    id: 3,
-    title: '예비 신입생 사전 교육 일정',
-    category: 'orientation',
-    date: '2024-10-29',
-  },
+  { key: 'NOTICE', label: '입학 공지사항' },
+  { key: 'GUIDE', label: '예비 신입생 안내' },
 ];
 
 export const NoticeList = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'admission' | 'orientation'>('admission');
+  const [activeTab, setActiveTab] = useState<NoticeType>('NOTICE');
+
+  const { data: noticeListData, isLoading } = useGetNoticeList({ type: activeTab });
+  const { mutate: deleteNotice } = useDeleteNotice();
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab as 'admission' | 'orientation');
+    setActiveTab(tab as NoticeType);
   };
 
   const handleCreateClick = () => {
     navigate('/notice/create');
   };
 
-  const handleEditClick = (id: number) => {
+  const handleEditClick = (id: string) => {
     navigate(`/notice/edit/${id}`);
   };
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = (id: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      console.log('Delete notice:', id);
+      deleteNotice(id);
     }
   };
 
-  const filteredNotices = mockNotices.filter(notice => notice.category === activeTab);
+  const notices = noticeListData?.notices || [];
 
   return (
     <Container>
@@ -84,51 +60,71 @@ export const NoticeList = () => {
           options={TAB_OPTIONS}
         />
 
-        <NoticeTable>
-          <TableHeader>
-            <HeaderColumn width="80px">번호</HeaderColumn>
-            <HeaderColumn flex={1} justifyLeft>제목</HeaderColumn>
-            <HeaderColumn width="120px">작성일</HeaderColumn>
-            <HeaderColumn width="140px">관리</HeaderColumn>
-          </TableHeader>
-
-          <TableBody>
-            {filteredNotices.map((notice) => (
-              <TableRow key={notice.id}>
-                <TableCell width="80px">{notice.id}</TableCell>
-                <TableCell flex={1} justifyLeft>
-                  <TitleCell>
-                    {notice.title}
-                  </TitleCell>
-                </TableCell>
-                <TableCell width="120px">{notice.date}</TableCell>
-                <TableCell width="140px">
-                  <ActionButtons>
-                    <ActionButton
-                      onClick={() => handleEditClick(notice.id)}
-                      color="#3b82f6"
-                    >
-                      수정
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => handleDeleteClick(notice.id)}
-                      color="#ef4444"
-                    >
-                      삭제
-                    </ActionButton>
-                  </ActionButtons>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </NoticeTable>
-
-        {filteredNotices.length === 0 && (
-          <EmptyState>
+        {isLoading ? (
+          <LoadingState>
             <Text fontSize={16} color={colors.gray[400]}>
-              등록된 공지사항이 없습니다.
+              공지사항을 불러오는 중...
             </Text>
-          </EmptyState>
+          </LoadingState>
+        ) : (
+          <>
+            <NoticeTable>
+              <TableHeader>
+                <HeaderColumn width="80px">번호</HeaderColumn>
+                <HeaderColumn flex={1} justifyLeft>제목</HeaderColumn>
+                <HeaderColumn width="100px">고정</HeaderColumn>
+                <HeaderColumn width="150px">작성일</HeaderColumn>
+                <HeaderColumn width="140px">관리</HeaderColumn>
+              </TableHeader>
+
+              <TableBody>
+                {notices.map((notice, index) => (
+                  <TableRow key={notice.id}>
+                    <TableCell width="80px">{notices.length - index}</TableCell>
+                    <TableCell flex={1} justifyLeft>
+                      <TitleCell>
+                        {notice.title}
+                      </TitleCell>
+                    </TableCell>
+                    <TableCell width="100px">
+                      {notice.isPinned ? (
+                        <PinBadge>고정</PinBadge>
+                      ) : (
+                        <Text fontSize={12} color={colors.gray[400]}>-</Text>
+                      )}
+                    </TableCell>
+                    <TableCell width="150px">
+                      {new Date(notice.createdAt).toLocaleDateString('ko-KR')}
+                    </TableCell>
+                    <TableCell width="140px">
+                      <ActionButtons>
+                        <ActionButton
+                          onClick={() => handleEditClick(notice.id)}
+                          color="#3b82f6"
+                        >
+                          수정
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => handleDeleteClick(notice.id)}
+                          color="#ef4444"
+                        >
+                          삭제
+                        </ActionButton>
+                      </ActionButtons>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </NoticeTable>
+
+            {notices.length === 0 && (
+              <EmptyState>
+                <Text fontSize={16} color={colors.gray[400]}>
+                  등록된 공지사항이 없습니다.
+                </Text>
+              </EmptyState>
+            )}
+          </>
         )}
       </Flex>
     </Container>
@@ -244,4 +240,20 @@ const EmptyState = styled.div`
   justify-content: center;
   align-items: center;
   padding: 60px 0;
+`;
+
+const LoadingState = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+`;
+
+const PinBadge = styled.span`
+  padding: 4px 8px;
+  background-color: #fef3c7;
+  color: #f59e0b;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
 `;
