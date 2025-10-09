@@ -1,5 +1,5 @@
 import { AdmissionUserInstance } from '@entry/util-config';
-import { IScheduleRequestType, IScheduleResponseType } from './type';
+import { IScheduleRequestType, IScheduleResponseType, IAllScheduleResponseType } from './type';
 import { useQuery } from '@tanstack/react-query';
 
 const path = "/schedule"
@@ -15,7 +15,7 @@ export const fetchSchedule = async (
 
 
 export const useGetAllSchedule = () => {
-  return useQuery({
+  return useQuery<IAllScheduleResponseType>({
     queryKey: ['schedule'],
     queryFn: async () => {
       const { data } = await AdmissionUserInstance.get(`${path}/all`);

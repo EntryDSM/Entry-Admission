@@ -16,3 +16,8 @@ export interface IScheduleResponseType {
     | 'END_DATE';
   date: string;
 }
+
+export interface IAllScheduleResponseType {
+  schedules: IScheduleResponseType[];
+  currentStatus: 'BEFORE_START' | 'RECRUITING' | 'FIRST_ANNOUNCEMENT' | 'INTERVIEW' | 'SECOND_ANNOUNCEMENT' | 'END';
+}
