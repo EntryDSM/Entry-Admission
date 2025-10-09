@@ -27,7 +27,16 @@ export const MyPage = () => {
   // 지원정보 상태 조회
   const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery({
     queryKey: ['applicationStatus'],
-    queryFn: getApplicationStatus,
+    queryFn: async () => {
+      try {
+        return await getApplicationStatus();
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
     retry: false,
   });
 
@@ -151,21 +160,19 @@ export const MyPage = () => {
         <UserName>{userInfo?.name || '사용자'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
-        {applicationStatus && (
-          <ApplicationStatusSection>
-            <StatusTitle>지원 상태</StatusTitle>
-            <StatusBox>
-              <ApplicationType>일반 전형</ApplicationType>
-              <Divider />
-              <StatusInfo>
-                <StatusLabel>지원서 상태 : </StatusLabel>
-                <StatusValue isSubmitted={applicationStatus.isSubmitted}>
-                  {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
-                </StatusValue>
-              </StatusInfo>
-            </StatusBox>
-          </ApplicationStatusSection>
-        )}
+        <ApplicationStatusSection>
+          <StatusTitle>지원 상태</StatusTitle>
+          <StatusBox>
+            <ApplicationType>일반 전형</ApplicationType>
+            <Divider />
+            <StatusInfo>
+              <StatusLabel>지원서 상태 : </StatusLabel>
+              <StatusValue isSubmitted={applicationStatus?.isSubmitted || false}>
+                {applicationStatus ? (applicationStatus.isSubmitted ? '제출 완료' : '미제출') : '미지원'}
+              </StatusValue>
+            </StatusInfo>
+          </StatusBox>
+        </ApplicationStatusSection>
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
