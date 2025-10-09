@@ -13,7 +13,7 @@ import {
   ArrowIcon,
 } from '../assets';
 import React from 'react';
-import { useGetAllSchedule } from '../apis';
+import { useGetAllSchedule, useGetRegionStatistics, useGetCompetitionRate } from '../apis';
 
 // 날짜 포맷 변환 함수 (yyyy-MM-ddTHH:mm:ss -> MM/DD)
 const formatDateToMMDD = (dateString: string) => {
@@ -41,39 +41,16 @@ const calculateDday = (dateString: string) => {
 };
 
 const mockData = {
-  admissionRate: '12명 /64명',
-  competitionRate: '2.8 : 1',
-  applicationTypes: [
-    { type: '일반 전형', count: '11/64', percentage: '12.00%', color: '#1DB954' },
-    { type: '마이스터 전형', count: '11/64', percentage: '12.00%', color: '#FF7A00' },
-    { type: '사회 통합 전형', count: '11/64', percentage: '12.00%', color: '#007BFF' },
-  ],
   genderStats: [
     { gender: '남성', count: '12명', percentage: '12.00%' },
     { gender: '여성', count: '12명', percentage: '12.00%' },
-  ],
-  regionStats: [
-    { region: '대전', count: '12명' },
-    { region: '서울', count: '12명' },
-    { region: '경기', count: '12명' },
-    { region: '부산', count: '12명' },
-    { region: '대구', count: '12명' },
-    { region: '광주', count: '12명' },
-    { region: '세종', count: '12명' },
-    { region: '울산', count: '12명' },
-    { region: '인천', count: '12명' },
-    { region: '제주', count: '12명' },
-    { region: '강원도', count: '12명' },
-    { region: '경상남도', count: '12명' },
-    { region: '전라남도', count: '12명' },
-    { region: '전라북도', count: '12명' },
-    { region: '충청남도', count: '12명' },
-    { region: '충청북도', count: '12명' },
   ],
 };
 
 export const StatisticsLandingPage = () => {
   const { data: scheduleData, isLoading } = useGetAllSchedule();
+  const { data: regionData, isLoading: isRegionLoading } = useGetRegionStatistics();
+  const { data: competitionData, isLoading: isCompetitionLoading } = useGetCompetitionRate();
 
   // 스케줄 데이터에서 날짜 찾기
   const findDate = (type: string) =>
@@ -196,7 +173,13 @@ export const StatisticsLandingPage = () => {
         <StatCard>
           <StatContent>
             <StatTitle>신입생 지원율</StatTitle>
-            <StatValue>{mockData.admissionRate}</StatValue>
+            {isCompetitionLoading ? (
+              <SkeletonValue />
+            ) : (
+              <StatValue>
+                {competitionData?.data?.total?.applicants || 0}명 /{competitionData?.data?.total?.capacity || 0}명
+              </StatValue>
+            )}
           </StatContent>
           <StatIcon>
             <AdmissionRateIcon />
@@ -206,7 +189,13 @@ export const StatisticsLandingPage = () => {
         <StatCard>
           <StatContent>
             <StatTitle>경쟁률</StatTitle>
-            <StatValue>{mockData.competitionRate}</StatValue>
+            {isCompetitionLoading ? (
+              <SkeletonValue />
+            ) : (
+              <StatValue>
+                {competitionData?.data?.total?.rate?.toFixed(1) || 0} : 1
+              </StatValue>
+            )}
           </StatContent>
           <StatIcon>
             <CompetitionRateIcon />
@@ -248,20 +237,43 @@ export const StatisticsLandingPage = () => {
       <SectionContainer>
         <SectionTitle>전형별 접수 현황</SectionTitle>
         <ApplicationTypesGrid>
-          {mockData.applicationTypes.map((item, index) => (
-            <ApplicationTypeCard key={index}>
-              <ApplicationTypeHeader>
-                <ApplicationTypeTitle>{item.type}</ApplicationTypeTitle>
-                <ApplicationTypeCount>{item.count}</ApplicationTypeCount>
-              </ApplicationTypeHeader>
-              <ProgressBarContainer>
-                <ProgressBar progress={18.75} color={item.color} />
-              </ProgressBarContainer>
-              <ApplicationTypePercentage>
-                {item.percentage}가 지원했습니다.
-              </ApplicationTypePercentage>
-            </ApplicationTypeCard>
-          ))}
+          {isCompetitionLoading ? (
+            <>
+              <ApplicationTypeCard><SkeletonValue /></ApplicationTypeCard>
+              <ApplicationTypeCard><SkeletonValue /></ApplicationTypeCard>
+              <ApplicationTypeCard><SkeletonValue /></ApplicationTypeCard>
+            </>
+          ) : (
+            competitionData?.data?.byType?.map((item, index) => {
+              const typeColors: { [key: string]: string } = {
+                'GENERAL': '#1DB954',
+                'MEISTER': '#FF7A00',
+                'SOCIAL': '#007BFF',
+              };
+              const typeNames: { [key: string]: string } = {
+                'GENERAL': '일반 전형',
+                'MEISTER': '마이스터 전형',
+                'SOCIAL': '사회 통합 전형',
+              };
+              const progressPercentage = item.capacity > 0 ? (item.applicants / item.capacity) * 100 : 0;
+              const percentage = item.capacity > 0 ? ((item.applicants / item.capacity) * 100).toFixed(2) : '0.00';
+
+              return (
+                <ApplicationTypeCard key={index}>
+                  <ApplicationTypeHeader>
+                    <ApplicationTypeTitle>{typeNames[item.applicationType] || item.applicationType}</ApplicationTypeTitle>
+                    <ApplicationTypeCount>{item.applicants}/{item.capacity}</ApplicationTypeCount>
+                  </ApplicationTypeHeader>
+                  <ProgressBarContainer>
+                    <ProgressBar progress={progressPercentage} color={typeColors[item.applicationType] || '#666'} />
+                  </ProgressBarContainer>
+                  <ApplicationTypePercentage>
+                    {percentage}%가 지원했습니다.
+                  </ApplicationTypePercentage>
+                </ApplicationTypeCard>
+              );
+            })
+          )}
         </ApplicationTypesGrid>
       </SectionContainer>
 
@@ -289,12 +301,22 @@ export const StatisticsLandingPage = () => {
       <SectionContainer>
         <SectionTitle>지역별 접수 현황</SectionTitle>
         <RegionGrid>
-          {mockData.regionStats.map((item, index) => (
-            <RegionCard key={index}>
-              <RegionName>{item.region}</RegionName>
-              <RegionCount>{item.count}</RegionCount>
-            </RegionCard>
-          ))}
+          {isRegionLoading ? (
+            <>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <RegionCard key={index}>
+                  <SkeletonValue />
+                </RegionCard>
+              ))}
+            </>
+          ) : (
+            regionData?.data?.byRegion?.map((item, index) => (
+              <RegionCard key={index}>
+                <RegionName>{item.regionName}</RegionName>
+                <RegionCount>{item.count}명</RegionCount>
+              </RegionCard>
+            ))
+          )}
         </RegionGrid>
       </SectionContainer>
 
@@ -308,22 +330,22 @@ export const StatisticsLandingPage = () => {
             <NationalMapMarker />
           </MapWrapper>
           <MapLegend>
-            <MapLegendItem>
-              <MapLegendText>서울</MapLegendText>
-              <MapLegendCount>12명</MapLegendCount>
-            </MapLegendItem>
-            <MapLegendItem>
-              <MapLegendText>대전</MapLegendText>
-              <MapLegendCount>12명</MapLegendCount>
-            </MapLegendItem>
-            <MapLegendItem>
-              <MapLegendText>서울</MapLegendText>
-              <MapLegendCount>12명</MapLegendCount>
-            </MapLegendItem>
-            <MapLegendItem>
-              <MapLegendText>서울</MapLegendText>
-              <MapLegendCount>12명</MapLegendCount>
-            </MapLegendItem>
+            {isRegionLoading ? (
+              <>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <MapLegendItem key={index}>
+                    <SkeletonValue />
+                  </MapLegendItem>
+                ))}
+              </>
+            ) : (
+              regionData?.data?.byRegion?.slice(0, 4).map((item, index) => (
+                <MapLegendItem key={index}>
+                  <MapLegendText>{item.regionName}</MapLegendText>
+                  <MapLegendCount>{item.count}명</MapLegendCount>
+                </MapLegendItem>
+              ))
+            )}
           </MapLegend>
         </MapContainer>
       </SectionContainer>

@@ -5,8 +5,22 @@ import { school } from '../assets';
 import { getAccessToken } from '@entry/util-config';
 import { useSchedule } from '../hooks/useSchedule';
 import { toast } from 'react-toastify';
+import { getApplicationStatus, IApplicationStatusResponse } from '../apis';
+import { useEffect, useState } from 'react';
 
 export const Main = () => {
+  const [status, setStatus] = useState<IApplicationStatusResponse | null>(null);
+
+  useEffect(() => {
+    getApplicationStatus()
+      .then((data) => {
+        setStatus(data);
+      })
+      .catch((err) => {
+        console.error('원서 상태 불러오기 실패', err);
+      });
+  }, []);
+
   const isLoggedIn = !!getAccessToken();
   const { data: startDate } = useSchedule({ type: 'START_DATE' });
   const { data: endDate } = useSchedule({ type: 'END_DATE' });
@@ -23,6 +37,9 @@ export const Main = () => {
       return;
     } else if (!isTrueSchedule) {
       toast.error('아직 지원 기간이 아닙니다.');
+      return;
+    } else if (status?.isSubmitted) {
+      toast.error('이미 원서를 제출하셨습니다.');
       return;
     } else {
       window.location.href = 'https://admission.entrydsm.kr';

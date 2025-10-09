@@ -86,35 +86,39 @@ export const Activity = () => {
             <GridContainer>
               <AttendanceForm
                 width={'100%'}
-                title="미인정 결석"
+                title="결석"
                 value={safeActivityData?.absences || ''}
                 onChange={handleAbsencesChange}
                 suffix="회"
                 defaultCount={10}
+                prefix='미인정'
               />
               <AttendanceForm
                 width={'100%'}
-                title="미인정 조퇴"
+                title="조퇴"
                 value={safeActivityData?.earlyLeaves || ''}
                 onChange={handleEarlyLeavesChange}
                 suffix="회"
                 defaultCount={10}
+                prefix='미인정'
               />
               <AttendanceForm
                 width={'100%'}
-                title="미인정 지각"
+                title="지각"
                 value={safeActivityData?.lateArrivals || ''}
                 onChange={handleLateArrivalsChange}
                 suffix="회"
                 defaultCount={10}
+                prefix='미인정'
               />
               <AttendanceForm
                 width={'100%'}
-                title="미인정 결과"
+                title="결과"
                 value={safeActivityData?.resultMissing || ''}
                 onChange={handleResultMissingChange}
                 suffix="회"
                 defaultCount={10}
+                prefix='미인정'
               />
             </GridContainer>
           </Section>
