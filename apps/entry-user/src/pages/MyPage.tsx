@@ -6,7 +6,7 @@ import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeA
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
-import { getFinalApplicationPdf, deleteApplication } from '../apis';
+import { getFinalApplicationPdf, deleteApplication, getApplicationStatus } from '../apis';
 
 
 export const MyPage = () => {
@@ -22,6 +22,13 @@ export const MyPage = () => {
   const { data: userInfo, isLoading: isUserLoading } = useQuery<IUserInfoResponseType>({
     queryKey: ['userInfo'],
     queryFn: getUserInfo,
+  });
+
+  // 지원정보 상태 조회
+  const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery({
+    queryKey: ['applicationStatus'],
+    queryFn: getApplicationStatus,
+    retry: false,
   });
 
 
@@ -128,7 +135,7 @@ export const MyPage = () => {
     window.location.href = 'https://entrydsm.kr/';
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || isApplicationLoading) {
     return (
       <PageContainer>
         <ContentWrapper>
@@ -144,6 +151,33 @@ export const MyPage = () => {
         <UserName>{userInfo?.name || '사용자'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
+        {applicationStatus && (
+          <ApplicationStatusSection>
+            <StatusTitle>지원 정보</StatusTitle>
+            <StatusGrid>
+              <StatusItem>
+                <StatusLabel>수험번호</StatusLabel>
+                <StatusValue>{applicationStatus.receiptCode || '미부여'}</StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>제출 상태</StatusLabel>
+                <StatusValue>
+                  <StatusBadge isSubmitted={applicationStatus.isSubmitted}>
+                    {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
+                  </StatusBadge>
+                </StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>서류 도착</StatusLabel>
+                <StatusValue>
+                  <StatusBadge isSubmitted={applicationStatus.isPrintedArrived}>
+                    {applicationStatus.isPrintedArrived ? '도착 완료' : '미도착'}
+                  </StatusBadge>
+                </StatusValue>
+              </StatusItem>
+            </StatusGrid>
+          </ApplicationStatusSection>
+        )}
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
@@ -346,4 +380,58 @@ const EmptyQuestionsArea = styled.div`
   border: 1px solid white;
   border-radius: 8px;
   margin-top: 40px;
+`;
+
+const ApplicationStatusSection = styled.div`
+  margin-top: 32px;
+  padding: 24px;
+  background-color: ${colors.gray[50]};
+  border-radius: 12px;
+  border: 1px solid ${colors.gray[200]};
+`;
+
+const StatusTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${colors.gray[500]};
+  margin: 0 0 16px 0;
+`;
+
+const StatusGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StatusItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const StatusLabel = styled.span`
+  font-size: 14px;
+  color: ${colors.gray[400]};
+  font-weight: 500;
+`;
+
+const StatusValue = styled.span`
+  font-size: 16px;
+  color: ${colors.gray[600]};
+  font-weight: 600;
+`;
+
+const StatusBadge = styled.span<{ isSubmitted: boolean }>`
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: ${({ isSubmitted }) =>
+    isSubmitted ? '#dcfce7' : '#fee2e2'};
+  color: ${({ isSubmitted }) => (isSubmitted ? '#16a34a' : '#dc2626')};
 `;
