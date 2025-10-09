@@ -49,7 +49,7 @@ export const MyPage = () => {
       toast.success('회원 탈퇴가 완료되었습니다.');
       setPasswordModalOpen(false);
       setDelOpen(false);
-      window.location.href = '/logout';
+      window.location.href = 'https://auth.entrydsm.kr';
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || '회원 탈퇴 중 오류가 발생했습니다.');

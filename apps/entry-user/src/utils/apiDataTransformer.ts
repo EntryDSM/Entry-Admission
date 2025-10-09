@@ -80,6 +80,7 @@ export const transformCalculationDataToAPI = (
   // 검정고시인 경우
   if (hasQEData) {
     educationalStatus = 'QUALIFICATION_EXAM';
+    activity = state.qeActivity;
 
     return {
       applicationType,
@@ -93,6 +94,10 @@ export const transformCalculationDataToAPI = (
         qualificationScience: parseFloat(state.qeScore.science) || undefined,
         qualificationEnglish: parseFloat(state.qeScore.english) || undefined,
         qualificationTech: parseFloat(state.qeScore.technology) || undefined,
+      },
+      bonus: {
+        dsmAlgorithm: activity.dsmAlgorithm === 'O',
+        infoProcessing: activity.infoProcessing === 'O',
       }
     };
   }

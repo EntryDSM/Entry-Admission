@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
 import { ScoreThird, Activity } from './';
+import { useCalculationData } from '../../contexts/CalculationDataContext';
+import { calculateScore } from '../../apis/calculator';
+import { transformCalculationDataToAPI } from '../../utils/apiDataTransformer';
+import { CalculatorScoreResponse } from '../../apis/calculator/types';
 
 const STEPS = [
   { key: 'current', label: '3학년 1학기' },
@@ -13,6 +17,10 @@ const STEPS = [
 export const PrimaryCalculationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [results, setResults] = useState<{ name: string; data: CalculatorScoreResponse['data'] }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { state } = useCalculationData();
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -26,8 +34,32 @@ export const PrimaryCalculationPage = () => {
     }
   };
 
-  const handleComplete = () => {
-    setShowResultModal(true);
+  const handleComplete = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const commonRequest = transformCalculationDataToAPI(state, 'COMMON');
+      const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
+      const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
+
+      const [commonResponse, socialResponse, meisterResponse] = await Promise.all([
+        calculateScore(commonRequest),
+        calculateScore(socialRequest),
+        calculateScore(meisterRequest),
+      ]);
+
+      setResults([
+        { name: '일반 전형', data: commonResponse.data },
+        { name: '사회통합 전형', data: socialResponse.data },
+        { name: '마이스터 인재', data: meisterResponse.data },
+      ]);
+      setShowResultModal(true);
+    } catch (err: any) {
+      setError(err.message || '성적 계산 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -97,8 +129,8 @@ export const PrimaryCalculationPage = () => {
         </Button>
         
         {currentStep === STEPS.length - 1 ? (
-          <Button onClick={handleComplete}>
-            완료
+          <Button onClick={handleComplete} isBlocked={isLoading}>
+            {isLoading ? '계산 중...' : '완료'}
           </Button>
         ) : (
           <Button onClick={handleNext}>
@@ -130,20 +162,22 @@ export const PrimaryCalculationPage = () => {
             <Text fontSize={20} fontWeight={600}>
               성적 산출 결과
             </Text>
-            
+
+            {error && (
+              <Text color="#FF0000" fontSize={14}>
+                {error}
+              </Text>
+            )}
+
             <Flex isColumn={true} gap={16}>
-              <Flex justifyContent="space-between">
-                <Text>일반 전형</Text>
-                <Text color="#FF6B35" fontWeight={600}>173.000 / 173</Text>
-              </Flex>
-              <Flex justifyContent="space-between">
-                <Text>사회통합 전형</Text>
-                <Text color="#FF6B35" fontWeight={600}>104.000 / 119</Text>
-              </Flex>
-              <Flex justifyContent="space-between">
-                <Text>마이스터 인재</Text>
-                <Text color="#FF6B35" fontWeight={600}>104.000 / 119</Text>
-              </Flex>
+              {results.map((result, index) => (
+                <Flex key={index} justifyContent="space-between">
+                  <Text>{result.name}</Text>
+                  <Text color="#FF6B35" fontWeight={600}>
+                    {result.data.totalScore.toFixed(3)} / {result.data.maxScore}
+                  </Text>
+                </Flex>
+              ))}
             </Flex>
 
             <Button onClick={() => setShowResultModal(false)}>
