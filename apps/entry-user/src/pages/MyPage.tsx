@@ -6,7 +6,8 @@ import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeA
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
-import { getFinalApplicationPdf, deleteApplication, getApplicationStatus } from '../apis';
+import { getFinalApplicationPdf, deleteApplication, getApplicationStatus, getFirstRoundPass, getSecondRoundPass } from '../apis';
+import { useGetAllSchedule } from '../apis/schedule/schedule';
 
 
 export const MyPage = () => {
@@ -14,32 +15,40 @@ export const MyPage = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState<boolean>(false);
   const [cancelApplicationOpen, setCancelApplicationOpen] = useState<boolean>(false);
+  const [isPass, setIsPass] = useState<boolean>(false);
+  const [announcementStep, setAnnouncementStep] = useState<1 | 2>(1);
 
   const resultModal = useModal();
   const { startVerification, isLoading: isPassLoading, isVerified, verifyData, reset } = usePassVerification();
 
-  // 사용자 정보 조회
   const { data: userInfo, isLoading: isUserLoading } = useQuery<IUserInfoResponseType>({
     queryKey: ['userInfo'],
     queryFn: getUserInfo,
   });
 
-  // 지원정보 상태 조회
   const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery({
     queryKey: ['applicationStatus'],
-    queryFn: getApplicationStatus,
+    queryFn: async () => {
+      try {
+        return await getApplicationStatus();
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
     retry: false,
   });
 
+  const { data: scheduleData } = useGetAllSchedule();
 
-  // 회원 탈퇴 API
   const deleteUserMutation = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
       toast.success('회원 탈퇴가 완료되었습니다.');
       setPasswordModalOpen(false);
       setDelOpen(false);
-      // 로그아웃 처리
       window.location.href = '/logout';
     },
     onError: (error: any) => {
@@ -47,7 +56,6 @@ export const MyPage = () => {
     },
   });
 
-  // 비밀번호 변경 API
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
@@ -59,7 +67,6 @@ export const MyPage = () => {
     },
   });
 
-  // 원서 취소 API
   const cancelApplicationMutation = useMutation({
     mutationFn: deleteApplication,
     onSuccess: () => {
@@ -85,7 +92,6 @@ export const MyPage = () => {
   };
 
   const handleApplicationSubmit = () => {
-    // 원서 접수 페이지로 이동
     window.open('https://admission.entrydsm.kr', '_blank');
   };
 
@@ -93,7 +99,6 @@ export const MyPage = () => {
     try {
       const blob = await getFinalApplicationPdf();
 
-      // Blob으로 파일 다운로드 처리
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -115,21 +120,38 @@ export const MyPage = () => {
   };
 
   const handleChangePassword = () => {
-    // PASS 인증 시작
     startVerification();
   };
 
-  // PASS 인증 완료 시 비밀번호 변경 모달 열기
+  const handleCheckFirstRoundResult = async () => {
+    try {
+      const result = await getFirstRoundPass();
+      setIsPass(result.isFirstRoundPass);
+      setAnnouncementStep(1);
+      resultModal.open();
+    } catch (error) {
+      toast.error('1차 합격 여부 조회 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleCheckSecondRoundResult = async () => {
+    try {
+      const result = await getSecondRoundPass();
+      setIsPass(result.finalPass);
+      setAnnouncementStep(2);
+      resultModal.open();
+    } catch (error) {
+      toast.error('2차 합격 여부 조회 중 오류가 발생했습니다.');
+    }
+  };
+
   useEffect(() => {
     if (isVerified && verifyData) {
       setChangePasswordModalOpen(true);
-      // reset(); // 인증 데이터는 모달에서 사용하므로 여기서는 reset하지 않음
     }
   }, [isVerified, verifyData]);
 
   const handleLogout = () => {
-    // TODO: 로그아웃 API 연동
-    // console.log('로그아웃 API 호출');
     removeAccessToken()
     removeRefreshToken()
     window.location.href = 'https://entrydsm.kr/';
@@ -151,37 +173,68 @@ export const MyPage = () => {
         <UserName>{userInfo?.name || '사용자'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
-        {applicationStatus && (
-          <ApplicationStatusSection>
-            <StatusTitle>지원 정보</StatusTitle>
-            <StatusGrid>
-              <StatusItem>
-                <StatusLabel>수험번호</StatusLabel>
-                <StatusValue>{applicationStatus.receiptCode || '미부여'}</StatusValue>
-              </StatusItem>
-              <StatusItem>
-                <StatusLabel>제출 상태</StatusLabel>
-                <StatusValue>
-                  <StatusBadge isSubmitted={applicationStatus.isSubmitted}>
-                    {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
-                  </StatusBadge>
-                </StatusValue>
-              </StatusItem>
-              <StatusItem>
-                <StatusLabel>서류 도착</StatusLabel>
-                <StatusValue>
-                  <StatusBadge isSubmitted={applicationStatus.isPrintedArrived}>
-                    {applicationStatus.isPrintedArrived ? '도착 완료' : '미도착'}
-                  </StatusBadge>
-                </StatusValue>
-              </StatusItem>
-            </StatusGrid>
-          </ApplicationStatusSection>
-        )}
+        <ApplicationStatusSection>
+          <StatusTitle>지원 상태</StatusTitle>
+          <StatusBox>
+            <ApplicationType>일반 전형</ApplicationType>
+            <Divider />
+            <StatusInfo>
+              <StatusLabel>지원서 상태 : </StatusLabel>
+              <StatusValue isSubmitted={applicationStatus?.isSubmitted || false}>
+                {applicationStatus 
+                  ? (applicationStatus.isPrintedArrived 
+                      ? '제출 완료 및 원서 학교 도착' 
+                      : (applicationStatus.isSubmitted ? '제출 완료' : '미제출'))
+                  : '미지원'}
+              </StatusValue>
+            </StatusInfo>
+          </StatusBox>
+        </ApplicationStatusSection>
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
-            <Button onClick={handleDownloadApplication}>원서 다운로드</Button>
+            <Button 
+              backgroundColor={colors.orange[800]}
+              color="#FFFFFF"
+              borderColor={colors.orange[800]}
+              hoverBackgroundColor={colors.orange[800]}
+              onClick={handleDownloadApplication}
+            >
+              원서 다운로드
+            </Button>
+            {scheduleData?.currentStatus === 'FIRST_ANNOUNCEMENT' || scheduleData?.currentStatus === 'INTERVIEW' ? (
+              <Button
+                backgroundColor={colors.gray[50]}
+                color={colors.orange[800]}
+                borderColor={colors.orange[800]}
+                hoverBackgroundColor="transparent"
+                onClick={handleCheckFirstRoundResult}
+              >
+                1차 결과 확인
+              </Button>
+            ) : scheduleData?.currentStatus === 'SECOND_ANNOUNCEMENT' || scheduleData?.currentStatus === 'END' ? (
+              <Button
+                backgroundColor={colors.gray[50]}
+                color={colors.orange[800]}
+                borderColor={colors.orange[800]}
+                hoverBackgroundColor="transparent"
+                onClick={handleCheckSecondRoundResult}
+              >
+                2차 결과 확인
+              </Button>
+            ) : null}
+          </Flex>
+          {applicationStatus ? (
+            <Button
+              backgroundColor={colors.gray[50]}
+              color={colors.extra.error}
+              borderColor={colors.extra.error}
+              hoverBackgroundColor="transparent"
+              onClick={() => setCancelApplicationOpen(true)}
+            >
+              원서 최종 제출 취소
+            </Button>
+          ) : (
             <Button
               backgroundColor={colors.gray[50]}
               color={colors.orange[800]}
@@ -191,19 +244,8 @@ export const MyPage = () => {
             >
               원서 접수하기
             </Button>
-          </Flex>
-          <Button
-            backgroundColor={colors.gray[100]}
-            color={colors.gray[400]}
-            borderColor={colors.gray[300]}
-            hoverBackgroundColor={colors.gray[100]}
-            onClick={() => setCancelApplicationOpen(true)}
-          >
-            원서 작성 제출 취소
-          </Button>
+          )}
         </ButtonGroup>
-
-        <EmptyQuestionsArea />
 
         <SettingsTitle>설정</SettingsTitle>
 
@@ -222,7 +264,7 @@ export const MyPage = () => {
           </SettingsRow>
 
           <SettingsRow>
-            <SettingsLabel>제정</SettingsLabel>
+            <SettingsLabel>계정</SettingsLabel>
             <SettingsButtonGroup>
               <Button
                 backgroundColor={colors.gray[50]}
@@ -289,8 +331,8 @@ export const MyPage = () => {
       <ShowResultModal
         isOpen={resultModal.isOpen}
         onClose={resultModal.close}
-        isPass={true}
-        step={1}
+        isPass={isPass}
+        step={announcementStep}
       />
     </PageContainer>
   );
@@ -335,19 +377,11 @@ const ButtonGroup = styled.div`
   flex-wrap: wrap;
 `;
 
-const QuestionsTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 600;
-  color: inherit;
-  margin: 137px 0 0 0;
-`;
-
-
 const SettingsTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
   color: inherit;
-  margin: 142px 0 0 0;
+  margin: 80px 0 0 0;
 `;
 
 const SettingsSection = styled.div`
@@ -373,65 +407,55 @@ const SettingsButtonGroup = styled.div`
   gap: 12px;
 `;
 
-const EmptyQuestionsArea = styled.div`
-  width: 100%;
-  height: 200px;
-  background-color: white;
-  border: 1px solid white;
-  border-radius: 8px;
-  margin-top: 40px;
-`;
-
 const ApplicationStatusSection = styled.div`
-  margin-top: 32px;
-  padding: 24px;
-  background-color: ${colors.gray[50]};
-  border-radius: 12px;
-  border: 1px solid ${colors.gray[200]};
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const StatusTitle = styled.h3`
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
   color: ${colors.gray[500]};
-  margin: 0 0 16px 0;
+  margin: 0;
 `;
 
-const StatusGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const StatusItem = styled.div`
+const StatusBox = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 20px 40px;
+  background-color: ${colors.gray[100]};
+  border-radius: 12px;
+`;
+
+const ApplicationType = styled.span`
+  font-size: 20px;
+  font-weight: 500;
+  color: ${colors.gray[500]};
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: ${colors.gray[300]};
+`;
+
+const StatusInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const StatusLabel = styled.span`
-  font-size: 14px;
-  color: ${colors.gray[400]};
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
+  color: ${colors.gray[500]};
 `;
 
-const StatusValue = styled.span`
-  font-size: 16px;
-  color: ${colors.gray[600]};
+const StatusValue = styled.span<{ isSubmitted: boolean }>`
+  font-size: 24px;
   font-weight: 600;
-`;
-
-const StatusBadge = styled.span<{ isSubmitted: boolean }>`
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  background-color: ${({ isSubmitted }) =>
-    isSubmitted ? '#dcfce7' : '#fee2e2'};
-  color: ${({ isSubmitted }) => (isSubmitted ? '#16a34a' : '#dc2626')};
+  color: ${({ isSubmitted }) => (isSubmitted ? colors.orange[800] : colors.gray[400])};
 `;

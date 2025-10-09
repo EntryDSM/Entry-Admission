@@ -13,3 +13,13 @@ export const getPassVerifyInfo = async (mdlToken: string) => {
   });
   return data as { phoneNumber: string; name: string };
 };
+
+export const getFirstRoundPass = async () => {
+  const { data } = await AdmissionUserInstance.get('/pass/first-round');
+  return data as { isFirstRoundPass: boolean };
+};
+
+export const getSecondRoundPass = async () => {
+  const { data } = await AdmissionUserInstance.get('/pass/second-round');
+  return data as { finalPass: boolean };
+};
