@@ -2,15 +2,27 @@ import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
 import { QEDScore, Activity } from './';
+import { useCalculationPageData } from '../../contexts';
+import { calculateScore } from '../../apis/calculator';
+import {
+  CalculatorScoreRequest,
+  CalculatorScoreResponse,
+} from '../../apis/calculator/types';
 
 const STEPS = [
   { key: 'qeScore', label: '검정고시 점수' },
-  { key: 'activity', label: '출석 및 봉사' }
+  { key: 'activity', label: '출석 및 봉사' },
 ];
 
 export const QECalculationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [result, setResult] = useState<CalculatorScoreResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [qeScoreData] = useCalculationPageData('qeScore');
+  const [qeActivityData] = useCalculationPageData('qeActivity');
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -24,8 +36,30 @@ export const QECalculationPage = () => {
     }
   };
 
-  const handleComplete = () => {
-    setShowResultModal(true);
+  const handleComplete = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    const requestData: CalculatorScoreRequest = {
+      admissionType: 'QE',
+      scores: {
+        ...qeScoreData,
+      },
+      bonus: {
+        dsmAlgorithm: qeActivityData?.dsmAlgorithm === 'O',
+        infoProcessing: qeActivityData?.infoProcessing === 'O',
+      },
+    };
+
+    try {
+      const response = await calculateScore(requestData);
+      setResult(response);
+      setShowResultModal(true);
+    } catch (e: any) {
+      setError(e.message || 'An unexpected error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -100,17 +134,15 @@ export const QECalculationPage = () => {
         </Button>
         
         {currentStep === STEPS.length - 1 ? (
-          <Button onClick={handleComplete}>
-            완료
+          <Button onClick={handleComplete} isBlocked={isLoading}>
+            {isLoading ? '계산 중...' : '완료'}
           </Button>
         ) : (
-          <Button onClick={handleNext}>
-            다음
-          </Button>
+          <Button onClick={handleNext}>다음</Button>
         )}
       </Flex>
 
-      {showResultModal && (
+      {showResultModal && result && (
         <Flex
           position="fixed"
           top="0"
@@ -133,25 +165,31 @@ export const QECalculationPage = () => {
             <Text fontSize={20} fontWeight={600}>
               성적 산출 결과
             </Text>
-            
+
+            {error && <Text color="red">{error}</Text>}
+
             <Flex isColumn={true} gap={16}>
               <Flex justifyContent="space-between">
-                <Text>일반 전형</Text>
-                <Text color="#FF6B35" fontWeight={600}>173.000 / 173</Text>
+                <Text>총 점수</Text>
+                <Text color="#FF6B35" fontWeight={600}>
+                  {result.totalScore.toFixed(3)} / {result.maxScore}
+                </Text>
               </Flex>
               <Flex justifyContent="space-between">
-                <Text>사회통합 전형</Text>
-                <Text color="#FF6B35" fontWeight={600}>104.000 / 119</Text>
+                <Text>교과 점수</Text>
+                <Text color="#FF6B35" fontWeight={600}>
+                  {result.subjectScore.toFixed(3)}
+                </Text>
               </Flex>
               <Flex justifyContent="space-between">
-                <Text>마이스터 인재</Text>
-                <Text color="#FF6B35" fontWeight={600}>104.000 / 119</Text>
+                <Text>가산점</Text>
+                <Text color="#FF6B35" fontWeight={600}>
+                  {result.bonusScore}
+                </Text>
               </Flex>
             </Flex>
 
-            <Button onClick={() => setShowResultModal(false)}>
-              닫기
-            </Button>
+            <Button onClick={() => setShowResultModal(false)}>닫기</Button>
           </Flex>
         </Flex>
       )}
