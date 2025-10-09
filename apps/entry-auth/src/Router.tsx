@@ -10,12 +10,17 @@ import {
   SignUpPage,
   UserInfoPage,
   SorryPage,
+  DevEnablePage,
 } from './pages';
 
 export const Router = createBrowserRouter([
   {
     path: '/sorry',
     element: <SorryPage />,
+  },
+  {
+    path: '/dev/enable',
+    element: <DevEnablePage />,
   },
   {
     path: '/',

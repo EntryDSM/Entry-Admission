@@ -7,7 +7,10 @@ import { useEffect } from 'react';
 export const App = () => {
   useEffect(() => {
     const isDev = localStorage.getItem('DEV');
-    if (isDev !== 'TRUE' && !window.location.pathname.includes('/sorry')) {
+    const currentPath = window.location.pathname;
+
+    // /dev/enable과 /sorry 경로는 체크 제외
+    if (isDev !== 'TRUE' && !currentPath.includes('/sorry') && !currentPath.includes('/dev/enable')) {
       window.location.href = '/sorry';
     }
   }, []);
