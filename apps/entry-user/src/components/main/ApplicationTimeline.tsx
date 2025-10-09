@@ -1,13 +1,53 @@
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
+import { useGetAllSchedule } from '../../apis';
+import { useEffect, useState } from 'react';
 
 export const ApplicationTimeline = () => {
+  const {data : scheduleData, isLoading} = useGetAllSchedule()
+  const [datas, setDatas] = useState<{
+    applicationStart: string;
+    applicationEnd: string;
+    firstAnnouncement: string;
+    interview: string;
+    finalAnnouncement: string;
+  }>({
+    applicationStart: "",
+    applicationEnd: "",
+    firstAnnouncement: "",
+    interview: "",
+    finalAnnouncement: "",
+  });
+
+
   const timelineData = [
-    { title: '원서 제출', date: '1/14 ~ 12/06' },
-    { title: '1차 발표', date: '12/21' },
-    { title: '2차 전형', date: '12/25' },
-    { title: '최종 발표', date: '12/25' },
+    { title: '원서 제출', date: datas.applicationStart + " ~ " + datas.applicationEnd },
+    { title: '1차 발표', date: datas.firstAnnouncement },
+    { title: '2차 전형', date: datas.interview },
+    { title: '최종 발표', date: datas.finalAnnouncement },
   ];
+
+  const formatForInput = (value: string) => {
+  if (!value) return "";
+  return value.split("T")[0];
+};
+
+
+
+  useEffect(() => {
+  if (!scheduleData?.schedules) return;
+
+  const findDate = (type: string) =>
+    scheduleData.schedules.find((s: any) => s.type === type)?.date || "";
+
+  setDatas({
+    applicationStart: formatForInput(findDate("START_DATE")),
+    applicationEnd: formatForInput(findDate("END_DATE")),
+    firstAnnouncement: formatForInput(findDate("FIRST_ANNOUNCEMENT")),
+    interview: formatForInput(findDate("INTERVIEW")),
+    finalAnnouncement: formatForInput(findDate("SECOND_ANNOUNCEMENT")),
+  });
+}, [scheduleData]);
 
   return (
     <TimelineWrapper>
@@ -19,7 +59,7 @@ export const ApplicationTimeline = () => {
           <TimelineItem style={{ left: '80px' }}>
             <TimelineLabel>
               <LabelTitle>원서 제출</LabelTitle>
-              <LabelDate>24/11 ~ 12/06</LabelDate>
+              <LabelDate>{timelineData[0].date}</LabelDate>
             </TimelineLabel>
             <TimelineDot />
           </TimelineItem>
@@ -27,7 +67,7 @@ export const ApplicationTimeline = () => {
           <TimelineItem style={{ left: '35%' }}>
             <TimelineLabel>
               <LabelTitle>1차 발표</LabelTitle>
-              <LabelDate>12/21</LabelDate>
+              <LabelDate>{timelineData[1].date}</LabelDate>
             </TimelineLabel>
             <TimelineDot />
           </TimelineItem>
@@ -35,7 +75,7 @@ export const ApplicationTimeline = () => {
           <TimelineItem style={{ left: '62%' }}>
             <TimelineLabel>
               <LabelTitle>2차 전형</LabelTitle>
-              <LabelDate>12/25</LabelDate>
+              <LabelDate>{timelineData[2].date}</LabelDate>
             </TimelineLabel>
             <TimelineDot />
           </TimelineItem>
@@ -43,7 +83,7 @@ export const ApplicationTimeline = () => {
           <TimelineItem style={{ right: '80px' }}>
             <TimelineLabel>
               <LabelTitle>최종 발표</LabelTitle>
-              <LabelDate>12/25</LabelDate>
+              <LabelDate>{timelineData[3].date}</LabelDate>
             </TimelineLabel>
             <TimelineDot />
           </TimelineItem>
