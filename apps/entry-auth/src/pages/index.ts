@@ -6,3 +6,4 @@ export * from './AdminLogin';
 export * from './LogoutPage';
 export * from './Page404';
 export * from './UserInfoPage';
+export * from './SorryPage';

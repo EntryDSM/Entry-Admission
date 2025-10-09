@@ -9,9 +9,14 @@ import {
   Page404,
   SignUpPage,
   UserInfoPage,
+  SorryPage,
 } from './pages';
 
 export const Router = createBrowserRouter([
+  {
+    path: '/sorry',
+    element: <SorryPage />,
+  },
   {
     path: '/',
     element: <AppLayout />,
