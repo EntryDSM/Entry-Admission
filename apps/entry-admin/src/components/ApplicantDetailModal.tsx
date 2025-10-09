@@ -50,8 +50,11 @@ export const ApplicantDetailModal = ({
 
   if (isLoading)
     return (
-      <ModalOverlay>
-        <ModalContent>
+      <ModalOverlay onClick={onClose}>
+        <ModalContent onClick={(e) => e.stopPropagation()}>
+          <CloseButton onClick={onClose}>
+            <img src={cancel} alt="x" />
+          </CloseButton>
           <LoadingText>원서 정보를 불러오는 중입니다...</LoadingText>
         </ModalContent>
       </ModalOverlay>
@@ -59,8 +62,11 @@ export const ApplicantDetailModal = ({
 
   if (isError)
     return (
-      <ModalOverlay>
-        <ModalContent>
+      <ModalOverlay onClick={onClose}>
+        <ModalContent onClick={(e) => e.stopPropagation()}>
+          <CloseButton onClick={onClose}>
+            <img src={cancel} alt="x" />
+          </CloseButton>
           <ErrorText>원서 정보를 불러오는 중 오류가 발생했습니다.</ErrorText>
         </ModalContent>
       </ModalOverlay>

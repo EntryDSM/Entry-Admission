@@ -87,9 +87,3 @@ export interface IApplicationDetail {
   createdAt: string;
   updatedAt: string;
 }
-
-//원서 학교 도착 여부 업데이트
-interface IPatchApplicationArrivalType {
-  applicationId: string;
-  isArrived: boolean;
-}
