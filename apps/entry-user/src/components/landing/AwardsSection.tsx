@@ -1,35 +1,41 @@
 import styled from '@emotion/styled';
-import { Award1 } from '../../assets/landing/award';
+import {
+  Award1,
+  Activity1,
+  Activity2,
+  Activity3,
+  Activity4,
+} from '../../assets/landing/award';
 import { colors } from '@entry/design-token';
 
 export const AwardsSection = () => {
   const awards = [
     {
-      image: Award1,
-      year: '2022년',
-      title: 'MIDAS 해커톤 금상, 은상 외 다수 입상',
+      image: Activity1,
+      year: '2024년',
+      title: '임베디드 경진대회',
     },
     {
-      image: Award1,
-      year: '2022년',
-      title: '공개 SW 개발자 대회 특별상',
+      image: Activity2,
+      year: '2024년',
+      title: 'stac',
     },
     {
-      image: Award1,
-      year: '2022년',
-      title: 'STAC+ 대회 우수상 입상',
+      image: Activity3,
+      year: '2024년',
+      title: '유성구청 리빙랩',
     },
     {
-      image: Award1,
-      year: '2023년',
-      title: 'SW마이스터고 연합 해커톤 장려상',
+      image: Activity4,
+      year: '2024년',
+      title: '르완다 교류',
     },
   ];
 
   return (
     <Container>
       <Title>
-        다양한 대회에서 <Highlight>수상</Highlight>도 했어요!
+        다양한 <Highlight>대외 활동</Highlight>도 진행합니다!
       </Title>
       <AwardsGrid>
         {awards.map((award, index) => (

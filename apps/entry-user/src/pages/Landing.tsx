@@ -159,7 +159,7 @@ export const Landing = () => {
         {/* 취업률 그래프 */}
         <EmploymentChartSection />
 
-        {/* 수상 */}
+        {/* 다양한 대외 활동 */}
         <AwardsSection />
 
         {/* MOU */}
