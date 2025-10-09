@@ -38,6 +38,7 @@ const skipAuthUrls = [
   'GET /user/verify/info',
   'GET /notice',
   'GET /schedule',
+  'GET /schedule/all'
 ];
 
 let isUserRefreshingToken = false;

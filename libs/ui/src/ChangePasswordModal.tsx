@@ -9,6 +9,7 @@ interface IChangePasswordModalType {
   onConfirm: (phoneNumber: string, newPassword: string) => void;
   isLoading?: boolean;
   userPhoneNumber?: string;
+  passVerifiedPhoneNumber?: string;
 }
 
 export const ChangePasswordModal = ({
@@ -17,9 +18,10 @@ export const ChangePasswordModal = ({
   onConfirm,
   isLoading = false,
   userPhoneNumber = '',
+  passVerifiedPhoneNumber = '',
 }: IChangePasswordModalType) => {
   const backRef = useRef(null);
-  const [phoneNumber, setPhoneNumber] = useState(userPhoneNumber);
+  const [phoneNumber, setPhoneNumber] = useState(passVerifiedPhoneNumber || userPhoneNumber);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -45,7 +47,7 @@ export const ChangePasswordModal = ({
   };
 
   const handleClose = () => {
-    setPhoneNumber(userPhoneNumber);
+    setPhoneNumber(passVerifiedPhoneNumber || userPhoneNumber);
     setNewPassword('');
     setConfirmPassword('');
     setIsOpen(false);
@@ -78,7 +80,7 @@ export const ChangePasswordModal = ({
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="전화번호를 입력하세요"
-                disabled={isLoading}
+                disabled={isLoading || !!passVerifiedPhoneNumber}
               />
             </InputGroup>
 

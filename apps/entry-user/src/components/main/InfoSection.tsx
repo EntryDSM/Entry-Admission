@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { useNavigate } from 'react-router-dom';
 import { noticeIcon, downloadIcon, noticeMoveArrowIcon } from '../../assets';
-import { useGetAllNotice } from '../../apis';
+import { useGetAllNotice, useGetAllSchedule } from '../../apis';
 import { useEffect, useState } from 'react';
 
 interface NoticeItem {
@@ -49,6 +49,40 @@ export const InfoSection = () => {
     }
   }, [data]);
 
+
+  const {data : scheduleData} = useGetAllSchedule()
+
+  const [currentPeriod, setCurrentPeriod] = useState<string>('');
+
+
+  useEffect(() => {
+    if (!scheduleData || !scheduleData.schedules) return;
+
+    const schedules = scheduleData.schedules;
+    const now = new Date();
+
+    const getDate = (type: string) =>
+      new Date(schedules.find((s: any) => s.type === type)?.date || '');
+
+    const startDate = getDate('START_DATE');
+    const endDate = getDate('END_DATE');
+    const firstAnnouncement = getDate('FIRST_ANNOUNCEMENT');
+    const interview = getDate('INTERVIEW');
+    const secondAnnouncement = getDate('SECOND_ANNOUNCEMENT');
+
+    if (now >= startDate && now <= endDate) {
+      setCurrentPeriod('원서 접수 기간입니다.');
+    } else if (now >= firstAnnouncement && now < interview) {
+      setCurrentPeriod('1차 발표 기간입니다.');
+    } else if (now >= interview && now < secondAnnouncement) {
+      setCurrentPeriod('2차 전형 기간입니다.');
+    } else if (now >= secondAnnouncement) {
+      setCurrentPeriod('최종 발표 기간입니다.');
+    } else {
+      setCurrentPeriod('준비 중입니다.');
+    }
+  }, [scheduleData]);
+
   // const notices = [
   //   {
   //     title: '기숙사 탈출하면 벌점 몇 점인지에 대해',
@@ -69,13 +103,15 @@ export const InfoSection = () => {
   //   },
   // ];
 
+  
+
   return (
     <Container>
       <ContentWrapper>
         <Title>
           <HighlightText>지금은</HighlightText>
         </Title>
-        <SubTitle>최종 발표 기간입니다.</SubTitle>
+        <SubTitle>{currentPeriod}</SubTitle>
         <Divider />
 
         <SectionHeader>

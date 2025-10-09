@@ -6,7 +6,7 @@ import { useCalculationPageData } from '../../contexts';
 
 export const ScoreThird = () => {
   const location = useLocation();
-  const subjects = ['국어', '사회', '역사', '수학', '과학', '기술 · 가정'];
+  const subjects = ['국어', '사회', '역사', '수학', '과학', '기술 · 가정', '영어'];
   const [globalGrade, setGlobalGrade] = useState<string | null>(null);
   
   // 경로에 따라 다른 키 사용

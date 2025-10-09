@@ -29,37 +29,39 @@ const GridContainer = styled.div`
 
 export const Activity = () => {
   const location = useLocation();
-  
+
   const getDataKey = (): 'primaryActivity' | 'graduatedActivity' | 'qeActivity' => {
     if (location.pathname.includes('primary')) return 'primaryActivity';
     if (location.pathname.includes('graduated')) return 'graduatedActivity';
     if (location.pathname.includes('qe')) return 'qeActivity';
     return 'primaryActivity';
   };
-  
+
+  const isQE = location.pathname.includes('qe');
+
   const [activityData, setActivityData] = useCalculationPageData(getDataKey());
-  
+
   const safeActivityData = activityData || {};
   const safeSetActivityData = (data: typeof activityData) => {
     setActivityData(data || {});
   };
-  
+
   const handleAbsencesChange = (value: string) => {
     safeSetActivityData({ ...safeActivityData, absences: value });
   };
-  
+
   const handleEarlyLeavesChange = (value: string) => {
     safeSetActivityData({ ...safeActivityData, earlyLeaves: value });
   };
-  
+
   const handleLateArrivalsChange = (value: string) => {
     safeSetActivityData({ ...safeActivityData, lateArrivals: value });
   };
-  
+
   const handleResultMissingChange = (value: string) => {
     safeSetActivityData({ ...safeActivityData, resultMissing: value });
   };
-  
+
   const handleVolunteerHoursChange = (value: string) => {
     safeSetActivityData({ ...safeActivityData, volunteerHours: value });
   };
@@ -74,58 +76,67 @@ export const Activity = () => {
 
   return (
     <Container>
-      <Section>
-        <Text fontSize={24} fontWeight={600}>
-          출석
-        </Text>
-        <GridContainer>
-          <AttendanceForm
-            width={'100%'}
-            title="미인정 결석"
-            value={safeActivityData?.absences || ''}
-            onChange={handleAbsencesChange}
-            suffix="회"
-            defaultCount={10}
-          />
-          <AttendanceForm
-            width={'100%'}
-            title="미인정 조퇴"
-            value={safeActivityData?.earlyLeaves || ''}
-            onChange={handleEarlyLeavesChange}
-            suffix="회"
-            defaultCount={10}
-          />
-          <AttendanceForm
-            width={'100%'}
-            title="미인정 지각"
-            value={safeActivityData?.lateArrivals || ''}
-            onChange={handleLateArrivalsChange}
-            suffix="회"
-            defaultCount={10}
-          />
-          <AttendanceForm
-            width={'100%'}
-            title="미인정 결과"
-            value={safeActivityData?.resultMissing || ''}
-            onChange={handleResultMissingChange}
-            suffix="회"
-            defaultCount={10}
-          />
-        </GridContainer>
-      </Section>
-      <Section>
-        <Text fontSize={24} fontWeight={600}>
-          봉사
-        </Text>
-        <AttendanceForm 
-          width={'748px'} 
-          title="봉사시간" 
-          value={safeActivityData?.volunteerHours || ''}
-          onChange={handleVolunteerHoursChange}
-          suffix="시간"
-          defaultCount={10} 
-        /> 
-      </Section>
+      {/* 검정고시가 아닐 때만 출석/봉사 보이기 */}
+      {!isQE && (
+        <>
+          <Section>
+            <Text fontSize={24} fontWeight={600}>
+              출석
+            </Text>
+            <GridContainer>
+              <AttendanceForm
+                width={'100%'}
+                title="결석"
+                value={safeActivityData?.absences || ''}
+                onChange={handleAbsencesChange}
+                suffix="회"
+                defaultCount={10}
+                prefix='미인정'
+              />
+              <AttendanceForm
+                width={'100%'}
+                title="조퇴"
+                value={safeActivityData?.earlyLeaves || ''}
+                onChange={handleEarlyLeavesChange}
+                suffix="회"
+                defaultCount={10}
+                prefix='미인정'
+              />
+              <AttendanceForm
+                width={'100%'}
+                title="지각"
+                value={safeActivityData?.lateArrivals || ''}
+                onChange={handleLateArrivalsChange}
+                suffix="회"
+                defaultCount={10}
+                prefix='미인정'
+              />
+              <AttendanceForm
+                width={'100%'}
+                title="결과"
+                value={safeActivityData?.resultMissing || ''}
+                onChange={handleResultMissingChange}
+                suffix="회"
+                defaultCount={10}
+                prefix='미인정'
+              />
+            </GridContainer>
+          </Section>
+          <Section>
+            <Text fontSize={24} fontWeight={600}>
+              봉사
+            </Text>
+            <AttendanceForm
+              width={'748px'}
+              title="봉사시간"
+              value={safeActivityData?.volunteerHours || ''}
+              onChange={handleVolunteerHoursChange}
+              suffix="시간"
+              defaultCount={10}
+            />
+          </Section>
+        </>
+      )}
       <Section>
         <Text fontSize={24} fontWeight={600}>
           자격증

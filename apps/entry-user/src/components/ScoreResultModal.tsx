@@ -2,7 +2,9 @@ import styled from '@emotion/styled';
 import { Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
 import { useCalculationData } from '../contexts/CalculationDataContext';
-import { calculateAllScores } from '../utils/scoreCalculator';
+import { calculateScore } from '../apis/calculator';
+import { transformCalculationDataToAPI } from '../utils/apiDataTransformer';
+import { useState, useEffect } from 'react';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -17,44 +19,107 @@ interface ScoreResult {
 
 export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => {
   const { state } = useCalculationData();
+  const [results, setResults] = useState<ScoreResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchScores = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // 세 가지 전형 타입에 대해 각각 API 호출
+        const commonRequest = transformCalculationDataToAPI(state, 'COMMON');
+        const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
+        const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
+
+        const [commonResponse, socialResponse, meisterResponse] = await Promise.all([
+          calculateScore(commonRequest),
+          calculateScore(socialRequest),
+          calculateScore(meisterRequest),
+        ]);
+
+        const newResults: ScoreResult[] = [
+          {
+            name: '일반 전형',
+            score: commonResponse.data.totalScore.toFixed(3),
+            total: commonResponse.data.maxScore.toString()
+          },
+          {
+            name: '사회통합 전형',
+            score: socialResponse.data.totalScore.toFixed(3),
+            total: socialResponse.data.maxScore.toString()
+          },
+          {
+            name: '마이스터 인재',
+            score: meisterResponse.data.totalScore.toFixed(3),
+            total: meisterResponse.data.maxScore.toString()
+          }
+        ];
+
+        setResults(newResults);
+      } catch (err) {
+        console.error('Score calculation error:', err);
+        setError('성적 계산 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScores();
+  }, [isOpen, state]);
 
   if (!isOpen) return null;
-
-  const calculatedScores = calculateAllScores(state);
-
-  const results: ScoreResult[] = [
-    { name: '일반 전형', score: calculatedScores.general.score, total: calculatedScores.general.total },
-    { name: '사회통합 전형', score: calculatedScores.social.score, total: calculatedScores.social.total },
-    { name: '마이스터 인재', score: calculatedScores.meister.score, total: calculatedScores.meister.total }
-  ];
 
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         {/* 제목 */}
         <Title>성적 산출 결과</Title>
-        
+
+        {/* 로딩 및 에러 처리 */}
+        {loading && (
+          <ResultList>
+            <Text fontSize={20} fontWeight={400}>
+              성적을 계산하고 있습니다...
+            </Text>
+          </ResultList>
+        )}
+
+        {error && (
+          <ResultList>
+            <Text fontSize={20} fontWeight={400} color="#FF0000">
+              {error}
+            </Text>
+          </ResultList>
+        )}
+
         {/* 결과 목록 */}
-        <ResultList>
-          {results.map((result, index) => (
-            <ResultItem key={index}>
-              <Text fontSize={24} fontWeight={400}>
-                {result.name}
-              </Text>
-              <ScoreText>
-                <Text fontSize={24} fontWeight={600} color="#FF6B35">
-                  {result.score}
+        {!loading && !error && (
+          <ResultList>
+            {results.map((result, index) => (
+              <ResultItem key={index}>
+                <Text fontSize={24} fontWeight={400}>
+                  {result.name}
                 </Text>
-                <Text fontSize={24} fontWeight={400} color="#999999">
-                  {' / '}
-                </Text>
-                <Text fontSize={24} fontWeight={400} color="#999999">
-                  {result.total}
-                </Text>
-              </ScoreText>
-            </ResultItem>
-          ))}
-        </ResultList>
+                <ScoreText>
+                  <Text fontSize={24} fontWeight={600} color="#FF6B35">
+                    {result.score}
+                  </Text>
+                  <Text fontSize={24} fontWeight={400} color="#999999">
+                    {' / '}
+                  </Text>
+                  <Text fontSize={24} fontWeight={400} color="#999999">
+                    {result.total}
+                  </Text>
+                </ScoreText>
+              </ResultItem>
+            ))}
+          </ResultList>
+        )}
 
         {/* 닫기 버튼 */}
         <ButtonWrapper>

@@ -5,6 +5,7 @@ interface IScoreType {
   math: string | null;
   sci: string | null;
   tech: string | null;
+  eng: string | null;
   [key: string]: string | null;
 }
 
@@ -25,6 +26,7 @@ interface IQEScoreType {
   science: string;
   technology: string;
   math: string;
+  english: string;
 }
 
 interface CalculationState {
@@ -56,6 +58,7 @@ const subjectWeights = {
   kor: 1.0,
   math: 1.0,
   sci: 1.0,
+  eng: 1.0,
   soc: 0.8,
   his: 0.8,
   tech: 0.6
@@ -106,7 +109,8 @@ const calculateQEScore = (qeScore: IQEScoreType): number => {
     qeScore.science,
     qeScore.social,
     qeScore.history,
-    qeScore.technology
+    qeScore.technology,
+    qeScore.english
   ];
 
   const validScores = subjects.filter(score => score && !isNaN(parseFloat(score)));

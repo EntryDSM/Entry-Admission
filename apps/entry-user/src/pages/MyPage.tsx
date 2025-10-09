@@ -5,19 +5,30 @@ import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModa
 import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeAccessToken, removeRefreshToken } from '@entry/util-config';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { usePassVerification } from '../hooks/usePassVerification';
+import { getFinalApplicationPdf, deleteApplication, getApplicationStatus } from '../apis';
 
 
 export const MyPage = () => {
   const [delOpen, setDelOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState<boolean>(false);
+  const [cancelApplicationOpen, setCancelApplicationOpen] = useState<boolean>(false);
 
   const resultModal = useModal();
+  const { startVerification, isLoading: isPassLoading, isVerified, verifyData, reset } = usePassVerification();
 
   // 사용자 정보 조회
   const { data: userInfo, isLoading: isUserLoading } = useQuery<IUserInfoResponseType>({
     queryKey: ['userInfo'],
     queryFn: getUserInfo,
+  });
+
+  // 지원정보 상태 조회
+  const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery({
+    queryKey: ['applicationStatus'],
+    queryFn: getApplicationStatus,
+    retry: false,
   });
 
 
@@ -48,6 +59,18 @@ export const MyPage = () => {
     },
   });
 
+  // 원서 취소 API
+  const cancelApplicationMutation = useMutation({
+    mutationFn: deleteApplication,
+    onSuccess: () => {
+      toast.success('원서 접수가 취소되었습니다.');
+      setCancelApplicationOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || '원서 취소 중 오류가 발생했습니다.');
+    },
+  });
+
 
   const handleDelClick = () => {
     setDelOpen(true);
@@ -67,32 +90,42 @@ export const MyPage = () => {
   };
 
   const handleDownloadApplication = async () => {
-    // try {
-    //   const response = await TestInstance.get('/application/pdf', {
-    //     responseType: 'blob',
-    //   });
+    try {
+      const blob = await getFinalApplicationPdf();
 
-    //   // Blob으로 파일 다운로드 처리
-    //   const url = window.URL.createObjectURL(new Blob([response.data]));
-    //   const link = document.createElement('a');
-    //   link.href = url;
-    //   link.setAttribute('download', '입학원서.pdf');
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   link.remove();
-    //   window.URL.revokeObjectURL(url);
+      // Blob으로 파일 다운로드 처리
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', '입학원서.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
 
-    //   toast.success('원서가 다운로드되었습니다.');
-    // } catch (error) {
-    //   toast.error('원서 다운로드 중 오류가 발생했습니다.');
-    //   console.error('원서 다운로드 에러:', error);
-    // }
-    toast.info('원서 다운로드 기능이 일시적으로 비활성화되었습니다.');
+      toast.success('원서가 다운로드되었습니다.');
+    } catch (error) {
+      toast.error('원서 다운로드 중 오류가 발생했습니다.');
+      console.error('원서 다운로드 에러:', error);
+    }
+  };
+
+  const handleCancelApplication = () => {
+    cancelApplicationMutation.mutate();
   };
 
   const handleChangePassword = () => {
-    setChangePasswordModalOpen(true);
+    // PASS 인증 시작
+    startVerification();
   };
+
+  // PASS 인증 완료 시 비밀번호 변경 모달 열기
+  useEffect(() => {
+    if (isVerified && verifyData) {
+      setChangePasswordModalOpen(true);
+      // reset(); // 인증 데이터는 모달에서 사용하므로 여기서는 reset하지 않음
+    }
+  }, [isVerified, verifyData]);
 
   const handleLogout = () => {
     // TODO: 로그아웃 API 연동
@@ -102,7 +135,7 @@ export const MyPage = () => {
     window.location.href = 'https://entrydsm.kr/';
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || isApplicationLoading) {
     return (
       <PageContainer>
         <ContentWrapper>
@@ -118,6 +151,33 @@ export const MyPage = () => {
         <UserName>{userInfo?.name || '사용자'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
+        {applicationStatus && (
+          <ApplicationStatusSection>
+            <StatusTitle>지원 정보</StatusTitle>
+            <StatusGrid>
+              <StatusItem>
+                <StatusLabel>수험번호</StatusLabel>
+                <StatusValue>{applicationStatus.receiptCode || '미부여'}</StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>제출 상태</StatusLabel>
+                <StatusValue>
+                  <StatusBadge isSubmitted={applicationStatus.isSubmitted}>
+                    {applicationStatus.isSubmitted ? '제출 완료' : '미제출'}
+                  </StatusBadge>
+                </StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>서류 도착</StatusLabel>
+                <StatusValue>
+                  <StatusBadge isSubmitted={applicationStatus.isPrintedArrived}>
+                    {applicationStatus.isPrintedArrived ? '도착 완료' : '미도착'}
+                  </StatusBadge>
+                </StatusValue>
+              </StatusItem>
+            </StatusGrid>
+          </ApplicationStatusSection>
+        )}
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
@@ -137,7 +197,7 @@ export const MyPage = () => {
             color={colors.gray[400]}
             borderColor={colors.gray[300]}
             hoverBackgroundColor={colors.gray[100]}
-            disabled
+            onClick={() => setCancelApplicationOpen(true)}
           >
             원서 작성 제출 취소
           </Button>
@@ -214,6 +274,16 @@ export const MyPage = () => {
         onConfirm={handleChangePasswordConfirm}
         isLoading={changePasswordMutation.isPending}
         userPhoneNumber={userInfo?.phoneNumber || ''}
+        passVerifiedPhoneNumber={verifyData?.phoneNumber || ''}
+      />
+
+      <CancelModal
+        setIsOpen={setCancelApplicationOpen}
+        isOpen={cancelApplicationOpen}
+        title="원서 접수를 취소하시겠습니까?"
+        content="취소 시 제출된 원서가 삭제되며, 다시 복구하실 수 없습니다."
+        btnText="접수 취소"
+        onClick={handleCancelApplication}
       />
 
       <ShowResultModal
@@ -310,4 +380,58 @@ const EmptyQuestionsArea = styled.div`
   border: 1px solid white;
   border-radius: 8px;
   margin-top: 40px;
+`;
+
+const ApplicationStatusSection = styled.div`
+  margin-top: 32px;
+  padding: 24px;
+  background-color: ${colors.gray[50]};
+  border-radius: 12px;
+  border: 1px solid ${colors.gray[200]};
+`;
+
+const StatusTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${colors.gray[500]};
+  margin: 0 0 16px 0;
+`;
+
+const StatusGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StatusItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const StatusLabel = styled.span`
+  font-size: 14px;
+  color: ${colors.gray[400]};
+  font-weight: 500;
+`;
+
+const StatusValue = styled.span`
+  font-size: 16px;
+  color: ${colors.gray[600]};
+  font-weight: 600;
+`;
+
+const StatusBadge = styled.span<{ isSubmitted: boolean }>`
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: ${({ isSubmitted }) =>
+    isSubmitted ? '#dcfce7' : '#fee2e2'};
+  color: ${({ isSubmitted }) => (isSubmitted ? '#16a34a' : '#dc2626')};
 `;

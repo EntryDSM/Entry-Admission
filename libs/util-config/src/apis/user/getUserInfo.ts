@@ -9,7 +9,7 @@ export const getUserInfo = async (): Promise<IUserInfoResponseType> => {
 
 // 회원 탈퇴 API
 export const deleteUser = async (userData: IDeleteUserRequestType): Promise<void> => {
-  await AdmissionUserInstance.delete('/user/user', { data: userData });
+  await AdmissionUserInstance.delete('/user', { data: userData });
 };
 
 // 비밀번호 변경 API

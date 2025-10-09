@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
 import { Button, AuthInput } from '@entry/ui';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGetNoticeDetail, useUpdateNotice, NoticeType } from '../apis';
 
 interface AttachmentFile {
   id: string;
@@ -11,62 +12,43 @@ interface AttachmentFile {
   url?: string;
 }
 
-interface NoticeData {
-  id: number;
-  title: string;
-  category: 'admission' | 'orientation';
-  content: string;
-  attachments: AttachmentFile[];
-}
-
-const mockNoticeData: NoticeData = {
-  id: 1,
-  title: '2025학년도 신입생 오리엔테이션 안내',
-  category: 'admission',
-  content: `안녕하세요?
-
-2025학년도 신입생 오리엔테이션를 다음과 같이 실시합니다.
-
-13시부터 입학 도착하는 순서로 교복 치수 측정 및 사진 촬영을 하여 오리엔테이션 시작 전에 완료할 예정입니다.
-
-오리엔테이션 시작: 2024. 11. 16. (토) 14시
-
-장소: 본교 창의관(중등) 1층 새롬홀. 오리엔테이션 진행은 90분 내외로 상황에 따라 탄력적으로 운영될 수 있습니다.`,
-  attachments: [
-    { id: '1', name: '2025학년도 신입생 전형 요강.pdf', url: '#' },
-    { id: '2', name: '오리엔테이션 안내.pdf', url: '#' },
-  ]
-};
-
 export const NoticeEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState({
     title: '',
-    category: 'admission' as 'admission' | 'orientation',
+    category: 'NOTICE' as NoticeType,
     content: '',
+    isPinned: false,
   });
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const { data: noticeDetail, isLoading } = useGetNoticeDetail(id);
+  const { mutate: updateNotice, isPending } = useUpdateNotice(id || '');
 
   useEffect(() => {
-    const loadNoticeData = () => {
+    if (noticeDetail) {
       setFormData({
-        title: mockNoticeData.title,
-        category: mockNoticeData.category,
-        content: mockNoticeData.content,
+        title: noticeDetail.title,
+        category: noticeDetail.type,
+        content: noticeDetail.content,
+        isPinned: noticeDetail.isPinned,
       });
-      setAttachments(mockNoticeData.attachments);
-      setIsLoading(false);
-    };
 
-    loadNoticeData();
-  }, [id]);
+      const existingFiles = noticeDetail.attachFiles.map((file, index) => ({
+        id: `existing-${index}`,
+        name: file.attachFileName,
+        url: file.attachFileUrl,
+      }));
+      setAttachments(existingFiles);
+    }
+  }, [noticeDetail]);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const value = field === 'isPinned' ? (e.target as HTMLInputElement).checked : e.target.value;
     setFormData(prev => ({
       ...prev,
-      [field]: e.target.value
+      [field]: value
     }));
   };
 
@@ -96,13 +78,23 @@ export const NoticeEdit = () => {
       return;
     }
 
-    console.log('Update notice:', {
-      id: Number(id),
-      ...formData,
-      attachments
-    });
+    // TODO: 파일 업로드 후 fileName 받아오기
+    const attachFileNames = attachments.map(att => att.name);
 
-    navigate('/notice');
+    updateNotice(
+      {
+        title: formData.title,
+        content: formData.content,
+        isPinned: formData.isPinned,
+        type: formData.category,
+        attachFileName: attachFileNames.length > 0 ? attachFileNames : undefined,
+      },
+      {
+        onSuccess: () => {
+          navigate('/notice');
+        },
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -140,13 +132,26 @@ export const NoticeEdit = () => {
         <FormContainer>
           <FormRow>
             <FormLabel>카테고리</FormLabel>
-            <Select 
-              value={formData.category} 
+            <Select
+              value={formData.category}
               onChange={handleInputChange('category')}
             >
-              <option value="admission">입학 공지사항</option>
-              <option value="orientation">예비 신입생 안내</option>
+              <option value="NOTICE">입학 공지사항</option>
+              <option value="GUIDE">예비 신입생 안내</option>
             </Select>
+          </FormRow>
+
+          <FormRow>
+            <CheckboxRow>
+              <CheckboxLabel>
+                <input
+                  type="checkbox"
+                  checked={formData.isPinned}
+                  onChange={handleInputChange('isPinned')}
+                />
+                <span>상단 고정</span>
+              </CheckboxLabel>
+            </CheckboxRow>
           </FormRow>
 
           <FormRow>
@@ -217,6 +222,7 @@ export const NoticeEdit = () => {
             backgroundColor="#9ca3af"
             hoverBackgroundColor="#6b7280"
             onClick={handleCancel}
+            disabled={isPending}
           >
             취소
           </Button>
@@ -224,8 +230,9 @@ export const NoticeEdit = () => {
             backgroundColor="#22c55e"
             hoverBackgroundColor="#16a34a"
             onClick={handleSubmit}
+            disabled={isPending}
           >
-            수정 완료
+            {isPending ? '수정 중...' : '수정 완료'}
           </Button>
         </ButtonSection>
       </Flex>
@@ -413,4 +420,28 @@ const ButtonSection = styled.div`
   gap: 12px;
   justify-content: flex-end;
   width: 100%;
+`;
+
+const CheckboxRow = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: ${colors.gray[400]};
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  span {
+    user-select: none;
+  }
 `;
