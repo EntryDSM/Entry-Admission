@@ -324,8 +324,11 @@ export const ApplicantsList = () => {
 
 const ButtonContiner = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+  flex-wrap: wrap;
 `;
 
 const Container = styled.div`
@@ -341,8 +344,8 @@ const Container = styled.div`
 const HeadContent = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
 `;
 
 const FilterControl = styled.div`
