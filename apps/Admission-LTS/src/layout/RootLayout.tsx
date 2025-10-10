@@ -2,8 +2,9 @@ import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 import { NoPathHeader } from '@entry/ui';
 import { ToastContainer } from 'react-toastify';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import { useGetApplicationStatus } from '../apis';
 
 
 export const RootLayout = () => {
@@ -23,6 +24,17 @@ export const RootLayout = () => {
       }
     });
   }, [location.pathname]);
+
+  const {data, isLoading} = useGetApplicationStatus()
+  
+    useEffect(() => {
+      if (location.pathname !== '/submitted' && !isLoading && data?.isSubmitted) {
+        alert('이미 제출된 원서가 있습니다.')
+        window.location.href = 'https://entrydsm.kr/';
+      }
+    }, [data, isLoading, location.pathname]);
+  
+    // if (isLoading) return null;
 
   return (
     <>
