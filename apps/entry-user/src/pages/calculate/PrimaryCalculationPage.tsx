@@ -174,7 +174,7 @@ export const PrimaryCalculationPage = () => {
                 <Flex key={index} justifyContent="space-between">
                   <Text>{result.name}</Text>
                   <Text color="#FF6B35" fontWeight={600}>
-                    {result.data.totalScore.toFixed(3)} / {result.data.maxScore}
+                    {result.data.totalScore.toFixed(3)} / 300
                   </Text>
                 </Flex>
               ))}
