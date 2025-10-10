@@ -170,8 +170,8 @@ export const MyPage = () => {
     window.location.href = 'https://entrydsm.kr/';
   };
 
-  // 접수 가능 여부 확인 (RECRUITING 상태일 때만 가능)
-  const isApplicationAvailable = scheduleData?.currentStatus === 'RECRUITING';
+  // 접수 가능 여부를 시간 기반으로 확인
+  const [isApplicationAvailable, setIsApplicationAvailable] = useState<boolean>(false);
 
   // 접수 종료 시간까지 남은 시간 계산 (1초마다 업데이트)
   useEffect(() => {
@@ -182,7 +182,10 @@ export const MyPage = () => {
         (s) => s.type === 'FIRST_ANNOUNCEMENT'
       );
 
-      if (!firstAnnouncementSchedule) return;
+      if (!firstAnnouncementSchedule) {
+        setIsApplicationAvailable(false);
+        return;
+      }
 
       const endDate = new Date(firstAnnouncementSchedule.date);
       const now = new Date();
@@ -190,8 +193,12 @@ export const MyPage = () => {
 
       if (diff <= 0) {
         setRemainingTime('접수 마감');
+        setIsApplicationAvailable(false);
         return;
       }
+
+      // 접수 마감 전이면 접수 가능
+      setIsApplicationAvailable(true);
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

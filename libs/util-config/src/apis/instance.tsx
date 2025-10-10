@@ -66,7 +66,11 @@ const handleUserTokenRefresh = () => {
       const refreshResponse = await AdmissionUserInstance.put(
         '/user/auth',
         {},
-        { headers: { 'X-Refresh-Token': userRefreshToken } }
+        {
+          headers: { 'X-Refresh-Token': userRefreshToken },
+          // @ts-ignore - interceptor를 우회하기 위한 플래그
+          skipAuthInterceptor: true
+        }
       );
 
       if (refreshResponse.status !== 200) {
@@ -114,6 +118,8 @@ const handleAdminTokenRefresh = () => {
             'Request-User-Id': getAdminId(),
             'Request-User-Role': 'ADMIN',
           },
+          // @ts-ignore - interceptor를 우회하기 위한 플래그
+          skipAuthInterceptor: true
         }
       );
 
@@ -140,6 +146,12 @@ const handleAdminTokenRefresh = () => {
 };
 
 const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
+  // @ts-ignore - skipAuthInterceptor 플래그 확인
+  if (config.skipAuthInterceptor) {
+    console.log('[User Interceptor] Skipping interceptor (skipAuthInterceptor flag)');
+    return config;
+  }
+
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
@@ -148,21 +160,28 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   const baseUrl = url.split('?')[0];
   const endpoint = `${method} ${baseUrl}`;
 
+  console.log('[User Interceptor] URL:', url, '| Endpoint:', endpoint);
+
   // 인증이 필요 없는 공개 API는 그냥 통과
   if (skipAuthUrls.includes(endpoint)) {
+    console.log('[User Interceptor] Public API - skipping auth');
     return config;
   }
+
+  console.log('[User Interceptor] Protected API - checking token');
 
   // 인증이 필요한 API: 토큰 확인
   let token = getAccessToken() || cookies.get('accessToken');
 
   if (!token) {
+    console.log('[User Interceptor] No token found - attempting refresh');
     // 토큰이 없으면 리프레시 시도
     try {
       token = await handleUserTokenRefresh();
+      console.log('[User Interceptor] Token refresh successful');
     } catch (error) {
       // 리프레시도 실패하면 auth로 리다이렉트
-      console.error('Token refresh failed - redirecting to auth', error);
+      console.error('[User Interceptor] Token refresh failed - redirecting to auth', error);
       window.location.href = 'https://auth.entrydsm.kr';
       return Promise.reject(new axios.Cancel('No valid token - redirecting to auth'));
     }
@@ -173,6 +192,12 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
 };
 
 const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
+  // @ts-ignore - skipAuthInterceptor 플래그 확인
+  if (config.skipAuthInterceptor) {
+    console.log('[Admin Interceptor] Skipping interceptor (skipAuthInterceptor flag)');
+    return config;
+  }
+
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
@@ -183,6 +208,7 @@ const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
 
   // 인증이 필요 없는 공개 API는 그냥 통과
   if (skipAuthUrls.includes(endpoint)) {
+    console.log('[Admin Interceptor] Public API - skipping auth');
     return config;
   }
 
