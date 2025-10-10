@@ -6,7 +6,7 @@ import ADMISSION_OVERVIEW from '../assets/ADMISSION_OVERVIEW.svg';
 export const AdmissionOverviewPage = () => {
   return (
     <PageContainer>
-      <Flex width='100%' height='fit-content' isColumn gap={32}>
+      <Flex width='fit-content' height='fit-content' isColumn gap={32}>
         <Flex width='fit-content' height='fit-content' isColumn gap={12}>
           <Title>신입생 전형 요강</Title>
           <SubTitle>2025학년도 신입생 전형 일정</SubTitle>
@@ -41,6 +41,8 @@ const PageContainer = styled.div`
   width: 100%;
   background-color: white;
   padding: 70px 100px;
+  display: flex;
+  justify-content: center;
 `;
 
 const Title = styled.h1`
@@ -62,10 +64,12 @@ const TableContainer = styled.div`
 
 const TableImage = styled.img`
   width: 100%;
+  max-width: 1044px;
 `;
 
 const AttachmentSection = styled.div`
   width: 100%;
+  max-width: 1044px;
 `;
 
 const AttachmentTable = styled.div`
