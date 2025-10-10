@@ -12,9 +12,9 @@ interface NoticeDetail {
   createdAt: string;
   content: string;
   attachments?: Array<{ name: string; url: string }>;
-  imageURL: string,
-  imageName: string,
-  isPinned: false,
+  imageURL: string;
+  imageName: string;
+  isPinned: false;
 }
 
 export const NoticeDetailPage = () => {
@@ -26,7 +26,7 @@ export const NoticeDetailPage = () => {
     type: '',
     title: '',
     createdAt: '',
-    content:'',
+    content: '',
     imageURL: '',
     imageName: '',
     isPinned: false,
@@ -36,18 +36,18 @@ export const NoticeDetailPage = () => {
   const { data, isLoading, error } = useGetDetailNotice(id);
 
   const formatDate = (dateString: string) => {
-      return dateString.split('T')[0]; 
-    };
+    return dateString.split('T')[0];
+  };
 
   useEffect(() => {
     if (data) {
       setNoticeDetail({
         ...data,
-        createdAt: formatDate(data.createdAt)
+        createdAt: formatDate(data.createdAt),
       });
     }
   }, [data]);
-  
+
   const handleBackToList = () => {
     navigate('/notice');
   };
@@ -88,7 +88,11 @@ export const NoticeDetailPage = () => {
   return (
     <PageContainer>
       <ContentWrapper>
-        <CategoryText>{noticeDetail.type === "NOTICE" ? "입학 공지사항" : "예비 신입생 안내"}</CategoryText>
+        <CategoryText>
+          {noticeDetail.type === 'NOTICE'
+            ? '입학 공지사항'
+            : '예비 신입생 안내'}
+        </CategoryText>
 
         <TitleSection>
           <Title>{noticeDetail.title}</Title>
@@ -224,7 +228,7 @@ const AttachmentItem = styled.div`
 
 const AttachmentName = styled.span`
   font-size: 14px;
-  color: ${colors.gray[600]};
+  color: ${colors.gray[500]};
 `;
 
 const DownloadButton = styled.div`
