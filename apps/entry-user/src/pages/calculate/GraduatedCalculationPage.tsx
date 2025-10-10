@@ -22,6 +22,11 @@ export const GraduatedCalculationPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { state } = useCalculationData();
+  const maxScores = {
+    COMMON: 173,
+    SOCIAL: 119,
+    MEISTER: 119
+  };
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -177,7 +182,7 @@ export const GraduatedCalculationPage = () => {
                 <Flex key={index} justifyContent="space-between">
                   <Text>{result.name}</Text>
                   <Text color="#FF6B35" fontWeight={600}>
-                    {result.data.totalScore.toFixed(3)} / 300
+                    {result.data.totalScore.toFixed(3)} / {maxScores[result.name === '일반 전형' ? 'COMMON' : result.name === '사회통합 전형' ? 'SOCIAL' : 'MEISTER']}
                   </Text>
                 </Flex>
               ))}

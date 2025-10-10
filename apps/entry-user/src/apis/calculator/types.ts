@@ -17,7 +17,5 @@ export interface CalculatorScoreResponse {
     volunteerScore: number;
     bonusScore: number;
     totalScore: number;
-    maxScore?: number;
-    scorePercentage?: number;
   };
 }
