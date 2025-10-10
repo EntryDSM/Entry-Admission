@@ -91,7 +91,7 @@ export const Activity = () => {
                 onChange={handleAbsencesChange}
                 suffix="회"
                 defaultCount={10}
-                prefix='미인정'
+                prefix="미인정"
               />
               <AttendanceForm
                 width={'100%'}
@@ -100,7 +100,7 @@ export const Activity = () => {
                 onChange={handleEarlyLeavesChange}
                 suffix="회"
                 defaultCount={10}
-                prefix='미인정'
+                prefix="미인정"
               />
               <AttendanceForm
                 width={'100%'}
@@ -109,7 +109,7 @@ export const Activity = () => {
                 onChange={handleLateArrivalsChange}
                 suffix="회"
                 defaultCount={10}
-                prefix='미인정'
+                prefix="미인정"
               />
               <AttendanceForm
                 width={'100%'}
@@ -118,7 +118,7 @@ export const Activity = () => {
                 onChange={handleResultMissingChange}
                 suffix="회"
                 defaultCount={10}
-                prefix='미인정'
+                prefix="미인정"
               />
             </GridContainer>
           </Section>

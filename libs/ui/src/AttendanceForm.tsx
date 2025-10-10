@@ -10,6 +10,7 @@ interface IAttendanceFormType {
   defaultCount?: number;
   width?: string;
   suffix: string;
+  prefix?: string;
 }
 
 export const AttendanceForm: React.FC<IAttendanceFormType> = ({
@@ -19,6 +20,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   defaultCount,
   width = '100%',
   suffix,
+  prefix,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState<boolean>(false);
@@ -38,7 +40,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
         <CheckMark hasValue={!!value}>
           <Check />
         </CheckMark>
-        <Text>미인정 {title}</Text>
+        <Text>{prefix ? `${prefix} ` : ''}{title}</Text>
       </HeaderRow>
       <InputWrapper>
         <StyledInput

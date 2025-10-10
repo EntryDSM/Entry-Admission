@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { INoticeCreateType, INoticeUpdateType } from './types';
-import { AdmissionUserInstance } from '@entry/util-config';
+import { AdmissionUserInstance, AdmissionPublicInstance } from '@entry/util-config';
 
 const path = '/notice';
 
@@ -42,7 +42,7 @@ export const useGetAllNotice = (type: 'GUIDE' | 'NOTICE') => {
   return useQuery({
     queryKey: ['notice', type],
     queryFn: async () => {
-      const { data } = await AdmissionUserInstance.get(`${path}`, {
+      const { data } = await AdmissionPublicInstance.get(`${path}`, {
         params: { type },
       });
       return data;
@@ -54,7 +54,7 @@ export const useGetDetailNotice = (noticeId: string) => {
   return useQuery({
     queryKey: ['notice', noticeId],
     queryFn: async () => {
-      const { data } = await AdmissionUserInstance.get(`${path}/${noticeId}`);
+      const { data } = await AdmissionPublicInstance.get(`${path}/${noticeId}`);
       return data;
     },
   });
