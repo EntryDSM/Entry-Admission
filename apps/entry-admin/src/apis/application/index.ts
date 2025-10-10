@@ -22,6 +22,7 @@ export const useGetApplicationAllList = (
         );
       return data;
     },
+    networkMode: 'always',
     enabled: true,
   });
 };

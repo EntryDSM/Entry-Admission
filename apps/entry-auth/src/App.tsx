@@ -10,8 +10,12 @@ export const App = () => {
     const currentPath = window.location.pathname;
 
     // /dev/enable과 /sorry 경로는 체크 제외
-    if (isDev !== 'TRUE' && !currentPath.includes('/sorry') && !currentPath.includes('/dev/enable')) {
-      window.location.href = '/sorry';
+    if (
+      isDev !== 'TRUE' &&
+      !currentPath.includes('/sorry') &&
+      !currentPath.includes('/dev/enable')
+    ) {
+      // window.location.href = '/sorry';
     }
   }, []);
 

@@ -160,7 +160,7 @@ export const ApplicantsList = () => {
   }, [data]);
 
   useEffect(() => {
-    refetch();
+    refetch({ cancelRefetch: false });
   }, [filterParams]);
 
   // 검색 필터
@@ -285,6 +285,8 @@ export const ApplicantsList = () => {
       <ApplicantsAllList>
         {isLoading ? (
           <LoadingContent>지원자 조회 데이터 기다리는 중...</LoadingContent>
+        ) : filteredApplicants.length === 0 ? (
+          <LoadingContent>지원자 내역이 없습니다.</LoadingContent>
         ) : (
           filteredApplicants.map((applicant) => (
             <Applicant
