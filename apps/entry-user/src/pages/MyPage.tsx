@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModal, useModal } from '@entry/ui';
 import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeAccessToken, removeRefreshToken } from '@entry/util-config';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
 import { getFinalApplicationPdf, deleteApplication, getApplicationStatus, getFirstRoundPass, getSecondRoundPass } from '../apis';
@@ -17,7 +17,9 @@ export const MyPage = () => {
   const [cancelApplicationOpen, setCancelApplicationOpen] = useState<boolean>(false);
   const [isPass, setIsPass] = useState<boolean>(false);
   const [announcementStep, setAnnouncementStep] = useState<1 | 2>(1);
+  const [remainingTime, setRemainingTime] = useState<string>('');
 
+  const queryClient = useQueryClient();
   const resultModal = useModal();
   const { startVerification, isLoading: isPassLoading, isVerified, verifyData, reset } = usePassVerification();
 
@@ -42,6 +44,15 @@ export const MyPage = () => {
   });
 
   const { data: scheduleData } = useGetAllSchedule();
+
+  // 30초마다 일정을 자동으로 조회하여 상태 업데이트
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['schedule'] });
+    }, 30000); // 30초마다 갱신
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   const deleteUserMutation = useMutation({
     mutationFn: deleteUser,
@@ -72,6 +83,8 @@ export const MyPage = () => {
     onSuccess: () => {
       toast.success('원서 접수가 취소되었습니다.');
       setCancelApplicationOpen(false);
+      // 원서 상태를 다시 조회하여 UI 업데이트
+      queryClient.invalidateQueries({ queryKey: ['applicationStatus'] });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || '원서 취소 중 오류가 발생했습니다.');
@@ -157,6 +170,47 @@ export const MyPage = () => {
     window.location.href = 'https://entrydsm.kr/';
   };
 
+  // 접수 가능 여부 확인 (RECRUITING 상태일 때만 가능)
+  const isApplicationAvailable = scheduleData?.currentStatus === 'RECRUITING';
+
+  // 접수 종료 시간까지 남은 시간 계산 (1초마다 업데이트)
+  useEffect(() => {
+    if (!scheduleData?.schedules || applicationStatus) return;
+
+    const calculateRemainingTime = () => {
+      const firstAnnouncementSchedule = scheduleData.schedules.find(
+        (s) => s.type === 'FIRST_ANNOUNCEMENT'
+      );
+
+      if (!firstAnnouncementSchedule) return;
+
+      const endDate = new Date(firstAnnouncementSchedule.date);
+      const now = new Date();
+      const diff = endDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setRemainingTime('접수 마감');
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        setRemainingTime(`${days}일 ${hours}시간 ${minutes}분 ${seconds}초`);
+      } else {
+        setRemainingTime(`${hours}시간 ${minutes}분 ${seconds}초`);
+      }
+    };
+
+    calculateRemainingTime();
+    const interval = setInterval(calculateRemainingTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [scheduleData, applicationStatus]);
+
   if (isUserLoading || isApplicationLoading) {
     return (
       <PageContainer>
@@ -181,12 +235,17 @@ export const MyPage = () => {
             <StatusInfo>
               <StatusLabel>지원서 상태 : </StatusLabel>
               <StatusValue isSubmitted={applicationStatus?.isSubmitted || false}>
-                {applicationStatus 
-                  ? (applicationStatus.isPrintedArrived 
-                      ? '제출 완료 및 원서 학교 도착' 
+                {applicationStatus
+                  ? (applicationStatus.isPrintedArrived
+                      ? '제출 완료 및 원서 학교 도착'
                       : (applicationStatus.isSubmitted ? '제출 완료' : '미제출'))
                   : '미지원'}
               </StatusValue>
+              {!applicationStatus && remainingTime && (
+                <RemainingTimeText>
+                  (접수 마감까지 {remainingTime})
+                </RemainingTimeText>
+              )}
             </StatusInfo>
           </StatusBox>
         </ApplicationStatusSection>
@@ -236,11 +295,12 @@ export const MyPage = () => {
             </Button>
           ) : (
             <Button
-              backgroundColor={colors.gray[50]}
-              color={colors.orange[800]}
-              borderColor={colors.orange[800]}
+              backgroundColor={isApplicationAvailable ? colors.gray[50] : colors.gray[200]}
+              color={isApplicationAvailable ? colors.orange[800] : colors.gray[400]}
+              borderColor={isApplicationAvailable ? colors.orange[800] : colors.gray[400]}
               hoverBackgroundColor="transparent"
-              onClick={handleApplicationSubmit}
+              onClick={isApplicationAvailable ? handleApplicationSubmit : undefined}
+              disabled={!isApplicationAvailable}
             >
               원서 접수하기
             </Button>
@@ -458,4 +518,11 @@ const StatusValue = styled.span<{ isSubmitted: boolean }>`
   font-size: 24px;
   font-weight: 600;
   color: ${({ isSubmitted }) => (isSubmitted ? colors.orange[800] : colors.gray[400])};
+`;
+
+const RemainingTimeText = styled.span`
+  font-size: 18px;
+  font-weight: 500;
+  color: ${colors.orange[800]};
+  margin-left: 8px;
 `;

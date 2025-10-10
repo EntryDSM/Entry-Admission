@@ -127,14 +127,26 @@ export const ApplicationNav = ({
     setCurrentPage(targetPage);
   };
 
-  const formatDate = (arr: (number|string)[]) => {
-    const [year, month = 0, day = 0] = arr;
+  const formatDate = (arr: (number|string)[], graduationType: string) => {
+    // 검정고시는 null 반환
+    if (graduationType === "검정고시 (중학교 졸업 학력)") {
+      return null;
+    }
+
+    // 배열이 비어있거나 값이 없으면 오늘 날짜를 기본값으로 사용
+    const today = new Date();
+    const [year = today.getFullYear(), month = today.getMonth() + 1, day = today.getDate()] = arr;
 
     const y = String(year).padStart(4, "0");
     const m = String(month).padStart(2, "0");
-    const d = String(day).padStart(2, "0");
 
-    return `${y}-${m}-${d}`;
+    // 졸업 예정: 년-월-00, 졸업: 년-월-일
+    if (graduationType === "졸업 예정") {
+      return `${y}-${m}-00`;
+    } else {
+      const d = String(day).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
   }
 
   const typeSelectionFormat = (type: string): "COMMON" | "MEISTER" | "SOCIAL" | null => {
@@ -180,7 +192,7 @@ export const ApplicationNav = ({
       applicantTel: state.applicantInfo.applicantNumber,
       applicationType: typeSelectionFormat(state.applicationClassification.typeSelection),//포맷
       educationalStatus: graduationTypeFormat(state.applicationClassification.graduationType),//포맷
-      birthDate: formatDate(state.applicantInfo.dateOfBirth),//date 포맷 (배열 -> YYYY-MM-DD)
+      birthDate: formatDate(state.applicantInfo.dateOfBirth, "졸업"),//date 포맷 (배열 -> YYYY-MM-DD)
       applicantGender: genderFormat(state.applicantInfo.gender),
       streetAddress: state.guardianInfo.address,
       postalCode: state.guardianInfo.postalCode,
@@ -197,7 +209,7 @@ export const ApplicationNav = ({
       teacherName: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.teacherName,
       nationalMeritChild: state.applicantInfo.specialNotes === "국가 유공자" ? true : false,
       specialAdmissionTarget: state.applicantInfo.specialNotes === "특례 입학 대상" ? true : false,
-      graduationDate: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : formatDate(state.applicationClassification.graduationDate),//날짜 포맷
+      graduationDate: formatDate(state.applicationClassification.graduationDate, state.applicationClassification.graduationType),//날짜 포맷 (졸업구분에 따라 다르게)
       studyPlan: state.personalStatements.studyPlan,
       selfIntroduce: state.personalStatements.personalStmt,
 

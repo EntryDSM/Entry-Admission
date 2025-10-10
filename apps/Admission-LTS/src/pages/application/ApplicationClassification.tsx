@@ -6,6 +6,12 @@ import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 export const ApplicationClassification = () => {
   const [datas, setDatas] = usePageData('applicationClassification');
 
+  // 오늘 날짜 계산
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const currentDay = today.getDate();
+
   // 1990 ~ 2030년 생성
   const yearDates = eachYearOfInterval({
     start: new Date(1990, 0, 1),
@@ -24,8 +30,8 @@ export const ApplicationClassification = () => {
     return Array.from({ length: daysCount }, (_, i) => i + 1);
   };
 
-  const selectedYear = datas?.graduationDate?.[0] || years[0];
-  const selectedMonth = datas?.graduationDate?.[1] || months[0];
+  const selectedYear = datas?.graduationDate?.[0] || currentYear;
+  const selectedMonth = datas?.graduationDate?.[1] || currentMonth;
 
   // day 배열 계산
   const days = getDaysInMonth(selectedYear as number, selectedMonth as number);

@@ -32,18 +32,21 @@ export const Main = () => {
       : false;
 
   const handleApplyClick = () => {
-    if (status?.isSubmitted || isTrueSchedule || isLoggedIn) {
-      window.location.href = 'https://admission.entrydsm.kr';
-    } else if (!isLoggedIn) {
+    // 로그인 체크가 가장 먼저
+    if (!isLoggedIn) {
       toast.error('로그인 후 지원이 가능합니다.');
-      return;
-    } else if (!isTrueSchedule) {
-      toast.error('아직 지원 기간이 아닙니다.');
-      return;
-    } else if (!status?.isSubmitted) {
-      toast.error('아직 원서를 제출하지 않았습니다.');
+      window.location.href = 'https://auth.entrydsm.kr';
       return;
     }
+
+    // 지원 기간 체크
+    if (!isTrueSchedule) {
+      toast.error('아직 지원 기간이 아닙니다.');
+      return;
+    }
+
+    // 모든 조건 통과 시 admission 페이지로 이동
+    window.location.href = 'https://admission.entrydsm.kr';
   };
 
   const canApply = isLoggedIn && isTrueSchedule;
