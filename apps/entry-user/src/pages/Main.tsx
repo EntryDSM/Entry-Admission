@@ -35,21 +35,23 @@ export const Main = () => {
       : false;
 
   const handleApplyClick = () => {
-    if (status?.isSubmitted && isTrueSchedule && isLoggedIn) {
-      window.location.href = 'https://admission.entrydsm.kr';
-    } else if (!isLoggedIn) {
+    if (!isLoggedIn) {
       toast.error('로그인 후 지원이 가능합니다.');
       return;
-    } else if (!isTrueSchedule) {
+    }
+    if (!isTrueSchedule) {
       toast.error('아직 지원 기간이 아닙니다.');
       return;
-    } else if (!status?.isSubmitted) {
-      toast.error('아직 원서를 제출하지 않았습니다.');
+    }
+    if (status?.isSubmitted) {
+      toast.error('이미 원서를 제출하였습니다.');
       return;
     }
+
+    window.location.href = 'https://admission.entrydsm.kr';
   };
 
-  const canApply = isLoggedIn && isTrueSchedule;
+  const canApply = isLoggedIn && isTrueSchedule && status?.isSubmitted;
 
   return (
     <>
