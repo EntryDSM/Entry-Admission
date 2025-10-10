@@ -175,17 +175,17 @@ export const MyPage = () => {
         setDisplayName('채도훈');
       }, 1000);
 
-      // 11초마다 20% 확률로 감귤 표시
+      // 1초마다 50% 확률로 감귤 표시
       const randomInterval = setInterval(() => {
         const random = Math.random();
-        if (random < 0.2) {
-          // 20% 확률
+        if (random < 0.5) {
+          // 50% 확률
           setDisplayName('감귤');
           setTimeout(() => {
             setDisplayName('채도훈');
           }, 500);
         }
-      }, 11000);
+      }, 1000);
 
       return () => {
         clearTimeout(initialTimer);
