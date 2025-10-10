@@ -4,6 +4,10 @@ import { colors } from '@entry/design-token';
 import { DownloadIcon } from '@entry/ui';
 import { useGetDetailNotice } from '../apis';
 import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 interface NoticeDetail {
   id: string;
@@ -101,16 +105,9 @@ export const NoticeDetailPage = () => {
 
         <ContentSection>
           <ContentText>
-            {noticeDetail.content?.split('\n\n').map((paragraph, index) => (
-              <Paragraph key={index}>
-                {paragraph.split('\n').map((line, lineIndex) => (
-                  <span key={lineIndex}>
-                    {line}
-                    {lineIndex < paragraph.split('\n').length - 1 && <br />}
-                  </span>
-                ))}
-              </Paragraph>
-            ))}
+            <ReactMarkdown rehypePlugins={[rehypeRaw, rehypeHighlight]}>
+              {noticeDetail.content}
+            </ReactMarkdown>
           </ContentText>
         </ContentSection>
 
@@ -187,14 +184,6 @@ const ContentText = styled.div`
   font-size: 16px;
   line-height: 1.8;
   color: ${colors.gray[500]};
-`;
-
-const Paragraph = styled.div`
-  margin-bottom: 16px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 `;
 
 const AttachmentsSection = styled.div`
