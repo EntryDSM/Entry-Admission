@@ -48,12 +48,12 @@ interface CalculationState {
 }
 
 const gradeToNumber: { [key: string]: number } = {
-  'A': 1,
-  'B': 2,
+  'A': 5,
+  'B': 4,
   'C': 3,
-  'D': 4,
-  'E': 5,
-  '✕': 5  // X는 5등급으로 처리
+  'D': 2,
+  'E': 1,
+  '✕': 0
 };
 
 const convertGradeToNumber = (grade: string | null): number | undefined => {

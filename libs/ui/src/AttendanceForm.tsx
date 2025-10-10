@@ -38,7 +38,7 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
         <CheckMark hasValue={!!value}>
           <Check />
         </CheckMark>
-        <Text>{title}</Text>
+        <Text>미인정 {title}</Text>
       </HeaderRow>
       <InputWrapper>
         <StyledInput
