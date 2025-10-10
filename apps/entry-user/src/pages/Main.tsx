@@ -51,7 +51,7 @@ export const Main = () => {
     window.location.href = 'https://admission.entrydsm.kr';
   };
 
-  const canApply = isLoggedIn && isTrueSchedule && status?.isSubmitted;
+  const canApply = isLoggedIn && isTrueSchedule && !status?.isSubmitted;
 
   return (
     <>
