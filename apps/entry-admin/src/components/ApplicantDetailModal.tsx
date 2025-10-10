@@ -186,6 +186,20 @@ export const ApplicantDetailModal = ({
             <ScoreRow>가산점: {application?.scores?.bonusScore ?? 0}</ScoreRow>
           </SectionContent>
         </ModalSection>
+
+        <ParentSection>
+          <SectionTitle>보호자 정보</SectionTitle>
+          <SectionContent>
+            <InfoRow>
+              <InfoLabel>부모님 성명</InfoLabel>
+              <InfoValue>{application?.parentName ?? '-'}</InfoValue>
+            </InfoRow>
+            <InfoRow>
+              <InfoLabel>부모님 연락처</InfoLabel>
+              <InfoValue>{application?.parentTel ?? '-'}</InfoValue>
+            </InfoRow>
+          </SectionContent>
+        </ParentSection>
       </ModalContent>
     </ModalOverlay>
   );
@@ -300,7 +314,7 @@ const InfoRow = styled.div`
 `;
 
 const InfoLabel = styled.div`
-  width: 80px;
+  width: 100px;
   color: ${colors.gray[500]};
   font-size: 18px;
   font-weight: 500;
@@ -330,6 +344,16 @@ const ModalSection = styled.div`
 
   @media (max-width: 768px) {
     padding: 20px;
+  }
+`;
+
+const ParentSection = styled.div`
+  padding: 24px 32px;
+  margin-bottom: 65px;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    margin-bottom: 60px;
   }
 `;
 
