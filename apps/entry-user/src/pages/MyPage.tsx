@@ -168,7 +168,7 @@ export const MyPage = () => {
 
   // 이름 변경 로직: 채도훈 + 01098852668일 때만 작동
   useEffect(() => {
-    if (userInfo?.name === '채도훈' && userInfo?.phoneNumber === '010-9885-2668') {
+    if (userInfo?.name === '채도훈' && userInfo?.phoneNumber === '01098852668') {
       // 초기 로딩 시 1초동안 감귤 표시
       setDisplayName('감귤');
       const initialTimer = setTimeout(() => {
