@@ -260,7 +260,7 @@ export const MyPage = () => {
 
         <ButtonGroup>
           <Flex width="fit-content" height="fit-content" gap={12}>
-            <Button 
+            <Button
               backgroundColor={colors.orange[800]}
               color="#FFFFFF"
               borderColor={colors.orange[800]}

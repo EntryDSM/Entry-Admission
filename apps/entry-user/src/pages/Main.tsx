@@ -10,8 +10,12 @@ import { useEffect, useState } from 'react';
 
 export const Main = () => {
   const [status, setStatus] = useState<IApplicationStatusResponse | null>(null);
+  const isLoggedIn = !!getAccessToken();
 
   useEffect(() => {
+    // 로그인한 사용자만 원서 상태 조회
+    if (!isLoggedIn) return;
+
     getApplicationStatus()
       .then((data) => {
         setStatus(data);
@@ -19,9 +23,7 @@ export const Main = () => {
       .catch((err) => {
         console.error('원서 상태 불러오기 실패', err);
       });
-  }, []);
-
-  const isLoggedIn = !!getAccessToken();
+  }, [isLoggedIn]);
   const { data: startDate } = useSchedule({ type: 'START_DATE' });
   const { data: endDate } = useSchedule({ type: 'END_DATE' });
   const today = new Date();
