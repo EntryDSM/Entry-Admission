@@ -35,7 +35,7 @@ export const Main = () => {
       : false;
 
   const handleApplyClick = () => {
-    if (status?.isSubmitted || isTrueSchedule || isLoggedIn) {
+    if (status?.isSubmitted && isTrueSchedule && isLoggedIn) {
       window.location.href = 'https://admission.entrydsm.kr';
     } else if (!isLoggedIn) {
       toast.error('로그인 후 지원이 가능합니다.');
