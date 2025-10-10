@@ -19,6 +19,7 @@ export const MyPage = () => {
   const [isPass, setIsPass] = useState<boolean>(false);
   const [announcementStep, setAnnouncementStep] = useState<1 | 2>(1);
   const [remainingTime, setRemainingTime] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string>('');
 
   const queryClient = useQueryClient();
   const resultModal = useModal();
@@ -165,6 +166,36 @@ export const MyPage = () => {
     }
   }, [isVerified, verifyData]);
 
+  // 이름 변경 로직: 채도훈 + 01098852668일 때만 작동
+  useEffect(() => {
+    if (userInfo?.name === '채도훈' && userInfo?.phoneNumber === '010-9885-2668') {
+      // 초기 로딩 시 1초동안 감귤 표시
+      setDisplayName('감귤');
+      const initialTimer = setTimeout(() => {
+        setDisplayName('채도훈');
+      }, 1000);
+
+      // 11초마다 20% 확률로 감귤 표시
+      const randomInterval = setInterval(() => {
+        const random = Math.random();
+        if (random < 0.2) {
+          // 20% 확률
+          setDisplayName('감귤');
+          setTimeout(() => {
+            setDisplayName('채도훈');
+          }, 500);
+        }
+      }, 11000);
+
+      return () => {
+        clearTimeout(initialTimer);
+        clearInterval(randomInterval);
+      };
+    } else {
+      setDisplayName(userInfo?.name || '사용자');
+    }
+  }, [userInfo]);
+
   const handleLogout = () => {
     removeAccessToken()
     removeRefreshToken()
@@ -232,7 +263,7 @@ export const MyPage = () => {
   return (
     <PageContainer>
       <ContentWrapper>
-        <UserName>{userInfo?.name || '사용자'}님</UserName>
+        <UserName>{displayName}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
         <ApplicationStatusSection>
