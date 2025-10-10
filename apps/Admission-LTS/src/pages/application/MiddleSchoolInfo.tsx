@@ -5,9 +5,12 @@ import { useEffect, useState } from 'react';
 
 export const MiddleSchoolInfo = () => {
   const [datas, setDatas] = usePageData('middleSchoolInfo');
-  const [selectedName, setSelectedName] = useState<string | null>(datas.schoolName || null)
-  const [selectedCode, setSelectedCode] = useState<string | null>(datas.schoolCode || null)
-
+  const [selectedName, setSelectedName] = useState<string | null>(
+    datas.schoolName || null
+  );
+  const [selectedCode, setSelectedCode] = useState<string | null>(
+    datas.schoolCode || null
+  );
 
   const handleSchoolPhoneChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -32,7 +35,7 @@ export const MiddleSchoolInfo = () => {
 
   useEffect(() => {
     setDatas({ ...datas, schoolCode: selectedCode, schoolName: selectedName });
-  },[selectedName, selectedCode])
+  }, [selectedName, selectedCode]);
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content">

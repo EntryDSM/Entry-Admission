@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { colors, Flex, Text } from '@entry/design-token';
 import { useEffect, useRef, useState } from 'react';
-import { Check, Search, PreviousButton} from '@entry/ui';
+import { Check, Search, PreviousButton } from '@entry/ui';
 import { useGetSchoolSearch } from '../apis';
 
 interface ISchoolSearchModalType {
@@ -21,7 +21,9 @@ export const SchoolSearchModal = ({
   setIsShow,
   isShow,
 }: ISchoolSearchModalType) => {
-  const [datas, setDatas] = useState<{code : string, name: string, information: string, address: string}[]>([]);
+  const [datas, setDatas] = useState<
+    { code: string; name: string; information: string; address: string }[]
+  >([]);
 
   const [searchValue, setSearchValue] = useState<string>('');
   const [tempSelectedName, setTempSelectedName] = useState<string | null>(
@@ -36,7 +38,9 @@ export const SchoolSearchModal = ({
   };
 
   const contentClick = (name: string, code: string) => {
-    setTempSelectedName((prev) => (prev === name && tempSelectedCode === code ? null : name)); // 선택된 값을 임시 저장에 저장
+    setTempSelectedName((prev) =>
+      prev === name && tempSelectedCode === code ? null : name
+    ); // 선택된 값을 임시 저장에 저장
     setTempSelectedCode((prev) => (prev === code ? null : code)); // 선택된 값을 임시 저장에 저장
   };
 
@@ -46,8 +50,8 @@ export const SchoolSearchModal = ({
       setTempSelectedName(selectedName ?? null); // 원래 값으로 변경
       setTempSelectedCode(selectedCode ?? null); // 원래 값으로 변경
       setIsShow(false);
-      setDatas([]) //검색 내역 초기화
-      setSearchValue('') //검색 내역 초기화
+      setDatas([]); //검색 내역 초기화
+      setSearchValue(''); //검색 내역 초기화
     }
   };
 
@@ -55,27 +59,25 @@ export const SchoolSearchModal = ({
     setTempSelectedName(selectedName ?? null); // 원래 값으로 변경
     setTempSelectedCode(selectedCode ?? null); // 원래 값으로 변경
     setIsShow(false);
-    setDatas([]) //검색 내역 초기화
-    setSearchValue('') //검색 내역 초기화
+    setDatas([]); //검색 내역 초기화
+    setSearchValue(''); //검색 내역 초기화
   };
 
   const handleConfirmClick = () => {
     setSelectedName(tempSelectedName); // 선택
     setSelectedCode(tempSelectedCode); //선택
     setIsShow(false);
-    setDatas([]) //검색 내역 초기화
-    setSearchValue('') //검색 내역 초기화
+    setDatas([]); //검색 내역 초기화
+    setSearchValue(''); //검색 내역 초기화
   };
 
   const { data, refetch } = useGetSchoolSearch(searchValue);
-  
-  
-  const handleSearchKeyUp = (e : React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      refetch();
-    }
-  }
-  
+
+  const handleSearchClick = () => {
+    if (searchValue.trim() === '') return;
+    refetch();
+  };
+
   useEffect(() => {
     if (data?.content) {
       setDatas(
@@ -85,11 +87,10 @@ export const SchoolSearchModal = ({
           information: item.information,
           address: item.address,
         }))
-      )
+      );
     }
-  },[data])
-  
-  
+  }, [data]);
+
   return (
     isShow && (
       <ModalBack ref={backRef} onClick={backClick}>
@@ -104,32 +105,50 @@ export const SchoolSearchModal = ({
             onKeyUp={handleSearchKeyUp}
           />
            */}
-           <FakeInput>
+          <Wrapper>
+            <FakeInput>
               <ImageContainer>
                 <Search />
-                </ImageContainer>
-                <SearchInput
-                  placeholder="학교 검색"
-                  onChange={handleSearchChange}
-                  value={searchValue}
-                  onKeyUp={handleSearchKeyUp}
-                />
-              </FakeInput>
+              </ImageContainer>
+              <SearchInput
+                placeholder="학교 검색"
+                onChange={handleSearchChange}
+                value={searchValue}
+              />
+            </FakeInput>
+            <SearchButton onClick={handleSearchClick}>찾기</SearchButton>
+          </Wrapper>
+
           <ContentContainer>
             {datas.length > 0 ? (
               datas.map((data) => (
-                <Content onClick={() => contentClick(data.name, data.code)} key={data.code}>
+                <Content
+                  onClick={() => contentClick(data.name, data.code)}
+                  key={data.code}
+                >
                   <Text>{data.name}</Text>
                   <Text color={colors.orange[800]}>{data.code}</Text>
-                  <Text color={colors.gray[400]} fontWeight={400}>{data.address}</Text>
-                  <Text color={colors.gray[400]} fontWeight={400}>{data.information}</Text>
+                  <Text color={colors.gray[400]} fontWeight={400}>
+                    {data.address}
+                  </Text>
+                  <Text color={colors.gray[400]} fontWeight={400}>
+                    {data.information}
+                  </Text>
                   {(() => {
                     // temp 상태가 있으면 temp 기준으로 체크
                     if (tempSelectedCode !== null) {
-                      return data.code === tempSelectedCode ? <Check /> : <Check color="transparent" />;
+                      return data.code === tempSelectedCode ? (
+                        <Check />
+                      ) : (
+                        <Check color="transparent" />
+                      );
                     }
-                    // temp 상태가 없으면 실제 선택된 값 기준으로 체크  
-                    return data.code === selectedCode ? <Check /> : <Check color="transparent" />;
+                    // temp 상태가 없으면 실제 선택된 값 기준으로 체크
+                    return data.code === selectedCode ? (
+                      <Check />
+                    ) : (
+                      <Check color="transparent" />
+                    );
                   })()}
                 </Content>
               ))
@@ -170,6 +189,29 @@ export const SchoolSearchModal = ({
   );
 };
 
+const SearchButton = styled.button`
+  height: 49px;
+  padding: 0 24px;
+  border-radius: 24px;
+  background-color: ${colors.orange[800]};
+  color: ${colors.extra.realWhite};
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  flex-shrink: 0;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  margin-top: 60px;
+  margin-bottom: 20px;
+  gap: 12px;
+`;
+
 const ModalBack = styled.div`
   padding: 30px;
   position: fixed;
@@ -192,7 +234,6 @@ const Modal = styled.div`
   background-color: ${colors.extra.realWhite};
   display: flex;
   flex-direction: column;
-  gap: 48px;
 `;
 
 const ContentContainer = styled.div`
