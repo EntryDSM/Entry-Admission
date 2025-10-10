@@ -5,6 +5,7 @@ import { useCalculationData } from '../contexts/CalculationDataContext';
 import { calculateScore } from '../apis/calculator';
 import { transformCalculationDataToAPI } from '../utils/apiDataTransformer';
 import { useState, useEffect } from 'react';
+import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE } from '../constants/admissionType';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -44,19 +45,19 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
 
         const newResults: ScoreResult[] = [
           {
-            name: '일반 전형',
+            name: ADMISSION_TYPE_LABEL.COMMON,
             score: commonResponse.data.totalScore.toFixed(3),
-            total: '173'
+            total: ADMISSION_TYPE_MAX_SCORE.COMMON.toString()
           },
           {
-            name: '사회통합 전형',
+            name: ADMISSION_TYPE_LABEL.SOCIAL,
             score: socialResponse.data.totalScore.toFixed(3),
-            total: '119'
+            total: ADMISSION_TYPE_MAX_SCORE.SOCIAL.toString()
           },
           {
-            name: '마이스터 인재',
+            name: ADMISSION_TYPE_LABEL.MEISTER,
             score: meisterResponse.data.totalScore.toFixed(3),
-            total: '119'
+            total: ADMISSION_TYPE_MAX_SCORE.MEISTER.toString()
           }
         ];
 

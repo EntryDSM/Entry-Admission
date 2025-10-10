@@ -6,6 +6,7 @@ import { useCalculationData } from '../../contexts/CalculationDataContext';
 import { calculateScore } from '../../apis/calculator';
 import { transformCalculationDataToAPI } from '../../utils/apiDataTransformer';
 import { CalculatorScoreResponse } from '../../apis/calculator/types';
+import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE, AdmissionType } from '../../constants/admissionType';
 
 const STEPS = [
   { key: 'current', label: '3학년 1학기' },
@@ -17,7 +18,7 @@ const STEPS = [
 export const PrimaryCalculationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [results, setResults] = useState<{ name: string; data: CalculatorScoreResponse['data'] }[]>([]);
+  const [results, setResults] = useState<{ name: string; type: AdmissionType; data: CalculatorScoreResponse['data'] }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { state } = useCalculationData();
@@ -50,9 +51,9 @@ export const PrimaryCalculationPage = () => {
       ]);
 
       setResults([
-        { name: '일반 전형', data: commonResponse.data },
-        { name: '사회통합 전형', data: socialResponse.data },
-        { name: '마이스터 인재', data: meisterResponse.data },
+        { name: ADMISSION_TYPE_LABEL.COMMON, type: 'COMMON', data: commonResponse.data },
+        { name: ADMISSION_TYPE_LABEL.SOCIAL, type: 'SOCIAL', data: socialResponse.data },
+        { name: ADMISSION_TYPE_LABEL.MEISTER, type: 'MEISTER', data: meisterResponse.data },
       ]);
       setShowResultModal(true);
     } catch (err: any) {
@@ -174,7 +175,7 @@ export const PrimaryCalculationPage = () => {
                 <Flex key={index} justifyContent="space-between">
                   <Text>{result.name}</Text>
                   <Text color="#FF6B35" fontWeight={600}>
-                    {result.data.totalScore.toFixed(3)} / 300
+                    {result.data.totalScore.toFixed(3)} / {ADMISSION_TYPE_MAX_SCORE[result.type]}
                   </Text>
                 </Flex>
               ))}

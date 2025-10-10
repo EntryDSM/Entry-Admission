@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
 import { getFinalApplicationPdf, deleteApplication, getApplicationStatus, getFirstRoundPass, getSecondRoundPass } from '../apis';
 import { useGetAllSchedule } from '../apis/schedule/schedule';
+import { ADMISSION_TYPE_LABEL } from '../constants/admissionType';
 
 
 export const MyPage = () => {
@@ -237,7 +238,7 @@ export const MyPage = () => {
         <ApplicationStatusSection>
           <StatusTitle>지원 상태</StatusTitle>
           <StatusBox>
-            <ApplicationType>일반 전형</ApplicationType>
+            <ApplicationType>{applicationStatus ? ADMISSION_TYPE_LABEL[applicationStatus.applicationType] : '미지원'}</ApplicationType>
             <Divider />
             <StatusInfo>
               <StatusLabel>지원서 상태 : </StatusLabel>
