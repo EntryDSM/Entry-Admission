@@ -46,17 +46,17 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
           {
             name: '일반 전형',
             score: commonResponse.data.totalScore.toFixed(3),
-            total: '300'
+            total: '173'
           },
           {
             name: '사회통합 전형',
             score: socialResponse.data.totalScore.toFixed(3),
-            total: '300'
+            total: '119'
           },
           {
             name: '마이스터 인재',
             score: meisterResponse.data.totalScore.toFixed(3),
-            total: '300'
+            total: '119'
           }
         ];
 
