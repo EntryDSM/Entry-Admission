@@ -15,7 +15,7 @@ export const App = () => {
       !currentPath.includes('/sorry') &&
       !currentPath.includes('/dev/enable')
     ) {
-      // window.location.href = '/sorry';
+      window.location.href = '/sorry';
     }
   }, []);
 
