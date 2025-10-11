@@ -8,5 +8,6 @@ export const useGetApplicationStatus = () => {
       const { data } = await AdmissionUserInstance.get(`/application/status`);
       return data;
     },
+    retry: 1,
   });
 };
