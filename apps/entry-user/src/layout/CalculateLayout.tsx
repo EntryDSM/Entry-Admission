@@ -7,7 +7,7 @@ import {
   Button,
   TabSection,
 } from '@entry/ui';
-import { CalculationDataProvider } from '../contexts';
+import { CalculationDataProvider, useCalculationData } from '../contexts';
 import { ScoreResultModal } from '../components';
 
 type CalculationType = 'primary' | 'graduated' | 'qe';
@@ -47,6 +47,7 @@ const SCORE_PAGES = {
 };
 
 export const CalculateLayout = () => {
+  const {clearAllData} = useCalculationData()
   const location = useLocation();
   const navigate = useNavigate();
   const [showResultModal, setShowResultModal] = useState(false);
@@ -90,6 +91,9 @@ export const CalculateLayout = () => {
   const isLastStep = currentStep === totalSteps - 1;
 
   const handleTypeChange = (type: CalculationType) => {
+    // 탭 변경 시 이전 데이터 초기화
+    clearAllData();
+
     setActiveType(type);
     const firstPage = SCORE_PAGES[type][0];
     navigate(
@@ -124,7 +128,6 @@ export const CalculateLayout = () => {
   };
 
   return (
-    <CalculationDataProvider>
       <PageContainer>
         <ContentWrapper>
           <MainContainer>
@@ -183,13 +186,16 @@ export const CalculateLayout = () => {
               {/* 결과 모달 */}
               <ScoreResultModal
                 isOpen={showResultModal}
-                onClose={() => setShowResultModal(false)}
+                onClose={() => {
+                  setShowResultModal(false)
+                  //성적 계산 완료 후 데이터 초기화
+                  clearAllData();
+                }}
               />
             </ContentContainer>
           </MainContainer>
         </ContentWrapper>
       </PageContainer>
-    </CalculationDataProvider>
   );
 };
 
