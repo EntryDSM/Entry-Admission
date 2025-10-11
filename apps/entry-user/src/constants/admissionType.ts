@@ -11,3 +11,9 @@ export const ADMISSION_TYPE_MAX_SCORE: Record<AdmissionType, number> = {
   SOCIAL: 119,
   MEISTER: 119,
 };
+
+export const ADMISSION_TYPE_MAX_SCORE_GED: Record<AdmissionType, number> = {
+  COMMON: 170,
+  SOCIAL: 110,
+  MEISTER: 110,
+};

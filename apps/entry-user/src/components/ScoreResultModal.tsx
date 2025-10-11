@@ -5,7 +5,7 @@ import { useCalculationData } from '../contexts/CalculationDataContext';
 import { calculateScore } from '../apis/calculator';
 import { transformCalculationDataToAPI } from '../utils/apiDataTransformer';
 import { useState, useEffect } from 'react';
-import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE } from '../constants/admissionType';
+import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE, ADMISSION_TYPE_MAX_SCORE_GED } from '../constants/admissionType';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -37,27 +37,34 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
         const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
         const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
 
+        const educationalStatus = commonRequest.educationalStatus;
+
         const [commonResponse, socialResponse, meisterResponse] = await Promise.all([
           calculateScore(commonRequest),
           calculateScore(socialRequest),
           calculateScore(meisterRequest),
         ]);
 
+        const maxScore =
+          educationalStatus === 'QUALIFICATION_EXAM'
+            ? ADMISSION_TYPE_MAX_SCORE_GED
+            : ADMISSION_TYPE_MAX_SCORE;
+
         const newResults: ScoreResult[] = [
           {
             name: ADMISSION_TYPE_LABEL.COMMON,
             score: commonResponse.data.totalScore.toFixed(3),
-            total: ADMISSION_TYPE_MAX_SCORE.COMMON.toString()
+            total: maxScore.COMMON.toString()
           },
           {
             name: ADMISSION_TYPE_LABEL.SOCIAL,
             score: socialResponse.data.totalScore.toFixed(3),
-            total: ADMISSION_TYPE_MAX_SCORE.SOCIAL.toString()
+            total: maxScore.SOCIAL.toString()
           },
           {
             name: ADMISSION_TYPE_LABEL.MEISTER,
             score: meisterResponse.data.totalScore.toFixed(3),
-            total: ADMISSION_TYPE_MAX_SCORE.MEISTER.toString()
+            total: maxScore.MEISTER.toString()
           }
         ];
 
@@ -74,7 +81,7 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
   }, [isOpen, state]);
 
   if (!isOpen) return null;
-
+  
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
