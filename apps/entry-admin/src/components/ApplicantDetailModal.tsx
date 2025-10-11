@@ -36,6 +36,17 @@ export const ApplicantDetailModal = ({
     }
   }, [isOpen]);
 
+  // 원서 \n 적용
+  const formatTextWithLineBreaks = (text?: string): React.ReactNode => {
+    if (!text) return null;
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br />}
+      </span>
+    ));
+  };
+
   const statusMap: Record<string, string> = {
     NOT_APPLIED: '미지원',
     WRITING: '원서 작성 중',
@@ -160,14 +171,16 @@ export const ApplicantDetailModal = ({
         <ModalSection>
           <SectionTitle>자기소개서</SectionTitle>
           <SectionContent>
-            {application?.selfIntroduce ?? '작성된 자기소개서가 없습니다.'}
+            {formatTextWithLineBreaks(application?.selfIntroduce) ??
+              '작성된 자기소개서가 없습니다.'}
           </SectionContent>
         </ModalSection>
 
         <ModalSection>
           <SectionTitle>학업 계획서</SectionTitle>
           <SectionContent>
-            {application?.studyPlan ?? '작성된 학업 계획서가 없습니다.'}
+            {formatTextWithLineBreaks(application?.studyPlan) ??
+              '작성된 학업 계획서가 없습니다.'}
           </SectionContent>
         </ModalSection>
 
