@@ -1,21 +1,42 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
-import { Button, CancelModal, ShowResultModal, PasswordModal, ChangePasswordModal, useModal } from '@entry/ui';
-import { getUserInfo, IUserInfoResponseType, deleteUser, changePassword, removeAccessToken, removeRefreshToken } from '@entry/util-config';
+import {
+  Button,
+  CancelModal,
+  ShowResultModal,
+  PasswordModal,
+  ChangePasswordModal,
+  useModal,
+} from '@entry/ui';
+import {
+  getUserInfo,
+  IUserInfoResponseType,
+  deleteUser,
+  changePassword,
+  removeAccessToken,
+  removeRefreshToken,
+} from '@entry/util-config';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
-import { getFinalApplicationPdf, deleteApplication, getApplicationStatus, getFirstRoundPass, getSecondRoundPass } from '../apis';
+import {
+  getFinalApplicationPdf,
+  deleteApplication,
+  getApplicationStatus,
+  getFirstRoundPass,
+  getSecondRoundPass,
+} from '../apis';
 import { useGetAllSchedule } from '../apis/schedule/schedule';
 import { ADMISSION_TYPE_LABEL } from '../constants/admissionType';
-
 
 export const MyPage = () => {
   const [delOpen, setDelOpen] = useState<boolean>(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
-  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState<boolean>(false);
-  const [cancelApplicationOpen, setCancelApplicationOpen] = useState<boolean>(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] =
+    useState<boolean>(false);
+  const [cancelApplicationOpen, setCancelApplicationOpen] =
+    useState<boolean>(false);
   const [isPass, setIsPass] = useState<boolean>(false);
   const [announcementStep, setAnnouncementStep] = useState<1 | 2>(1);
   const [remainingTime, setRemainingTime] = useState<string>('');
@@ -23,27 +44,36 @@ export const MyPage = () => {
 
   const queryClient = useQueryClient();
   const resultModal = useModal();
-  const { startVerification, isLoading: isPassLoading, isVerified, verifyData, reset } = usePassVerification();
+  const {
+    startVerification,
+    isLoading: isPassLoading,
+    isVerified,
+    verifyData,
+    reset,
+  } = usePassVerification();
 
-  const { data: userInfo, isLoading: isUserLoading } = useQuery<IUserInfoResponseType>({
-    queryKey: ['userInfo'],
-    queryFn: getUserInfo,
-  });
+  const { data: userInfo, isLoading: isUserLoading } =
+    useQuery<IUserInfoResponseType>({
+      queryKey: ['userInfo'],
+      queryFn: getUserInfo,
+    });
 
-  const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery({
-    queryKey: ['applicationStatus'],
-    queryFn: async () => {
-      try {
-        return await getApplicationStatus();
-      } catch (error: any) {
-        if (error.response?.status === 404) {
-          return null;
+  const { data: applicationStatus, isLoading: isApplicationLoading } = useQuery(
+    {
+      queryKey: ['applicationStatus'],
+      queryFn: async () => {
+        try {
+          return await getApplicationStatus();
+        } catch (error: any) {
+          if (error.response?.status === 404) {
+            return null;
+          }
+          throw error;
         }
-        throw error;
-      }
-    },
-    retry: false,
-  });
+      },
+      retry: false,
+    }
+  );
 
   const { data: scheduleData } = useGetAllSchedule();
 
@@ -65,7 +95,9 @@ export const MyPage = () => {
       window.location.href = 'https://auth.entrydsm.kr';
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || '회원 탈퇴 중 오류가 발생했습니다.');
+      toast.error(
+        error.response?.data?.message || '회원 탈퇴 중 오류가 발생했습니다.'
+      );
     },
   });
 
@@ -76,7 +108,9 @@ export const MyPage = () => {
       setChangePasswordModalOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || '비밀번호 변경 중 오류가 발생했습니다.');
+      toast.error(
+        error.response?.data?.message || '비밀번호 변경 중 오류가 발생했습니다.'
+      );
     },
   });
 
@@ -89,10 +123,11 @@ export const MyPage = () => {
       queryClient.invalidateQueries({ queryKey: ['applicationStatus'] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || '원서 취소 중 오류가 발생했습니다.');
+      toast.error(
+        error.response?.data?.message || '원서 취소 중 오류가 발생했습니다.'
+      );
     },
   });
-
 
   const handleDelClick = () => {
     setDelOpen(true);
@@ -102,7 +137,10 @@ export const MyPage = () => {
     deleteUserMutation.mutate({ password });
   };
 
-  const handleChangePasswordConfirm = (phoneNumber: string, newPassword: string) => {
+  const handleChangePasswordConfirm = (
+    phoneNumber: string,
+    newPassword: string
+  ) => {
     changePasswordMutation.mutate({ phoneNumber, newPassword });
   };
 
@@ -124,9 +162,11 @@ export const MyPage = () => {
       window.URL.revokeObjectURL(url);
 
       toast.success('원서가 다운로드되었습니다.');
-    } catch (error) {
-      toast.error('원서 다운로드 중 오류가 발생했습니다.');
-      console.error('원서 다운로드 에러:', error);
+    } catch (error: any) {
+      if (error.response.status === 404)
+        toast.error('원서가 아직 제출되지 않았습니다.');
+      else if (error.response.status === 500)
+        toast.error('원서 다운로드 중 오류가 발생하였습니다.');
     }
   };
 
@@ -168,7 +208,10 @@ export const MyPage = () => {
 
   // 이름 변경 로직: 채도훈 + 01098852668일 때만 작동
   useEffect(() => {
-    if (userInfo?.name === '채도훈' && userInfo?.phoneNumber === '01098852668') {
+    if (
+      userInfo?.name === '채도훈' &&
+      userInfo?.phoneNumber === '01098852668'
+    ) {
       // 초기 로딩 시 1초동안 감귤 표시
       setDisplayName('감귤');
       const initialTimer = setTimeout(() => {
@@ -197,13 +240,14 @@ export const MyPage = () => {
   }, [userInfo]);
 
   const handleLogout = () => {
-    removeAccessToken()
-    removeRefreshToken()
+    removeAccessToken();
+    removeRefreshToken();
     window.location.href = 'https://entrydsm.kr/';
   };
 
   // 접수 가능 여부를 시간 기반으로 확인
-  const [isApplicationAvailable, setIsApplicationAvailable] = useState<boolean>(false);
+  const [isApplicationAvailable, setIsApplicationAvailable] =
+    useState<boolean>(false);
 
   // 접수 종료 시간까지 남은 시간 계산 (1초마다 업데이트)
   useEffect(() => {
@@ -233,7 +277,9 @@ export const MyPage = () => {
       setIsApplicationAvailable(true);
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const hours = Math.floor(
+        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
@@ -269,15 +315,23 @@ export const MyPage = () => {
         <ApplicationStatusSection>
           <StatusTitle>지원 상태</StatusTitle>
           <StatusBox>
-            <ApplicationType>{applicationStatus ? ADMISSION_TYPE_LABEL[applicationStatus.applicationType] : '미지원'}</ApplicationType>
+            <ApplicationType>
+              {applicationStatus
+                ? ADMISSION_TYPE_LABEL[applicationStatus.applicationType]
+                : '미지원'}
+            </ApplicationType>
             <Divider />
             <StatusInfo>
               <StatusLabel>지원서 상태 : </StatusLabel>
-              <StatusValue isSubmitted={applicationStatus?.isSubmitted || false}>
+              <StatusValue
+                isSubmitted={applicationStatus?.isSubmitted || false}
+              >
                 {applicationStatus
-                  ? (applicationStatus.isPrintedArrived
-                      ? '제출 완료 및 원서 학교 도착'
-                      : (applicationStatus.isSubmitted ? '제출 완료' : '미제출'))
+                  ? applicationStatus.isPrintedArrived
+                    ? '제출 완료 및 원서 학교 도착'
+                    : applicationStatus.isSubmitted
+                    ? '제출 완료'
+                    : '미제출'
                   : '미지원'}
               </StatusValue>
               {!applicationStatus && remainingTime && (
@@ -300,7 +354,8 @@ export const MyPage = () => {
             >
               원서 다운로드
             </Button>
-            {scheduleData?.currentStatus === 'FIRST_ANNOUNCEMENT' || scheduleData?.currentStatus === 'INTERVIEW' ? (
+            {scheduleData?.currentStatus === 'FIRST_ANNOUNCEMENT' ||
+            scheduleData?.currentStatus === 'INTERVIEW' ? (
               <Button
                 backgroundColor={colors.gray[50]}
                 color={colors.orange[800]}
@@ -310,7 +365,8 @@ export const MyPage = () => {
               >
                 1차 결과 확인
               </Button>
-            ) : scheduleData?.currentStatus === 'SECOND_ANNOUNCEMENT' || scheduleData?.currentStatus === 'END' ? (
+            ) : scheduleData?.currentStatus === 'SECOND_ANNOUNCEMENT' ||
+              scheduleData?.currentStatus === 'END' ? (
               <Button
                 backgroundColor={colors.gray[50]}
                 color={colors.orange[800]}
@@ -334,11 +390,19 @@ export const MyPage = () => {
             </Button>
           ) : (
             <Button
-              backgroundColor={isApplicationAvailable ? colors.gray[50] : colors.gray[200]}
-              color={isApplicationAvailable ? colors.orange[800] : colors.gray[400]}
-              borderColor={isApplicationAvailable ? colors.orange[800] : colors.gray[400]}
+              backgroundColor={
+                isApplicationAvailable ? colors.gray[50] : colors.gray[200]
+              }
+              color={
+                isApplicationAvailable ? colors.orange[800] : colors.gray[400]
+              }
+              borderColor={
+                isApplicationAvailable ? colors.orange[800] : colors.gray[400]
+              }
               hoverBackgroundColor="transparent"
-              onClick={isApplicationAvailable ? handleApplicationSubmit : undefined}
+              onClick={
+                isApplicationAvailable ? handleApplicationSubmit : undefined
+              }
               disabled={!isApplicationAvailable}
             >
               원서 접수하기
@@ -466,7 +530,6 @@ const PhoneNumber = styled.div`
   margin-top: 12px;
 `;
 
-
 const ButtonGroup = styled.div`
   display: flex;
   gap: 12px;
@@ -556,7 +619,8 @@ const StatusLabel = styled.span`
 const StatusValue = styled.span<{ isSubmitted: boolean }>`
   font-size: 24px;
   font-weight: 600;
-  color: ${({ isSubmitted }) => (isSubmitted ? colors.orange[800] : colors.gray[400])};
+  color: ${({ isSubmitted }) =>
+    isSubmitted ? colors.orange[800] : colors.gray[400]};
 `;
 
 const RemainingTimeText = styled.span`
