@@ -351,6 +351,7 @@ export const MyPage = () => {
               borderColor={colors.orange[800]}
               hoverBackgroundColor={colors.orange[800]}
               onClick={handleDownloadApplication}
+              isBlocked={!applicationStatus?.isSubmitted}
             >
               원서 다운로드
             </Button>
