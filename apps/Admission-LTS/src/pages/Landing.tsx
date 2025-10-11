@@ -3,7 +3,7 @@ import { Button, EntryLogo } from '@entry/ui';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetAllSchedule } from '../apis';
+import { useGetAllSchedule, useGetApplicationStatus } from '../apis';
 import { getUserInfo } from '@entry/util-config';
 import { ClipLoader } from 'react-spinners';
 
@@ -18,6 +18,15 @@ export const Landing = () => {
   const navigate = useNavigate();
 
   const {data : scheduleData, isLoading} = useGetAllSchedule()
+
+  const {data : statusData, isLoading : statusLoading} = useGetApplicationStatus()
+  
+    useEffect(() => {
+      if (!statusLoading && statusData?.isSubmitted) {
+        alert('이미 제출된 원서가 있습니다.')
+        window.location.href = 'https://entrydsm.kr/';
+      }
+    }, [statusData, statusLoading]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -67,7 +76,6 @@ export const Landing = () => {
 
     fetchUserInfo();
   }, [])
-
 
   if (isMobile) {
     return (
@@ -180,7 +188,7 @@ export const Landing = () => {
           원서 접수 시작
         </Button>
       </Flex>
-      {isLoading && (
+      {(isLoading || statusLoading) && (
       <LoadingModal>
         <ClipLoader color={colors.orange[800]} size={100} />
       </LoadingModal>
