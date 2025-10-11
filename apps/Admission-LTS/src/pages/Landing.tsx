@@ -6,8 +6,37 @@ import { useNavigate } from 'react-router-dom';
 import { useGetAllSchedule, useGetApplicationStatus } from '../apis';
 import { getUserInfo } from '@entry/util-config';
 import { ClipLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
 
 export const Landing = () => {
+
+  const [networkLoading, setNetWorkLoading] = useState<boolean>(false)
+  useEffect(() => {
+    const handleOffline = () => {
+      toast.error('네트워크 상태가 불안정합니다. 연결을 확인해주세요.');
+      setNetWorkLoading(true)
+    };
+
+    const handleOnline = () => {
+      toast.success('네트워크가 연결되었습니다.');
+      setNetWorkLoading(false)
+      window.location.reload()
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    // 최초 로드 시 네트워크 상태 확인
+    if (!navigator.onLine) {
+      handleOffline();
+    }
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
   const [name, setName] = useState<string>('');
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [scheduleDatas, setScheduleDatas] = useState<{startDate: string, endDate: string, resultDate: string}>({
@@ -188,7 +217,7 @@ export const Landing = () => {
           원서 접수 시작
         </Button>
       </Flex>
-      {(isLoading || statusLoading) && (
+      {(isLoading || statusLoading || networkLoading) && (
       <LoadingModal>
         <ClipLoader color={colors.orange[800]} size={100} />
       </LoadingModal>
