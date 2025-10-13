@@ -11,6 +11,9 @@ interface IAttendanceFormType {
   width?: string;
   suffix: string;
   prefix?: string;
+  maxLength?: number;
+  maxScore?: number;
+  minScore?: number;
 }
 
 export const AttendanceForm: React.FC<IAttendanceFormType> = ({
@@ -21,6 +24,9 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   width = '100%',
   suffix,
   prefix,
+  maxLength,
+  maxScore,
+  minScore = 0,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState<boolean>(false);
@@ -30,8 +36,32 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const onlyNums = e.target.value.replace(/[^0-9]/g, '');
-    onChange(onlyNums);
+    const { value: rawValue } = e.target;
+
+    if (maxScore !== undefined) {
+      const onlyNums = rawValue.replace(/[^0-9]/g, '');
+
+      if (maxLength && onlyNums.length > maxLength) {
+        return;
+      }
+
+      if (onlyNums === '') {
+        onChange('');
+        return;
+      }
+
+      const numValue = Number(onlyNums);
+
+      if (numValue >= minScore && numValue <= maxScore) {
+        onChange(onlyNums);
+      }
+      return;
+    } else {
+      if (maxLength && rawValue.length > maxLength) {
+        return;
+      }
+      onChange(rawValue);
+    }
   };
 
   return (
@@ -40,10 +70,14 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
         <CheckMark hasValue={!!value}>
           <Check />
         </CheckMark>
-        <Text>{prefix ? `${prefix} ` : ''}{title}</Text>
+        <Text>
+          {prefix ? `${prefix} ` : ''}
+          {title}
+        </Text>
       </HeaderRow>
       <InputWrapper>
         <StyledInput
+          maxLength={maxLength}
           suffix={suffix}
           type="text"
           value={value ?? ''}
