@@ -410,7 +410,7 @@ export const ApplicationNav = ({
         window.indexedDB.deleteDatabase('ApplicationFormDB'); //db 초기화
       },
       onError: () => {
-        window.indexedDB.deleteDatabase('ApplicationFormDB'); //db 초기화
+        // window.indexedDB.deleteDatabase('ApplicationFormDB'); //db 초기화
       }
     })
     // try {
