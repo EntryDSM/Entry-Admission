@@ -36,6 +36,7 @@ export const GedScore = () => {
             suffix="점"
             value={datas[key]}
             maxLength={3}
+            maxScore={100}
           />
         ))}
       </Flex>
