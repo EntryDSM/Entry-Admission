@@ -83,5 +83,5 @@ const BackGroundWrapper = styled.div`
   display: flex;
   justify-content: center;
   overflow-x: hidden;
-  height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px);
 `;
