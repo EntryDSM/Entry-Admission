@@ -208,6 +208,10 @@ export const MyPage = () => {
     }
   }, [isVerified, verifyData]);
 
+  useEffect(() => {
+    setDisplayName(userInfo?.name || '사용자');
+  }, [userInfo]);
+
   const handleLogout = () => {
     removeAccessToken();
     removeRefreshToken();
