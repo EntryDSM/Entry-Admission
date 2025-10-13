@@ -33,6 +33,7 @@ export const TextAreaContent = ({
       alignItems="flex-end"
     >
       <TextArea
+        maxLength={1600}
         onChange={onInputHandler}
         value={value ?? undefined}
         placeholder={placeholder}
