@@ -90,6 +90,8 @@ export const MyPage = () => {
     mutationFn: deleteUser,
     onSuccess: () => {
       toast.success('회원 탈퇴가 완료되었습니다.');
+      removeAccessToken();
+      removeRefreshToken();
       setPasswordModalOpen(false);
       setDelOpen(false);
       window.location.href = 'https://auth.entrydsm.kr';

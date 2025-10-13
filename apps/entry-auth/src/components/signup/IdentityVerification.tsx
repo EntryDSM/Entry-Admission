@@ -42,7 +42,7 @@ const NextButton = styled.button`
   color: ${colors.extra.realWhite};
   font-size: 14px;
   font-weight: 550;
-  margin-top: 200px;
+  margin-top: 60px;
   transition: all 0.3s ease;
   cursor: pointer;
   &:hover {
