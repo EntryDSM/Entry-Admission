@@ -24,7 +24,6 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   width = '100%',
   suffix,
   prefix,
-  maxLength,
   maxScore,
   minScore = 0,
 }) => {
@@ -39,12 +38,10 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
     const { value: rawValue } = e.target;
 
     if (maxScore !== undefined) {
+      // 숫자만 추출
       const onlyNums = rawValue.replace(/[^0-9]/g, '');
 
-      if (maxLength && onlyNums.length > maxLength) {
-        return;
-      }
-
+      // 빈 값 처리
       if (onlyNums === '') {
         onChange('');
         return;
@@ -52,16 +49,14 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
 
       const numValue = Number(onlyNums);
 
-      if (numValue >= minScore && numValue <= maxScore) {
-        onChange(onlyNums);
+      // 최대값 체크
+      if (numValue <= maxScore && numValue >= minScore) {
+        // 숫자로 변환 후 다시 문자열로 (선행 0 자동 제거)
+        onChange(String(numValue));
       }
       return;
-    } else {
-      if (maxLength && rawValue.length > maxLength) {
-        return;
-      }
-      onChange(rawValue);
     }
+    onChange(rawValue);
   };
 
   return (
@@ -77,7 +72,6 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
       </HeaderRow>
       <InputWrapper>
         <StyledInput
-          maxLength={maxLength}
           suffix={suffix}
           type="text"
           value={value ?? ''}

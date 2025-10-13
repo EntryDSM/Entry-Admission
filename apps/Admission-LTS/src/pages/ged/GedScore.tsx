@@ -35,7 +35,6 @@ export const GedScore = () => {
             title={title}
             suffix="점"
             value={datas[key]}
-            maxLength={3}
             maxScore={100}
           />
         ))}
