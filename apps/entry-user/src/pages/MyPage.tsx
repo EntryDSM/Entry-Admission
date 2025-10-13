@@ -208,39 +208,6 @@ export const MyPage = () => {
     }
   }, [isVerified, verifyData]);
 
-  // 이름 변경 로직: 채도훈 + 01098852668일 때만 작동
-  useEffect(() => {
-    if (
-      userInfo?.name === '채도훈' &&
-      userInfo?.phoneNumber === '01098852668'
-    ) {
-      // 초기 로딩 시 1초동안 감귤 표시
-      setDisplayName('감귤');
-      const initialTimer = setTimeout(() => {
-        setDisplayName('채도훈');
-      }, 1000);
-
-      // 1초마다 50% 확률로 감귤 표시
-      const randomInterval = setInterval(() => {
-        const random = Math.random();
-        if (random < 0.5) {
-          // 50% 확률
-          setDisplayName('감귤');
-          setTimeout(() => {
-            setDisplayName('채도훈');
-          }, 500);
-        }
-      }, 1000);
-
-      return () => {
-        clearTimeout(initialTimer);
-        clearInterval(randomInterval);
-      };
-    } else {
-      setDisplayName(userInfo?.name || '사용자');
-    }
-  }, [userInfo]);
-
   const handleLogout = () => {
     removeAccessToken();
     removeRefreshToken();
