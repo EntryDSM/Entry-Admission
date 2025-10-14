@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import {
   getAdminId,
   getAccessToken,
@@ -28,7 +28,6 @@ export const AdmissionAdminInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// 인증이 필요 없는 공개 API 전용 인스턴스
 export const AdmissionPublicInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 50000,
@@ -37,52 +36,144 @@ export const AdmissionPublicInstance = axios.create({
 
 const cookies = new Cookies();
 
-// 인증이 필요 없는 공개 API 목록
 const skipAuthUrls = [
   'POST /admin/auth',
   'POST /user/auth',
-  'PUT /user/auth', // 토큰 갱신
+  'PUT /user/auth',
   'POST /user',
   'POST /user/verify/popup',
   'GET /user/verify/info',
-  'GET /notice', // 공지사항 목록
-  'GET /schedule', // 일정 조회
-  'GET /schedule/all', // 전체 일정
-  'GET /faq', // FAQ
+  'GET /notice',
+  'GET /schedule',
+  'GET /schedule/all',
+  'GET /faq',
 ];
 
-let isUserRefreshingToken = false;
-let isAdminRefreshingToken = false;
 let userRefreshTokenPromise: Promise<string> | null = null;
 let adminRefreshTokenPromise: Promise<string> | null = null;
 
-// Helper function for user token refresh
-const handleUserTokenRefresh = () => {
-  if (userRefreshTokenPromise) {
-    return userRefreshTokenPromise;
-  }
+const reportServerError = async (
+  config: InternalAxiosRequestConfig,
+  error: AxiosError
+) => {
+  try {
+    const pageType =
+      window.location.hostname.includes('auth.entrydsm.kr')
+        ? 'AUTH'
+        : window.location.hostname.includes('entrydsm.kr')
+          ? 'USER'
+          : 'ADMISSION';
 
-  isUserRefreshingToken = true;
+    const requestPayload =
+      typeof config.data === 'string' ? config.data : JSON.stringify(config.data || {});
+
+    let errorCategory = 'SERVER_ERROR';
+    let errorCode = 'INTERNAL_SERVER_ERROR';
+    let httpStatus = error.response?.status || 500;
+    let messageData: any = 'NULL';
+
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      errorCategory = 'NETWORK_ERROR';
+      errorCode = 'TIMEOUT';
+      httpStatus = 408; // Request Timeout
+      messageData = error.message || 'Request timeout';
+    } else if (error.code === 'ERR_NETWORK' || !error.response) {
+      errorCategory = 'NETWORK_ERROR';
+      errorCode = 'NETWORK_FAILURE';
+      httpStatus = 0; // Network error (no response)
+      messageData = error.message || 'Network connection failed';
+    } else if (error.response?.status === 403) {
+      errorCategory = 'FORBIDDEN';
+      errorCode = 'FORBIDDEN_ACCESS';
+      messageData = error.response?.data && Object.keys(error.response.data).length > 0
+        ? error.response.data
+        : 'NULL';
+    } else if (error.response?.status && error.response.status >= 500) {
+      errorCategory = 'SERVER_ERROR';
+      errorCode = 'INTERNAL_SERVER_ERROR';
+      messageData = error.response?.data && Object.keys(error.response.data).length > 0
+        ? error.response.data
+        : 'NULL';
+    }
+
+    const errorInfo = {
+      sessionId: crypto.randomUUID(),
+      pageType,
+      endpoint: config.url || '',
+      httpMethod: (config.method || 'GET').toUpperCase(),
+      httpStatus,
+      errorCategory,
+      errorCode,
+      message: messageData,
+      stackTrace: error.stack || '',
+      requestPayload,
+      responseTime: performance.now(),
+    };
+
+    await fetch('https://meeeeercat.ncloud.sbs/v1/error/server', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(errorInfo),
+    });
+  } catch {}
+};
+
+const logApiCall = (
+  config: InternalAxiosRequestConfig,
+  response: AxiosResponse,
+  startTime: number
+) => {
+  // 메인 애플리케이션에 영향 없도록 비동기 처리
+  setTimeout(async () => {
+    try {
+      const requestSize = config.data
+        ? new Blob([typeof config.data === 'string' ? config.data : JSON.stringify(config.data)]).size
+        : 0;
+
+      const responseSize = response.data
+        ? new Blob([typeof response.data === 'string' ? response.data : JSON.stringify(response.data)]).size
+        : 0;
+
+      const logData = {
+        sessionId: crypto.randomUUID(),
+        endpoint: config.url || '',
+        method: (config.method || 'GET').toUpperCase(),
+        statusCode: response.status,
+        responseTime: Math.round(performance.now() - startTime),
+        requestSize,
+        responseSize,
+      };
+
+      await fetch('https://meeeeercat.ncloud.sbs/v1/logs/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(logData),
+      });
+    } catch {
+    }
+  }, 0);
+};
+
+const handleUserTokenRefresh = () => {
+  if (userRefreshTokenPromise) return userRefreshTokenPromise;
+
   userRefreshTokenPromise = new Promise(async (resolve, reject) => {
     try {
       const userRefreshToken = getRefreshToken() || cookies.get('refreshToken');
-      if (!userRefreshToken) {
-        throw new Error('No refresh token');
-      }
+      if (!userRefreshToken) throw new Error('No refresh token');
 
       const refreshResponse = await AdmissionUserInstance.put(
         '/user/auth',
         {},
         {
           headers: { 'X-Refresh-Token': userRefreshToken },
-          // @ts-ignore - interceptor를 우회하기 위한 플래그
-          skipAuthInterceptor: true
+          // @ts-ignore
+          skipAuthInterceptor: true,
         }
       );
 
-      if (refreshResponse.status !== 200) {
+      if (refreshResponse.status !== 200)
         throw new Error(`Refresh failed with status: ${refreshResponse.status}`);
-      }
 
       const { data } = refreshResponse;
       setAccessToken(data.accessToken);
@@ -91,30 +182,22 @@ const handleUserTokenRefresh = () => {
     } catch (err) {
       removeAccessToken();
       removeRefreshToken();
-      // 토큰 갱신 실패 시 자동 리다이렉트하지 않음 - 각 페이지에서 처리하도록 함
-      console.error('User token refresh failed:', err);
       reject(err);
     } finally {
-      isUserRefreshingToken = false;
       userRefreshTokenPromise = null;
     }
   });
   return userRefreshTokenPromise;
 };
 
-// Helper function for admin token refresh
+// 관리자 토큰 갱신
 const handleAdminTokenRefresh = () => {
-  if (adminRefreshTokenPromise) {
-    return adminRefreshTokenPromise;
-  }
+  if (adminRefreshTokenPromise) return adminRefreshTokenPromise;
 
-  isAdminRefreshingToken = true;
   adminRefreshTokenPromise = new Promise(async (resolve, reject) => {
     try {
       const adminRefreshToken = getAdminRefreshToken() || cookies.get('adminRefreshToken');
-      if (!adminRefreshToken) {
-        throw new Error('No refresh token');
-      }
+      if (!adminRefreshToken) throw new Error('No refresh token');
 
       const refreshResponse = await AdmissionAdminInstance.put(
         '/admin/auth',
@@ -125,14 +208,13 @@ const handleAdminTokenRefresh = () => {
             'Request-User-Id': getAdminId(),
             'Request-User-Role': 'ADMIN',
           },
-          // @ts-ignore - interceptor를 우회하기 위한 플래그
-          skipAuthInterceptor: true
+          // @ts-ignore
+          skipAuthInterceptor: true,
         }
       );
 
-      if (refreshResponse.status !== 200) {
+      if (refreshResponse.status !== 200)
         throw new Error(`Admin refresh failed with status: ${refreshResponse.status}`);
-      }
 
       const { data } = refreshResponse;
       setAdminAccessToken(data.accessToken);
@@ -141,46 +223,35 @@ const handleAdminTokenRefresh = () => {
     } catch (err) {
       removeAdminAccessToken();
       removeAdminRefreshToken();
-      // 토큰 갱신 실패 시 자동 리다이렉트하지 않음 - 각 페이지에서 처리하도록 함
-      console.error('Admin token refresh failed:', err);
       reject(err);
     } finally {
-      isAdminRefreshingToken = false;
       adminRefreshTokenPromise = null;
     }
   });
   return adminRefreshTokenPromise;
 };
 
+// 사용자 요청 인터셉터
 const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
-  // @ts-ignore - skipAuthInterceptor 플래그 확인
-  if (config.skipAuthInterceptor) {
-    return config;
-  }
+  // @ts-ignore - 요청 시작 시간 기록
+  config.metadata = { startTime: performance.now() };
+
+  // @ts-ignore
+  if (config.skipAuthInterceptor) return config;
 
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
-
-  // 쿼리 파라미터 제거
   const baseUrl = url.split('?')[0];
   const endpoint = `${method} ${baseUrl}`;
 
-  // 인증이 필요 없는 공개 API는 그냥 통과
-  if (skipAuthUrls.includes(endpoint)) {
-    return config;
-  }
+  if (skipAuthUrls.includes(endpoint)) return config;
 
-  // 인증이 필요한 API: 토큰 확인
   let token = getAccessToken() || cookies.get('accessToken');
-
   if (!token) {
-    // 토큰이 없으면 리프레시 시도
     try {
       token = await handleUserTokenRefresh();
-    } catch (error) {
-      // 리프레시도 실패하면 auth로 리다이렉트
-      console.error('Token refresh failed - redirecting to auth', error);
+    } catch {
       window.location.href = 'https://auth.entrydsm.kr';
       return Promise.reject(new axios.Cancel('No valid token - redirecting to auth'));
     }
@@ -190,61 +261,66 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
+// 관리자 요청 인터셉터
 const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
-  // @ts-ignore - skipAuthInterceptor 플래그 확인
-  if (config.skipAuthInterceptor) {
-    return config;
-  }
+  // @ts-ignore - 요청 시작 시간 기록
+  config.metadata = { startTime: performance.now() };
+
+  // @ts-ignore
+  if (config.skipAuthInterceptor) return config;
 
   config.headers = config.headers || {};
   const url = config.url || '';
   const method = (config.method || 'get').toUpperCase();
-
-  // 쿼리 파라미터 제거
   const baseUrl = url.split('?')[0];
   const endpoint = `${method} ${baseUrl}`;
 
-  // 인증이 필요 없는 공개 API는 그냥 통과
-  if (skipAuthUrls.includes(endpoint)) {
-    return config;
-  }
+  if (skipAuthUrls.includes(endpoint)) return config;
 
-  // 인증이 필요한 API: 토큰 확인
   let token = getAdminAccessToken() || cookies.get('adminAccessToken');
-
   if (!token) {
-    // 토큰이 없으면 리프레시 시도
     try {
       token = await handleAdminTokenRefresh();
-    } catch (error) {
-      // 리프레시도 실패하면 auth로 리다이렉트
-      console.error('Admin token refresh failed - redirecting to auth', error);
+    } catch {
       window.location.href = 'https://auth.entrydsm.kr';
       return Promise.reject(new axios.Cancel('No valid admin token - redirecting to auth'));
     }
   }
 
   config.headers['Authorization'] = `Bearer ${token}`;
-
   return config;
 };
 
 AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
+// 사용자 응답 인터셉터
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
-  if (!config || (response?.status !== 401 && response?.status !== 403)) {
-    return Promise.reject(error);
+
+  // 모든 에러 타입 리포트 (403, 500, 네트워크 에러, 타임아웃 등)
+  const shouldReport =
+    response?.status === 403 ||
+    response?.status === 500 ||
+    response?.status && response.status >= 500 ||
+    error.code === 'ECONNABORTED' ||
+    error.message.includes('timeout') ||
+    error.code === 'ERR_NETWORK' ||
+    !response; // 응답 자체가 없는 경우 (네트워크 실패)
+
+  if (shouldReport && config) {
+    await reportServerError(config as InternalAxiosRequestConfig, error);
   }
 
-  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
+  if (!config || (response?.status !== 401 && response?.status !== 403))
+    return Promise.reject(error);
 
+  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
   if (retryConfig._retry) {
-    // 재시도도 실패하면 auth로 리다이렉트
     window.location.href = 'https://auth.entrydsm.kr';
     return Promise.reject(error);
   }
+
   retryConfig._retry = true;
 
   try {
@@ -252,25 +328,38 @@ const userResponseInterceptor = async (error: AxiosError) => {
     retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
     return await AdmissionUserInstance(retryConfig);
   } catch (err) {
-    // 토큰 갱신 실패 시 auth로 리다이렉트
     window.location.href = 'https://auth.entrydsm.kr';
     return Promise.reject(err);
   }
 };
 
+// 관리자 응답 인터셉터
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
-  if (!config || (response?.status !== 401 && response?.status !== 403)) {
-    return Promise.reject(error);
+
+  // 모든 에러 타입 리포트 (403, 500, 네트워크 에러, 타임아웃 등)
+  const shouldReport =
+    response?.status === 403 ||
+    response?.status === 500 ||
+    response?.status && response.status >= 500 ||
+    error.code === 'ECONNABORTED' ||
+    error.message.includes('timeout') ||
+    error.code === 'ERR_NETWORK' ||
+    !response; // 응답 자체가 없는 경우 (네트워크 실패)
+
+  if (shouldReport && config) {
+    await reportServerError(config as InternalAxiosRequestConfig, error);
   }
 
-  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
+  if (!config || (response?.status !== 401 && response?.status !== 403))
+    return Promise.reject(error);
 
+  const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
   if (retryConfig._retry) {
-    // 재시도도 실패하면 auth로 리다이렉트
     window.location.href = 'https://auth.entrydsm.kr';
     return Promise.reject(error);
   }
+
   retryConfig._retry = true;
 
   try {
@@ -278,18 +367,30 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
     return await AdmissionAdminInstance(retryConfig);
   } catch (err) {
-    // 토큰 갱신 실패 시 auth로 리다이렉트
     window.location.href = 'https://auth.entrydsm.kr';
     return Promise.reject(err);
   }
 };
 
+// 성공 응답 인터셉터 (API 로그 기록)
+const successResponseInterceptor = (response: AxiosResponse) => {
+  // @ts-ignore - 시작 시간 가져오기
+  const startTime = response.config.metadata?.startTime || performance.now();
+
+  // 200번대 응답일 때만 로그 기록
+  if (response.status >= 200 && response.status < 300) {
+    logApiCall(response.config, response, startTime);
+  }
+
+  return response;
+};
+
 AdmissionUserInstance.interceptors.response.use(
-  (response) => response,
+  successResponseInterceptor,
   userResponseInterceptor
 );
 
 AdmissionAdminInstance.interceptors.response.use(
-  (response) => response,
+  successResponseInterceptor,
   adminResponseInterceptor
 );
