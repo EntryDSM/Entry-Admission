@@ -13,9 +13,10 @@ export const initializeMeercatEngine = async () => {
   let sessionId = getSessionId();
 
   if (!sessionId) {
-    sessionId = await startSession();
-    if (sessionId) {
-      setSessionId(sessionId);
+    const newSessionId = await startSession();
+    if (newSessionId) {
+      setSessionId(newSessionId);
+      sessionId = newSessionId;
     }
   }
 
