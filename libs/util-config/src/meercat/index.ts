@@ -22,6 +22,14 @@ export const initializeMeercatEngine = async () => {
 
   if (sessionId) {
     await sendHealthcheck(sessionId);
+
+    // 30초마다 주기적으로 HealthCheck 전송
+    setInterval(() => {
+      const currentSessionId = getSessionId();
+      if (currentSessionId) {
+        sendHealthcheck(currentSessionId);
+      }
+    }, 30000);
   }
 
   window.onerror = (message, source, lineno, colno, error) => {
