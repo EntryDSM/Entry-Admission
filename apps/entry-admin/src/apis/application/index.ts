@@ -50,7 +50,7 @@ export const useGetApplicationDetail = (applicationId?: string) => {
 // 수험번호 일괄 부여
 export const usePostExamNumber = () => {
   return useMutation({
-    mutationFn: () => AdmissionAdminInstance.post('/api/v1/exam-code'),
+    mutationFn: () => AdmissionAdminInstance.post('/exam-code'),
     onSuccess: () => toast.success('수험번호가 일괄 부여되었습니다.'),
     onError: () => toast.error('수험번호 부여 중 오류가 발생했습니다.'),
   });
