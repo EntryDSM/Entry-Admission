@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import type { SessionStartResponse } from './types';
-import { MEERCAT_API_BASE, SESSION_COOKIE_KEY, COOKIE_DOMAIN, COOKIE_EXPIRES } from './constants';
+import { MEERCAT_API_BASE, SESSION_COOKIE_KEY, LAST_HEALTHCHECK_KEY, COOKIE_DOMAIN, COOKIE_EXPIRES, SESSION_TIMEOUT_MS } from './constants';
 import { performNetworkTest, getBrowserType, getDeviceType } from './utils';
 
 export const startSession = async (existingSessionId?: string): Promise<string | null> => {
@@ -49,4 +49,35 @@ export const setSessionId = (sessionId: string): void => {
     secure: true,
     sameSite: 'lax',
   });
+  updateLastHealthcheckTime();
+};
+
+export const getLastHealthcheckTime = (): number | null => {
+  const timestamp = Cookies.get(LAST_HEALTHCHECK_KEY);
+  return timestamp ? parseInt(timestamp, 10) : null;
+};
+
+export const updateLastHealthcheckTime = (): void => {
+  Cookies.set(LAST_HEALTHCHECK_KEY, Date.now().toString(), {
+    domain: COOKIE_DOMAIN,
+    expires: COOKIE_EXPIRES,
+    secure: true,
+    sameSite: 'lax',
+  });
+};
+
+export const isSessionValid = (): boolean => {
+  const sessionId = getSessionId();
+  if (!sessionId) return false;
+
+  const lastHealthcheck = getLastHealthcheckTime();
+  if (!lastHealthcheck) return false;
+
+  const timeSinceLastHealthcheck = Date.now() - lastHealthcheck;
+  return timeSinceLastHealthcheck < SESSION_TIMEOUT_MS;
+};
+
+export const clearSession = (): void => {
+  Cookies.remove(SESSION_COOKIE_KEY, { domain: COOKIE_DOMAIN });
+  Cookies.remove(LAST_HEALTHCHECK_KEY, { domain: COOKIE_DOMAIN });
 };

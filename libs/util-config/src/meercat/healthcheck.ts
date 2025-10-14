@@ -1,6 +1,7 @@
 import type { HealthcheckRequest } from './types';
 import { MEERCAT_API_BASE } from './constants';
 import { getPageType, getMemoryUsage, getConnectionType } from './utils';
+import { updateLastHealthcheckTime } from './session';
 
 export const sendHealthcheck = async (sessionId: string): Promise<void> => {
   try {
@@ -28,6 +29,9 @@ export const sendHealthcheck = async (sessionId: string): Promise<void> => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+
+    // HealthCheck 성공 시 타임스탬프 업데이트
+    updateLastHealthcheckTime();
   } catch (error) {
     console.error('Healthcheck failed:', error);
   }
