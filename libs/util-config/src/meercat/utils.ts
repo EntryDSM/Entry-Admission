@@ -5,6 +5,9 @@ export const getPageType = (): PageType => {
   if (window.location.hostname.includes('auth.entrydsm.kr')) {
     return 'AUTH';
   }
+  if (window.location.hostname.includes('admission.entrydsm.kr')) {
+    return 'ADMISSION';
+  }
   if (window.location.hostname.includes('entrydsm.kr')) {
     return 'USER';
   }
