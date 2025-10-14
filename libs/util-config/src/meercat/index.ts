@@ -1,6 +1,7 @@
 import { startSession, getSessionId, setSessionId, isSessionValid, clearSession } from './session';
 import { sendHealthcheck } from './healthcheck';
 import { sendClientError, createErrorPayload } from './error';
+import { MEERCAT_API_BASE } from './constants';
 
 export * from './types';
 export * from './constants';
@@ -46,6 +47,20 @@ export const initializeMeercatEngine = async () => {
         }
       }
     }, 6000);
+
+    // 페이지 이탈 시 세션 종료
+    window.addEventListener('beforeunload', () => {
+      const currentSessionId = getSessionId();
+      if (currentSessionId) {
+        navigator.sendBeacon(
+          `${MEERCAT_API_BASE}/session/end`,
+          JSON.stringify({
+            sessionId: currentSessionId,
+            reason: 'user_exit',
+          })
+        );
+      }
+    });
   }
 
   window.onerror = (message, source, lineno, colno, error) => {
