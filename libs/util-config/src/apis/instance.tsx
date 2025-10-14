@@ -95,12 +95,6 @@ const reportServerError = async (
       errorCode = 'NETWORK_FAILURE';
       httpStatus = 0;
       messageData = error.message || 'Network connection failed';
-    } else if (error.response?.status === 403) {
-      errorCategory = 'FORBIDDEN';
-      errorCode = 'FORBIDDEN_ACCESS';
-      messageData = error.response?.data && Object.keys(error.response.data).length > 0
-        ? error.response.data
-        : 'NULL';
     } else if (error.response?.status && error.response.status >= 500) {
       errorCategory = 'SERVER_ERROR';
       errorCode = 'INTERNAL_SERVER_ERROR';
@@ -314,9 +308,8 @@ AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
 
-  // 모든 에러 타입 리포트 (403, 500, 네트워크 에러, 타임아웃 등)
+  // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
   const shouldReport =
-    response?.status === 403 ||
     response?.status === 500 ||
     response?.status && response.status >= 500 ||
     error.code === 'ECONNABORTED' ||
@@ -353,9 +346,8 @@ const userResponseInterceptor = async (error: AxiosError) => {
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
 
-  // 모든 에러 타입 리포트 (403, 500, 네트워크 에러, 타임아웃 등)
+  // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
   const shouldReport =
-    response?.status === 403 ||
     response?.status === 500 ||
     response?.status && response.status >= 500 ||
     error.code === 'ECONNABORTED' ||
