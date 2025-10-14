@@ -36,6 +36,16 @@ export const AdmissionPublicInstance = axios.create({
 
 const cookies = new Cookies();
 
+// 세션 ID 가져오기 또는 생성
+const getSessionId = (): string => {
+  let sessionId = cookies.get('MIEERCAT_SESSION_ID');
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    cookies.set('MIEERCAT_SESSION_ID', sessionId, { path: '/', maxAge: 86400 * 30 });
+  }
+  return sessionId;
+};
+
 const skipAuthUrls = [
   'POST /admin/auth',
   'POST /user/auth',
@@ -52,6 +62,7 @@ const skipAuthUrls = [
 let userRefreshTokenPromise: Promise<string> | null = null;
 let adminRefreshTokenPromise: Promise<string> | null = null;
 
+// 서버 에러 리포트
 const reportServerError = async (
   config: InternalAxiosRequestConfig,
   error: AxiosError
@@ -67,20 +78,22 @@ const reportServerError = async (
     const requestPayload =
       typeof config.data === 'string' ? config.data : JSON.stringify(config.data || {});
 
+    // 에러 타입 분류
     let errorCategory = 'SERVER_ERROR';
     let errorCode = 'INTERNAL_SERVER_ERROR';
     let httpStatus = error.response?.status || 500;
     let messageData: any = 'NULL';
 
+    // 네트워크 에러 처리
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       errorCategory = 'NETWORK_ERROR';
       errorCode = 'TIMEOUT';
-      httpStatus = 408; // Request Timeout
+      httpStatus = 408;
       messageData = error.message || 'Request timeout';
     } else if (error.code === 'ERR_NETWORK' || !error.response) {
       errorCategory = 'NETWORK_ERROR';
       errorCode = 'NETWORK_FAILURE';
-      httpStatus = 0; // Network error (no response)
+      httpStatus = 0;
       messageData = error.message || 'Network connection failed';
     } else if (error.response?.status === 403) {
       errorCategory = 'FORBIDDEN';
@@ -97,7 +110,7 @@ const reportServerError = async (
     }
 
     const errorInfo = {
-      sessionId: crypto.randomUUID(),
+      sessionId: getSessionId(),
       pageType,
       endpoint: config.url || '',
       httpMethod: (config.method || 'GET').toUpperCase(),
@@ -118,6 +131,7 @@ const reportServerError = async (
   } catch {}
 };
 
+// API 로그 기록
 const logApiCall = (
   config: InternalAxiosRequestConfig,
   response: AxiosResponse,
@@ -135,7 +149,7 @@ const logApiCall = (
         : 0;
 
       const logData = {
-        sessionId: crypto.randomUUID(),
+        sessionId: getSessionId(),
         endpoint: config.url || '',
         method: (config.method || 'GET').toUpperCase(),
         statusCode: response.status,
@@ -150,10 +164,12 @@ const logApiCall = (
         body: JSON.stringify(logData),
       });
     } catch {
+      // 로깅 실패해도 무시
     }
   }, 0);
 };
 
+// 사용자 토큰 갱신
 const handleUserTokenRefresh = () => {
   if (userRefreshTokenPromise) return userRefreshTokenPromise;
 
@@ -190,7 +206,7 @@ const handleUserTokenRefresh = () => {
   return userRefreshTokenPromise;
 };
 
-// 관리자 토큰 갱신
+// ✅ 관리자 토큰 갱신
 const handleAdminTokenRefresh = () => {
   if (adminRefreshTokenPromise) return adminRefreshTokenPromise;
 
@@ -231,7 +247,7 @@ const handleAdminTokenRefresh = () => {
   return adminRefreshTokenPromise;
 };
 
-// 사용자 요청 인터셉터
+// ✅ 사용자 요청 인터셉터
 const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   // @ts-ignore - 요청 시작 시간 기록
   config.metadata = { startTime: performance.now() };
@@ -261,7 +277,7 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-// 관리자 요청 인터셉터
+// ✅ 관리자 요청 인터셉터
 const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   // @ts-ignore - 요청 시작 시간 기록
   config.metadata = { startTime: performance.now() };
@@ -294,7 +310,7 @@ const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
 AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
 
-// 사용자 응답 인터셉터
+// ✅ 사용자 응답 인터셉터
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
 
@@ -333,7 +349,7 @@ const userResponseInterceptor = async (error: AxiosError) => {
   }
 };
 
-// 관리자 응답 인터셉터
+// ✅ 관리자 응답 인터셉터
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
 
@@ -372,7 +388,7 @@ const adminResponseInterceptor = async (error: AxiosError) => {
   }
 };
 
-// 성공 응답 인터셉터 (API 로그 기록)
+// ✅ 성공 응답 인터셉터 (API 로그 기록)
 const successResponseInterceptor = (response: AxiosResponse) => {
   // @ts-ignore - 시작 시간 가져오기
   const startTime = response.config.metadata?.startTime || performance.now();
