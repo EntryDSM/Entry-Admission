@@ -28,9 +28,13 @@ export const Applicant = ({
       if (!receiptCode) return;
 
       if (isArrived) {
-        patchNotArrived(receiptCode);
+        patchNotArrived(receiptCode, {
+          onSuccess: () => setTimeout(() => window.location.reload(), 1500),
+        });
       } else {
-        patchArrived(receiptCode);
+        patchArrived(receiptCode, {
+          onSuccess: () => setTimeout(() => window.location.reload(), 1500),
+        });
       }
     },
     [isArrived, receiptCode, patchArrived, patchNotArrived]
