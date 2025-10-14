@@ -7,7 +7,18 @@
       "Bash(curl:*)",
       "Bash(cat:*)",
       "Bash(yarn nx build:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(yarn nx show:*)",
+      "Bash(yarn build)",
+      "Bash(npx nx run-many:*)",
+      "Bash(npx tsup:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(yarn add js-cookie)",
+      "Bash(yarn add:*)",
+      "Bash(yarn install)",
+      "Bash(npx nx show:*)",
+      "Bash(yarn nx run-many:*)"
     ],
     "deny": [],
     "ask": []

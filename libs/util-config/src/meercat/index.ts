@@ -1,4 +1,4 @@
-import { startSession, getSessionId, setSessionId } from './session';
+import { startSession, getSessionId, setSessionId, isSessionValid, clearSession } from './session';
 import { sendHealthcheck } from './healthcheck';
 import { sendClientError, createErrorPayload } from './error';
 
@@ -12,6 +12,14 @@ export * from './error';
 export const initializeMeercatEngine = async () => {
   let sessionId = getSessionId();
 
+  // 세션이 있으면 유효성 검증
+  if (sessionId && !isSessionValid()) {
+    console.log('Session expired. Clearing old session...');
+    clearSession();
+    sessionId = undefined;
+  }
+
+  // 세션이 없거나 만료되었으면 새로 생성
   if (!sessionId) {
     const newSessionId = await startSession();
     if (newSessionId) {
@@ -22,6 +30,22 @@ export const initializeMeercatEngine = async () => {
 
   if (sessionId) {
     await sendHealthcheck(sessionId);
+
+    // 6초마다 주기적으로 HealthCheck 전송
+    setInterval(() => {
+      const currentSessionId = getSessionId();
+      if (currentSessionId) {
+        // 세션 유효성 재검증
+        if (!isSessionValid()) {
+          console.log('Session expired during interval. Re-initializing...');
+          clearSession();
+          // 재초기화
+          initializeMeercatEngine();
+        } else {
+          sendHealthcheck(currentSessionId);
+        }
+      }
+    }, 6000);
   }
 
   window.onerror = (message, source, lineno, colno, error) => {
