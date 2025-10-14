@@ -29,11 +29,11 @@ export const Applicant = ({
 
       if (isArrived) {
         patchNotArrived(receiptCode, {
-          onSuccess: () => setTimeout(() => window.location.reload(), 1500),
+          onSuccess: () => setTimeout(() => window.location.reload(), 500),
         });
       } else {
         patchArrived(receiptCode, {
-          onSuccess: () => setTimeout(() => window.location.reload(), 1500),
+          onSuccess: () => setTimeout(() => window.location.reload(), 500),
         });
       }
     },

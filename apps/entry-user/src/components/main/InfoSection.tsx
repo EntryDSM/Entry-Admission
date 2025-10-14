@@ -49,11 +49,9 @@ export const InfoSection = () => {
     }
   }, [data]);
 
-
-  const {data : scheduleData} = useGetAllSchedule()
+  const { data: scheduleData } = useGetAllSchedule();
 
   const [currentPeriod, setCurrentPeriod] = useState<string>('');
-
 
   useEffect(() => {
     if (!scheduleData || !scheduleData.schedules) return;
@@ -70,7 +68,9 @@ export const InfoSection = () => {
     const interview = getDate('INTERVIEW');
     const secondAnnouncement = getDate('SECOND_ANNOUNCEMENT');
 
-    if (now >= startDate && now <= endDate) {
+    if (startDate > now) {
+      setCurrentPeriod('모의 접수 기간입니다.');
+    } else if (now >= startDate && now <= endDate) {
       setCurrentPeriod('원서 접수 기간입니다.');
     } else if (now >= firstAnnouncement && now < interview) {
       setCurrentPeriod('1차 발표 기간입니다.');
@@ -102,8 +102,6 @@ export const InfoSection = () => {
   //     date: '2024.03.21',
   //   },
   // ];
-
-  
 
   return (
     <Container>
