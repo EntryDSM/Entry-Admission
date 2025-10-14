@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 
 const sendClientError = async (errorData: any) => {
   try {
-    await fetch('https://meercat.entrydsm.kr/v1/error/client', {
+    await fetch('https://meeeeercat.ncloud.sbs/v1/error/client', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(errorData),
