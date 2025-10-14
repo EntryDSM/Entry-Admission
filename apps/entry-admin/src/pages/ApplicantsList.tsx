@@ -98,51 +98,19 @@ export const ApplicantsList = () => {
   };
 
   const getFilterParams = (): IApplicationAllListRequest => {
-    const admissionMap: Record<
-      AdmissionKey,
-      IApplicationAllListRequest['applicationType']
-    > = {
-      general: 'COMMON',
-      meister: 'MEISTER',
-      social: 'SOCIAL',
-    };
-
-    const educationMap: Record<
-      EducationKey,
-      IApplicationAllListRequest['educationalStatus']
-    > = {
-      prospective: 'PROSPECTIVE_GRADUATE',
-      graduate: 'GRADUATE',
-      exam: 'QUALIFICATION_EXAM',
-    };
-
-    const selectedAdmissions = Object.entries(filters.admission)
-      .filter(([, v]) => v)
-      .map(([k]) => k as AdmissionKey);
-
-    const selectedEducation = Object.entries(filters.education)
-      .filter(([, v]) => v)
-      .map(([k]) => k as EducationKey);
-
     const params: Partial<IApplicationAllListRequest> = {
-      page: 0,
+      page: currentPage - 1,
       size: 20,
     };
 
-    if (selectedAdmissions.length === 1) {
-      params.applicationType = admissionMap[selectedAdmissions[0]];
-    }
-
-    if (selectedEducation.length === 1) {
-      params.educationalStatus = educationMap[selectedEducation[0]];
-    }
-
+    // 지역 필터만 API로 전달 (대전/전국 둘 중 하나만 선택된 경우)
     const isDaejeonSelected = filters.region.daejeon;
     const isNationwideSelected = filters.region.nationwide;
     if (isDaejeonSelected !== isNationwideSelected) {
       params.isDaejeon = isDaejeonSelected;
     }
 
+    // 나머지 필터는 클라이언트에서 처리
     return params as IApplicationAllListRequest;
   };
 
@@ -163,14 +131,61 @@ export const ApplicantsList = () => {
     refetch({ cancelRefetch: false });
   }, [filterParams]);
 
-  // 검색 필터
-  const filteredApplicants = applicantsList
-    .filter((a) =>
-      a.applicantName
-        .toLocaleLowerCase()
-        .includes(searchKeyword.toLocaleLowerCase())
-    )
-    .sort((a, b) => a.receiptCode - b.receiptCode);
+  // 클라이언트 사이드 필터링
+  const filteredApplicants = useMemo(() => {
+    let filtered = applicantsList;
+
+    // 검색어 필터
+    if (searchKeyword) {
+      filtered = filtered.filter((a) =>
+        a.applicantName
+          .toLocaleLowerCase()
+          .includes(searchKeyword.toLocaleLowerCase())
+      );
+    }
+
+    // 전형 필터 (여러 개 선택 가능)
+    const selectedAdmissions = Object.entries(filters.admission)
+      .filter(([, v]) => v)
+      .map(([k]) => k as AdmissionKey);
+
+    if (selectedAdmissions.length > 0) {
+      const admissionMap: Record<AdmissionKey, string> = {
+        general: 'COMMON',
+        meister: 'MEISTER',
+        social: 'SOCIAL',
+      };
+      const allowedTypes = selectedAdmissions.map((k) => admissionMap[k]);
+      filtered = filtered.filter((a) =>
+        allowedTypes.includes(a.applicationType)
+      );
+    }
+
+    // 학력 필터 (여러 개 선택 가능)
+    const selectedEducation = Object.entries(filters.education)
+      .filter(([, v]) => v)
+      .map(([k]) => k as EducationKey);
+
+    if (selectedEducation.length > 0) {
+      const educationMap: Record<EducationKey, string> = {
+        prospective: 'PROSPECTIVE_GRADUATE',
+        graduate: 'GRADUATE',
+        exam: 'QUALIFICATION_EXAM',
+      };
+      const allowedEducation = selectedEducation.map((k) => educationMap[k]);
+      filtered = filtered.filter((a) =>
+        allowedEducation.includes(a.educationalStatus)
+      );
+    }
+
+    // 원서 도착 필터
+    if (filters.status.received) {
+      filtered = filtered.filter((a) => a.isArrived === true);
+    }
+
+    // 정렬
+    return filtered.sort((a, b) => a.receiptCode - b.receiptCode);
+  }, [applicantsList, searchKeyword, filters]);
 
   const totalPage = data?.data.totalPages ?? 1;
 
@@ -269,7 +284,6 @@ export const ApplicantsList = () => {
         </LabelContainer>
       </FilterControl>
 
-      {/* 지원자 목록 */}
       <ApplicantsTitle>
         <LeftTitle>
           <Title>접수 번호</Title>
@@ -314,7 +328,6 @@ export const ApplicantsList = () => {
         />
       )}
 
-      {/* 페이지네이션 */}
       <PagiNation
         currentPage={currentPage}
         totalPage={totalPage}
@@ -440,25 +453,25 @@ const LeftTitle = styled.div`
 
   > div:nth-of-type(1) {
     width: 100px;
-  } /* 접수 번호 */
+  }
   > div:nth-of-type(2) {
     width: 100px;
-  } /* 이름 */
+  }
   > div:nth-of-type(3) {
     width: 100px;
-  } /* 지역 */
+  }
   > div:nth-of-type(4) {
     width: 140px;
-  } /* 전형 */
+  }
   > div:nth-of-type(5) {
     width: 120px;
-  } /* 학력 */
+  }
   > div:nth-of-type(6) {
     width: 120px;
-  } /* 원서 도착 */
+  }
   > div:nth-of-type(7) {
     width: 120px;
-  } /* 최종 제출 */
+  }
 
   @media (max-width: 1200px) {
     > div:nth-of-type(1) {
