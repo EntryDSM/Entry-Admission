@@ -12,10 +12,19 @@ interface IFlexType {
   paddingLeft?: string;
   paddingRight?: string;
   paddingBottom?: string;
+  padding?: string;
   className?: string;
   style?: React.CSSProperties;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
+  borderRadius?: string;
+  backgroundColor?: string;
+  flex?: string;
+  position?: 'static' | 'relative' | 'absolute' | 'sticky' | 'fixed';
+  top?: string;
+  left?: string;
+  zIndex?: number;
+  borderBottom?: string;
 }
 
 export const Flex = ({
@@ -36,6 +45,14 @@ export const Flex = ({
   className,
   style = {},
   onClick,
+  borderRadius,
+  backgroundColor,
+  flex,
+  position,
+  top,
+  left,
+  zIndex,
+  borderBottom,
 }: IFlexType) => {
   // gap 설정
   let finalGap: string | number | undefined;
@@ -58,6 +75,14 @@ export const Flex = ({
     height,
     gap: finalGap,
     padding: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`,
+    borderRadius: borderRadius,
+    backgroundColor: backgroundColor,
+    flex: flex,
+    position: position,
+    top: top,
+    left: left,
+    zIndex: zIndex,
+    borderBottom: borderBottom,
     ...style,
   };
 

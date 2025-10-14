@@ -5,7 +5,11 @@ import { useCalculationData } from '../contexts/CalculationDataContext';
 import { calculateScore } from '../apis/calculator';
 import { transformCalculationDataToAPI } from '../utils/apiDataTransformer';
 import { useState, useEffect } from 'react';
-import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE, ADMISSION_TYPE_MAX_SCORE_GED } from '../constants/admissionType';
+import {
+  ADMISSION_TYPE_LABEL,
+  ADMISSION_TYPE_MAX_SCORE,
+  ADMISSION_TYPE_MAX_SCORE_GED,
+} from '../constants/admissionType';
 
 interface ScoreResultModalProps {
   isOpen: boolean;
@@ -18,7 +22,10 @@ interface ScoreResult {
   total: string;
 }
 
-export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => {
+export const ScoreResultModal = ({
+  isOpen,
+  onClose,
+}: ScoreResultModalProps) => {
   const { state } = useCalculationData();
   const [results, setResults] = useState<ScoreResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,13 +44,14 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
         const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
         const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
 
-        const educationalStatus = commonRequest.educationalStatus;
+        const educationalStatus = commonRequest.educanalStatus;
 
-        const [commonResponse, socialResponse, meisterResponse] = await Promise.all([
-          calculateScore(commonRequest),
-          calculateScore(socialRequest),
-          calculateScore(meisterRequest),
-        ]);
+        const [commonResponse, socialResponse, meisterResponse] =
+          await Promise.all([
+            calculateScore(commonRequest),
+            calculateScore(socialRequest),
+            calculateScore(meisterRequest),
+          ]);
 
         const maxScore =
           educationalStatus === 'QUALIFICATION_EXAM'
@@ -54,18 +62,18 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
           {
             name: ADMISSION_TYPE_LABEL.COMMON,
             score: commonResponse.data.totalScore.toFixed(3),
-            total: maxScore.COMMON.toString()
+            total: maxScore.COMMON.toString(),
           },
           {
             name: ADMISSION_TYPE_LABEL.SOCIAL,
             score: socialResponse.data.totalScore.toFixed(3),
-            total: maxScore.SOCIAL.toString()
+            total: maxScore.SOCIAL.toString(),
           },
           {
             name: ADMISSION_TYPE_LABEL.MEISTER,
             score: meisterResponse.data.totalScore.toFixed(3),
-            total: maxScore.MEISTER.toString()
-          }
+            total: maxScore.MEISTER.toString(),
+          },
         ];
 
         setResults(newResults);
@@ -81,7 +89,7 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
   }, [isOpen, state]);
 
   if (!isOpen) return null;
-  
+
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
@@ -131,9 +139,7 @@ export const ScoreResultModal = ({ isOpen, onClose }: ScoreResultModalProps) => 
 
         {/* 닫기 버튼 */}
         <ButtonWrapper>
-          <Button onClick={onClose}>
-            닫기
-          </Button>
+          <Button onClick={onClose}>닫기</Button>
         </ButtonWrapper>
       </ModalContainer>
     </ModalOverlay>

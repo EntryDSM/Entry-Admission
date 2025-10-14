@@ -3,11 +3,16 @@ import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
 import { QEDScore, Activity } from './';
 import { useCalculationPageData } from '../../contexts';
-import { calculateScore } from '../../apis/calculator';
 import {
   CalculatorScoreRequest,
   CalculatorScoreResponse,
-} from '../../apis/calculator/types';
+  calculateScore,
+} from '../../apis';
+import {
+  ADMISSION_TYPE_MAX_SCORE_GED,
+  ADMISSION_TYPE_LABEL,
+  AdmissionType,
+} from '../../constants/admissionType';
 
 const STEPS = [
   { key: 'qeScore', label: '검정고시 점수' },
@@ -17,9 +22,17 @@ const STEPS = [
 export const QECalculationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [result, setResult] = useState<CalculatorScoreResponse | null>(null);
+  const [results, setResults] = useState<
+    {
+      name: string;
+      type: AdmissionType;
+      data: CalculatorScoreResponse['data'];
+    }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useCalculationPageData('primaryThird');
 
   const [qeScoreData] = useCalculationPageData('qeScore');
   const [qeActivityData] = useCalculationPageData('qeActivity');
@@ -40,8 +53,30 @@ export const QECalculationPage = () => {
     setIsLoading(true);
     setError(null);
 
-    const requestData: CalculatorScoreRequest = {
-      admissionType: 'QE',
+    const commonRequest: CalculatorScoreRequest = {
+      admissionType: 'COMMON',
+      scores: {
+        ...qeScoreData,
+      },
+      bonus: {
+        dsmAlgorithm: qeActivityData?.dsmAlgorithm === 'O',
+        infoProcessing: qeActivityData?.infoProcessing === 'O',
+      },
+    };
+
+    const socialRequest: CalculatorScoreRequest = {
+      admissionType: 'SOCIAL',
+      scores: {
+        ...qeScoreData,
+      },
+      bonus: {
+        dsmAlgorithm: qeActivityData?.dsmAlgorithm === 'O',
+        infoProcessing: qeActivityData?.infoProcessing === 'O',
+      },
+    };
+
+    const meisterRequest: CalculatorScoreRequest = {
+      admissionType: 'MEISTER',
       scores: {
         ...qeScoreData,
       },
@@ -52,8 +87,30 @@ export const QECalculationPage = () => {
     };
 
     try {
-      const response = await calculateScore(requestData);
-      setResult(response);
+      const [commonResponse, socialResponse, meisterResponse] =
+        await Promise.all([
+          calculateScore(commonRequest),
+          calculateScore(socialRequest),
+          calculateScore(meisterRequest),
+        ]);
+
+      setResults([
+        {
+          name: ADMISSION_TYPE_LABEL.COMMON,
+          type: 'COMMON',
+          data: commonResponse.data,
+        },
+        {
+          name: ADMISSION_TYPE_LABEL.SOCIAL,
+          type: 'SOCIAL',
+          data: socialResponse.data,
+        },
+        {
+          name: ADMISSION_TYPE_LABEL.MEISTER,
+          type: 'MEISTER',
+          data: meisterResponse.data,
+        },
+      ]);
       setShowResultModal(true);
     } catch (e: any) {
       setError(e.message || 'An unexpected error occurred.');
@@ -99,15 +156,28 @@ export const QECalculationPage = () => {
                 width="32px"
                 height="32px"
                 borderRadius="50%"
-                backgroundColor={index === currentStep ? "#FF6B35" : index < currentStep ? "#FF6B35" : "#E5E5E5"}
+                backgroundColor={
+                  index === currentStep
+                    ? '#FF6B35'
+                    : index < currentStep
+                    ? '#FF6B35'
+                    : '#E5E5E5'
+                }
                 justifyContent="center"
                 alignItems="center"
               >
-                <Text fontSize={14} fontWeight={600} color={index <= currentStep ? "#FFFFFF" : "#999"}>
+                <Text
+                  fontSize={14}
+                  fontWeight={600}
+                  color={index <= currentStep ? '#FFFFFF' : '#999'}
+                >
                   {index + 1}
                 </Text>
               </Flex>
-              <Text fontSize={14} fontWeight={index === currentStep ? 600 : 400}>
+              <Text
+                fontSize={14}
+                fontWeight={index === currentStep ? 600 : 400}
+              >
                 {step.label}
               </Text>
               {index < STEPS.length - 1 && (
@@ -118,7 +188,7 @@ export const QECalculationPage = () => {
         </Flex>
       </Flex>
 
-      <Flex flex={1} paddingY="40px" width="100%">
+      <Flex flex={'1'} paddingTop="40px" width="100%">
         {renderStepContent()}
       </Flex>
 
@@ -132,7 +202,7 @@ export const QECalculationPage = () => {
         >
           이전
         </Button>
-        
+
         {currentStep === STEPS.length - 1 ? (
           <Button onClick={handleComplete} isBlocked={isLoading}>
             {isLoading ? '계산 중...' : '완료'}
@@ -142,7 +212,7 @@ export const QECalculationPage = () => {
         )}
       </Flex>
 
-      {showResultModal && result && (
+      {showResultModal && (
         <Flex
           position="fixed"
           top="0"
@@ -166,27 +236,22 @@ export const QECalculationPage = () => {
               성적 산출 결과
             </Text>
 
-            {error && <Text color="red">{error}</Text>}
+            {error && (
+              <Text color="#FF0000" fontSize={14}>
+                {error}
+              </Text>
+            )}
 
             <Flex isColumn={true} gap={16}>
-              <Flex justifyContent="space-between">
-                <Text>총 점수</Text>
-                <Text color="#FF6B35" fontWeight={600}>
-                  {result.totalScore.toFixed(3)} / {result.maxScore}
-                </Text>
-              </Flex>
-              <Flex justifyContent="space-between">
-                <Text>교과 점수</Text>
-                <Text color="#FF6B35" fontWeight={600}>
-                  {result.subjectScore.toFixed(3)}
-                </Text>
-              </Flex>
-              <Flex justifyContent="space-between">
-                <Text>가산점</Text>
-                <Text color="#FF6B35" fontWeight={600}>
-                  {result.bonusScore}
-                </Text>
-              </Flex>
+              {results.map((result, index) => (
+                <Flex key={index} justifyContent="space-between">
+                  <Text>{result.name}</Text>
+                  <Text color="#FF6B35" fontWeight={600}>
+                    {result.data.totalScore.toFixed(3)} /{' '}
+                    {ADMISSION_TYPE_MAX_SCORE_GED[result.type]}
+                  </Text>
+                </Flex>
+              ))}
             </Flex>
 
             <Button onClick={() => setShowResultModal(false)}>닫기</Button>

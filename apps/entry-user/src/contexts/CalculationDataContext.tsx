@@ -41,13 +41,13 @@ interface CalculationState {
   primarySecond: IScoreType;
   primaryFirst: IScoreType;
   primaryActivity: IActivityType;
-  
+
   graduatedThird2: IScoreType;
   graduatedThird1: IScoreType;
   graduatedSecond2: IScoreType;
   graduatedSecond1: IScoreType;
   graduatedActivity: IActivityType;
-  
+
   qeScore: IQEScoreType;
   qeActivity: IActivityType;
 }
@@ -97,7 +97,7 @@ const initialState: CalculationState = {
     dsmAlgorithm: null,
     infoProcessing: null,
   },
-  
+
   graduatedThird2: {
     kor: null,
     soc: null,
@@ -143,7 +143,7 @@ const initialState: CalculationState = {
     dsmAlgorithm: null,
     infoProcessing: null,
   },
-  
+
   qeScore: {
     korean: '',
     social: '',
@@ -307,7 +307,9 @@ export const useCalculationData = () => {
   return context;
 };
 
-export const useCalculationPageData = <T extends keyof CalculationState>(page: T) => {
+export const useCalculationPageData = <T extends keyof CalculationState>(
+  page: T
+) => {
   const { state, updatePageData } = useCalculationData();
 
   const pageData = state[page];
