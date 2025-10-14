@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Text } from '@entry/design-token';
@@ -30,7 +29,10 @@ const GridContainer = styled.div`
 export const Activity = () => {
   const location = useLocation();
 
-  const getDataKey = (): 'primaryActivity' | 'graduatedActivity' | 'qeActivity' => {
+  const getDataKey = ():
+    | 'primaryActivity'
+    | 'graduatedActivity'
+    | 'qeActivity' => {
     if (location.pathname.includes('primary')) return 'primaryActivity';
     if (location.pathname.includes('graduated')) return 'graduatedActivity';
     if (location.pathname.includes('qe')) return 'qeActivity';

@@ -1,55 +1,35 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { Flex, Text } from '@entry/design-token';
 import { AttendanceForm } from '@entry/ui';
 import { useCalculationPageData } from '../../contexts';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 48px;
-  width: 100%;
-  height: fit-content;
-`;
-
-const Column = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-`;
-
 export const QEDScore = () => {
-  const location = useLocation();
-  
   const [scoreData, setScoreData] = useCalculationPageData('qeScore');
-  
+
   const safeScoreData = scoreData || {};
   const safeSetScoreData = (data: typeof scoreData) => {
     setScoreData(data || {});
   };
-  
+
   const handleKoreanChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, korean: value });
   };
-  
+
   const handleSocialChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, social: value });
   };
-  
+
   const handleHistoryChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, history: value });
   };
-  
+
   const handleScienceChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, science: value });
   };
-  
+
   const handleTechnologyChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, technology: value });
   };
-  
+
   const handleMathChange = (value: string) => {
     safeSetScoreData({ ...safeScoreData, math: value });
   };
@@ -68,6 +48,7 @@ export const QEDScore = () => {
           onChange={handleKoreanChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
         <AttendanceForm
           width={'100%'}
@@ -76,6 +57,7 @@ export const QEDScore = () => {
           onChange={handleScienceChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
       </Column>
       <Column>
@@ -86,6 +68,7 @@ export const QEDScore = () => {
           onChange={handleSocialChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
         <AttendanceForm
           width={'100%'}
@@ -94,6 +77,7 @@ export const QEDScore = () => {
           onChange={handleTechnologyChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
         <AttendanceForm
           width={'100%'}
@@ -102,6 +86,7 @@ export const QEDScore = () => {
           onChange={handleEnglishChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
       </Column>
       <Column>
@@ -112,6 +97,7 @@ export const QEDScore = () => {
           onChange={handleHistoryChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
         <AttendanceForm
           width={'100%'}
@@ -120,8 +106,24 @@ export const QEDScore = () => {
           onChange={handleMathChange}
           suffix="점"
           defaultCount={100}
+          maxScore={100}
         />
       </Column>
     </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+  width: 100%;
+  height: fit-content;
+`;
+
+const Column = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;

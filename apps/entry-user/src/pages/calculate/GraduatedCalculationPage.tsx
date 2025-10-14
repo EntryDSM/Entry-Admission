@@ -1,25 +1,35 @@
 import { useState } from 'react';
 import { Flex, Text } from '@entry/design-token';
 import { Button } from '@entry/ui';
-import { ScoreThird, ScoreSecond, ScoreFirst, Activity } from './';
+import { ScoreThird, ScoreSecond, Activity } from './';
 import { useCalculationData } from '../../contexts/CalculationDataContext';
 import { calculateScore } from '../../apis/calculator';
 import { transformCalculationDataToAPI } from '../../utils/apiDataTransformer';
 import { CalculatorScoreResponse } from '../../apis/calculator/types';
-import { ADMISSION_TYPE_LABEL, ADMISSION_TYPE_MAX_SCORE, AdmissionType } from '../../constants/admissionType';
+import {
+  ADMISSION_TYPE_LABEL,
+  ADMISSION_TYPE_MAX_SCORE,
+  AdmissionType,
+} from '../../constants/admissionType';
 
 const STEPS = [
   { key: 'third2', label: '3학년 2학기' },
   { key: 'third1', label: '3학년 1학기' },
   { key: 'second2', label: '2학년 2학기' },
   { key: 'second1', label: '2학년 1학기' },
-  { key: 'activity', label: '출석 및 봉사' }
+  { key: 'activity', label: '출석 및 봉사' },
 ];
 
 export const GraduatedCalculationPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [results, setResults] = useState<{ name: string; type: AdmissionType; data: CalculatorScoreResponse['data'] }[]>([]);
+  const [results, setResults] = useState<
+    {
+      name: string;
+      type: AdmissionType;
+      data: CalculatorScoreResponse['data'];
+    }[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { state } = useCalculationData();
@@ -45,16 +55,29 @@ export const GraduatedCalculationPage = () => {
       const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
       const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
 
-      const [commonResponse, socialResponse, meisterResponse] = await Promise.all([
-        calculateScore(commonRequest),
-        calculateScore(socialRequest),
-        calculateScore(meisterRequest),
-      ]);
+      const [commonResponse, socialResponse, meisterResponse] =
+        await Promise.all([
+          calculateScore(commonRequest),
+          calculateScore(socialRequest),
+          calculateScore(meisterRequest),
+        ]);
 
       setResults([
-        { name: ADMISSION_TYPE_LABEL.COMMON, type: 'COMMON', data: commonResponse.data },
-        { name: ADMISSION_TYPE_LABEL.SOCIAL, type: 'SOCIAL', data: socialResponse.data },
-        { name: ADMISSION_TYPE_LABEL.MEISTER, type: 'MEISTER', data: meisterResponse.data },
+        {
+          name: ADMISSION_TYPE_LABEL.COMMON,
+          type: 'COMMON',
+          data: commonResponse.data,
+        },
+        {
+          name: ADMISSION_TYPE_LABEL.SOCIAL,
+          type: 'SOCIAL',
+          data: socialResponse.data,
+        },
+        {
+          name: ADMISSION_TYPE_LABEL.MEISTER,
+          type: 'MEISTER',
+          data: meisterResponse.data,
+        },
       ]);
       setShowResultModal(true);
     } catch (err: any) {
@@ -98,15 +121,28 @@ export const GraduatedCalculationPage = () => {
                 width="32px"
                 height="32px"
                 borderRadius="50%"
-                backgroundColor={index === currentStep ? "#FF6B35" : index < currentStep ? "#FF6B35" : "#E5E5E5"}
+                backgroundColor={
+                  index === currentStep
+                    ? '#FF6B35'
+                    : index < currentStep
+                    ? '#FF6B35'
+                    : '#E5E5E5'
+                }
                 justifyContent="center"
                 alignItems="center"
               >
-                <Text fontSize={14} fontWeight={600} color={index <= currentStep ? "#FFFFFF" : "#999"}>
+                <Text
+                  fontSize={14}
+                  fontWeight={600}
+                  color={index <= currentStep ? '#FFFFFF' : '#999'}
+                >
                   {index + 1}
                 </Text>
               </Flex>
-              <Text fontSize={14} fontWeight={index === currentStep ? 600 : 400}>
+              <Text
+                fontSize={14}
+                fontWeight={index === currentStep ? 600 : 400}
+              >
                 {step.label}
               </Text>
               {index < STEPS.length - 1 && (
@@ -117,7 +153,7 @@ export const GraduatedCalculationPage = () => {
         </Flex>
       </Flex>
 
-      <Flex flex={1} paddingY="40px" width="100%">
+      <Flex flex={'1'} paddingTop="40px" width="100%">
         {renderStepContent()}
       </Flex>
 
@@ -131,15 +167,13 @@ export const GraduatedCalculationPage = () => {
         >
           이전
         </Button>
-        
+
         {currentStep === STEPS.length - 1 ? (
           <Button onClick={handleComplete} isBlocked={isLoading}>
             {isLoading ? '계산 중...' : '완료'}
           </Button>
         ) : (
-          <Button onClick={handleNext}>
-            다음
-          </Button>
+          <Button onClick={handleNext}>다음</Button>
         )}
       </Flex>
 
@@ -178,15 +212,14 @@ export const GraduatedCalculationPage = () => {
                 <Flex key={index} justifyContent="space-between">
                   <Text>{result.name}</Text>
                   <Text color="#FF6B35" fontWeight={600}>
-                    {result.data.totalScore.toFixed(3)} / {ADMISSION_TYPE_MAX_SCORE[result.type]}
+                    {result.data.totalScore.toFixed(3)} /{' '}
+                    {ADMISSION_TYPE_MAX_SCORE[result.type]}
                   </Text>
                 </Flex>
               ))}
             </Flex>
 
-            <Button onClick={() => setShowResultModal(false)}>
-              닫기
-            </Button>
+            <Button onClick={() => setShowResultModal(false)}>닫기</Button>
           </Flex>
         </Flex>
       )}

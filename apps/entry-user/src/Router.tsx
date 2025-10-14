@@ -90,15 +90,15 @@ export const Router = createBrowserRouter([
           },
           {
             path: 'graduated/third1',
-            element: <ScoreThird />,
+            element: <ScoreSecond />,
           },
           {
             path: 'graduated/second2',
-            element: <ScoreSecond />,
+            element: <ScoreFirst />,
           },
           {
             path: 'graduated/second1',
-            element: <ScoreSecond />,
+            element: <ScoreThird />,
           },
           {
             path: 'graduated/activity',

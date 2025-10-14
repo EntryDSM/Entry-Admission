@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flex, Text } from '@entry/design-token';
+import { Flex } from '@entry/design-token';
 import { Button } from '@entry/ui';
 import { PrimaryCalculationPage } from './PrimaryCalculationPage';
 import { GraduatedCalculationPage } from './GraduatedCalculationPage';
@@ -10,7 +10,7 @@ type CalculationType = 'primary' | 'graduated' | 'qe';
 const CALCULATION_TYPES = [
   { key: 'primary' as const, label: '졸업 예정자' },
   { key: 'graduated' as const, label: '졸업자' },
-  { key: 'qe' as const, label: '검정고시' }
+  { key: 'qe' as const, label: '검정고시' },
 ];
 
 export const MainCalculationPage = () => {
@@ -31,30 +31,32 @@ export const MainCalculationPage = () => {
 
   return (
     <Flex isColumn={true} width="100%" height="100vh">
-        <Flex 
-          padding="24px 40px" 
-          borderBottom="1px solid #E5E5E5"
-          backgroundColor="white"
-          gap={32}
-        >
-          {CALCULATION_TYPES.map((type) => (
-            <Button
-              key={type.key}
-              onClick={() => setActiveType(type.key)}
-              width="160px"
-              backgroundColor={activeType === type.key ? '#FF6B35' : 'transparent'}
-              color={activeType === type.key ? 'white' : '#666'}
-              borderColor={activeType === type.key ? '#FF6B35' : '#E5E5E5'}
-              hoverBackgroundColor={activeType === type.key ? '#FF6B35' : '#F5F5F5'}
-            >
-              {type.label}
-            </Button>
-          ))}
-        </Flex>
+      <Flex
+        padding="24px 40px"
+        borderBottom="1px solid #E5E5E5"
+        backgroundColor="white"
+        gap={32}
+      >
+        {CALCULATION_TYPES.map((type) => (
+          <Button
+            key={type.key}
+            onClick={() => setActiveType(type.key)}
+            width="160px"
+            backgroundColor={
+              activeType === type.key ? '#FF6B35' : 'transparent'
+            }
+            color={activeType === type.key ? 'white' : '#666'}
+            borderColor={activeType === type.key ? '#FF6B35' : '#E5E5E5'}
+            hoverBackgroundColor={
+              activeType === type.key ? '#FF6B35' : '#F5F5F5'
+            }
+          >
+            {type.label}
+          </Button>
+        ))}
+      </Flex>
 
-        <Flex flex={1}>
-          {renderCalculationPage()}
-        </Flex>
+      <Flex flex={'1'}>{renderCalculationPage()}</Flex>
     </Flex>
   );
 };
