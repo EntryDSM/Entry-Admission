@@ -16,7 +16,7 @@ const STEPS = [
   { key: 'current', label: '3학년 1학기' },
   { key: 'previous', label: '직전 학기' },
   { key: 'beforePrevious', label: '직전전 학기' },
-  { key: 'activity', label: '출석 및 봉사' },
+  { key: 'activity', label: '출결 및 봉사' },
 ];
 
 export const PrimaryCalculationPage = () => {

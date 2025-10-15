@@ -30,19 +30,19 @@ const SCORE_PAGES = {
   primary: [
     { path: '/first-graduate', name: '3학년 1학기' },
     { path: '/second-graduate', name: '직전 학기' },
-    { path: '/third-graduate', name: '직직전 학기' },
-    { path: '/activity', name: '출석 및 봉사' },
+    { path: '/third-graduate', name: '직전전 학기' },
+    { path: '/activity', name: '출결 및 봉사' },
   ],
   graduated: [
     { path: '/third2', name: '3학년 2학기' },
     { path: '/third1', name: '3학년 1학기' },
     { path: '/second2', name: '2학년 2학기' },
     { path: '/second1', name: '2학년 1학기' },
-    { path: '/activity', name: '출석 및 봉사' },
+    { path: '/activity', name: '출결 및 봉사' },
   ],
   qe: [
     { path: '/score', name: '검정고시 점수' },
-    { path: '/activity', name: '출석 및 봉사' },
+    { path: '/activity', name: '출결 및 봉사' },
   ],
 };
 
