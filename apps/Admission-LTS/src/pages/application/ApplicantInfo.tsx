@@ -3,22 +3,23 @@ import { Flex } from '@entry/design-token';
 import { FormElement } from '../../components';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
-// import { uploadImage, usePostIdPhoto } from '../../apis';
 import { usePostIdPhoto } from '../../apis';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
 
-  // 1990~2025년 배열
+  // 1950~2025년 배열 (내림차순 정렬)
   const years = eachYearOfInterval({
-    start: new Date(1990, 0, 1),
+    start: new Date(1950, 0, 1),
     end: new Date(2025, 11, 31),
-  }).map((d) => parseInt(format(d, 'yyyy')));
+  })
+    .map((d) => parseInt(format(d, 'yyyy')))
+    .sort((a, b) => b - a);
 
   // 월은 1~12 고정
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  // 선택된 년, 월에 따라 일수 배열을 생성 (윤년, 30일, 31일)
+  // 선택된 년, 월에 따라 일수 배열 생성
   const getDaysInMonth = (year: number, month: number) => {
     if (!year || !month) return [];
     const lastDay = lastDayOfMonth(new Date(year, month - 1));
@@ -26,10 +27,10 @@ export const ApplicantInfo = () => {
     return Array.from({ length: daysCount }, (_, i) => i + 1);
   };
 
-  const selectedYear = datas?.dateOfBirth?.[0] || years[0];
-  const selectedMonth = datas?.dateOfBirth?.[1] || months[0];
+  // 생년월일 기본값: 2010년 1월 1일
+  const selectedYear = datas?.dateOfBirth?.[0] || 2010;
+  const selectedMonth = datas?.dateOfBirth?.[1] || 1;
 
-  // day 배열 계산
   const days = getDaysInMonth(selectedYear as number, selectedMonth as number);
 
   const formDropDownData = [
@@ -44,7 +45,7 @@ export const ApplicantInfo = () => {
 
   const formRadioData = [
     {
-      data: ['국가 유공자', '특례 입학 대상'],
+      data: ['국가 유공자', '특례 입학 대상','해당 없음'],
     },
     {
       name: '성별',
@@ -74,18 +75,21 @@ export const ApplicantInfo = () => {
     setDatas({ ...datas, specialNotes: value });
   };
 
-  const postIdPhotoApi = usePostIdPhoto()
+  const postIdPhotoApi = usePostIdPhoto();
 
   const handleImgChange = async (file: File | null) => {
     if (file) {
-      postIdPhotoApi.mutate({file : file}, {
-        onSuccess: () => {
-          setDatas({ ...datas, idPhoto: file });
+      postIdPhotoApi.mutate(
+        { file },
+        {
+          onSuccess: () => {
+            setDatas({ ...datas, idPhoto: file });
+          },
         }
-      })
+      );
     }
   };
-  
+
   const handleGenderSelection = (value: string) => {
     setDatas({ ...datas, gender: value });
   };
@@ -97,7 +101,7 @@ export const ApplicantInfo = () => {
         label="증명 사진"
         onFileChange={handleImgChange}
         imgUrl={datas.idPhoto}
-        explanation='증명사진은 3×4cm 규격이어야 합니다.'
+        explanation="증명사진은 3×4cm 규격이어야 하며, 파일 형식은 HEIC·JPG·JPEG·PNG만 가능합니다. 파일 용량은 5MB 이하로 제한됩니다."
       />
       <FormElement
         width="300px"
@@ -114,7 +118,7 @@ export const ApplicantInfo = () => {
         label="지원자 연락처"
         inputType="phone"
         placeholder="전화번호를 입력해주세요."
-        onInputChange={handleInputChange("applicantNumber")}
+        onInputChange={handleInputChange('applicantNumber')}
         value={datas.applicantNumber}
       />
       <FormElement
@@ -129,7 +133,7 @@ export const ApplicantInfo = () => {
         label="생년월일"
         onDropDownChange={handleDropdownChange}
         dropDownDatas={formDropDownData[0].data}
-        dropDownValues={datas.dateOfBirth}
+        dropDownValues={datas.dateOfBirth || [2010, 1, 1]}
       />
       <FormElement
         type="radio"

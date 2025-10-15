@@ -16,7 +16,7 @@ import {
 
 const STEPS = [
   { key: 'qeScore', label: '검정고시 점수' },
-  { key: 'activity', label: '출석 및 봉사' },
+  { key: 'activity', label: '출결 및 봉사' },
 ];
 
 export const QECalculationPage = () => {

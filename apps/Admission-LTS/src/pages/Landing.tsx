@@ -214,7 +214,8 @@ export const Landing = () => {
           </ContentContainer>
           <ContentContainer>
             <Text fontSize={18} fontWeight={500}>
-              최종 원서를 출력해, 서명과 직인을 찍은 뒤 반드시 본교로 발송 또는 방문 접수하세요.
+              마이페이지에서 최종 원서를 출력해,<br/>
+              서명과 직인을 찍은 뒤 반드시 본교로 등기우편 발송 또는 방문 접수하세요.
             </Text>
           </ContentContainer>
         </Flex>

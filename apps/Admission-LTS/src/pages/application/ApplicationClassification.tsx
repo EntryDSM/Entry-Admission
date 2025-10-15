@@ -10,19 +10,20 @@ export const ApplicationClassification = () => {
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
-  const currentDay = today.getDate();
 
-  // 1990 ~ 2030년 생성
+  // 1950 ~ 2030년 생성 (내림차순)
   const yearDates = eachYearOfInterval({
-    start: new Date(1990, 0, 1),
+    start: new Date(1950, 0, 1),
     end: new Date(2030, 11, 31),
   });
-  const years = yearDates.map((date) => parseInt(format(date, 'yyyy')));
+  const years = yearDates
+    .map((date) => parseInt(format(date, 'yyyy')))
+    .reverse();
 
   // 월은 고정 1~12
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  // 선택된 년, 월에 따라 일수 배열을 생성 (윤년, 30일, 31일)
+  // 선택된 년, 월에 따라 일수 배열 생성
   const getDaysInMonth = (year: number, month: number) => {
     if (!year || !month) return [];
     const lastDay = lastDayOfMonth(new Date(year, month - 1));
@@ -32,14 +33,11 @@ export const ApplicationClassification = () => {
 
   const selectedYear = datas?.graduationDate?.[0] || currentYear;
   const selectedMonth = datas?.graduationDate?.[1] || currentMonth;
-
-  // day 배열 계산
   const days = getDaysInMonth(selectedYear as number, selectedMonth as number);
 
-  // 졸업구분에 따른 드롭다운 데이터 생성
+  // 졸업구분에 따른 드롭다운 데이터
   const getFormDropDownData = () => {
-    if (datas?.graduationType === "졸업") {
-      // 졸업: 년월일 모두 표시
+    if (datas?.graduationType === '졸업') {
       return [
         {
           data: [
@@ -49,8 +47,7 @@ export const ApplicationClassification = () => {
           ],
         },
       ];
-    } else if (datas?.graduationType === "졸업 예정") {
-      // 졸업 예정: 년월만 표시
+    } else if (datas?.graduationType === '졸업 예정') {
       return [
         {
           data: [
@@ -60,27 +57,18 @@ export const ApplicationClassification = () => {
         },
       ];
     }
-    // 검정고시의 경우 빈 배열 반환 (드롭다운 숨김)
     return [];
   };
 
   const formDropDownData = getFormDropDownData();
 
   const formRadioData = [
-    {
-      name: '전형선택',
-      data: ['일반', '마이스터 인재', '사회통합 인재'],
-    },
-    {
-      name: '지역선택',
-      data: ['대전', '전국'],
-    },
-    {
-      name: '졸업구분',
-      data: ['졸업 예정', '졸업', '검정고시 (중학교 졸업 학력)'],
-    },
+    { name: '전형선택', data: ['일반', '마이스터 인재', '사회통합'] },
+    { name: '지역선택', data: ['대전', '전국'] },
+    { name: '졸업구분', data: ['졸업 예정', '졸업', '검정고시 (중학교 졸업 학력)'] },
   ];
 
+  // 라디오 핸들러
   const handleTypeSelection = (value: string) => {
     setDatas({ ...datas, typeSelection: value });
   };
@@ -90,22 +78,29 @@ export const ApplicationClassification = () => {
   };
 
   const handleGraduationTypeSelection = (value: string) => {
-    // 졸업구분이 변경되면 기존 졸업날짜 초기화
-    setDatas({ ...datas, graduationType: value, graduationDate: [] });
+    // 졸업구분 변경 시 기본값 설정
+    let defaultDate: (string | number)[] = [];
+    if (value === '졸업') {
+      defaultDate = [2026, 1, 1]; // 2026년 1월 1일
+    } else if (value === '졸업 예정') {
+      defaultDate = [2026, 1]; // 2026년 1월
+    }
+
+    setDatas({ ...datas, graduationType: value, graduationDate: defaultDate });
   };
 
   const handleDropdownChange = (values: (string | number)[]) => {
     setDatas({ ...datas, graduationDate: values });
   };
 
-  // 설명 텍스트 동적 생성
+  // 설명 텍스트
   const getExplanationText = () => {
-    if (datas?.graduationType === "졸업") {
-      return "졸업한 연월일을 모두 선택해주세요.";
-    } else if (datas?.graduationType === "졸업 예정") {
-      return "졸업 예정자의 경우 졸업 예정월만 선택해주세요.";
+    if (datas?.graduationType === '졸업') {
+      return '졸업한 연월일을 모두 선택해주세요.';
+    } else if (datas?.graduationType === '졸업 예정') {
+      return '졸업 예정자의 경우 졸업 예정월만 선택해주세요.';
     }
-    return "";
+    return '';
   };
 
   return (
@@ -133,18 +128,19 @@ export const ApplicationClassification = () => {
         selectedRadio={datas?.graduationType}
         setSelectedRadio={handleGraduationTypeSelection}
       />
+
       {datas?.graduationType &&
-       datas?.graduationType !== "검정고시 (중학교 졸업 학력)" && 
-       formDropDownData.length > 0 && (
-        <FormElement
-          explanation={getExplanationText()}
-          label={datas?.graduationType === "졸업" ? "졸업 연월일" : "졸업 예정 연월"}
-          type="dropDown"
-          dropDownDatas={formDropDownData[0].data}
-          dropDownValues={datas?.graduationDate || []}
-          onDropDownChange={handleDropdownChange}
-        />
-      )}
+        datas?.graduationType !== '검정고시 (중학교 졸업 학력)' &&
+        formDropDownData.length > 0 && (
+          <FormElement
+            explanation={getExplanationText()}
+            label={datas?.graduationType === '졸업' ? '졸업 연월일' : '졸업 예정 연월'}
+            type="dropDown"
+            dropDownDatas={formDropDownData[0].data}
+            dropDownValues={datas?.graduationDate || []}
+            onDropDownChange={handleDropdownChange}
+          />
+        )}
     </Flex>
   );
 };

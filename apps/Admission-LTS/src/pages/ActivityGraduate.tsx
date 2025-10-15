@@ -42,12 +42,12 @@ export const ActivityGraduate = () => {
       <Flex isColumn={true} gap={24} width="100%" height="fit-content">
         <Flex flexWrap='wrap' width='fit-content' height='fit-content' alignItems='center' gap={20}>
           <Text fontSize={24} fontWeight={600}>
-            출석
+            출결
           </Text>
           <Flex width='fit-content' height='fit-content' gap={8} alignItems='center'>
             <Caution/>
             <Text fontSize={16} fontWeight={300} color={colors.orange[700]}>
-              출석은 1,2,3학년 전체 합산합니다.
+              출결은 9월 30일까지의 1,2,3학년 전체 합산합니다.
             </Text>
           </Flex>
         </Flex>
@@ -108,7 +108,7 @@ export const ActivityGraduate = () => {
           <Flex width='fit-content' height='fit-content' gap={8} alignItems='center'>
             <Caution/>
             <Text fontSize={16} fontWeight={300} color={colors.orange[700]}>
-              봉사는 1,2,3학년 전체 합산합니다.
+              봉사 시간은 9월 30일까지의 1, 2, 3학년 전체 시간을 합산합니다.
             </Text>
           </Flex>
         </Flex>

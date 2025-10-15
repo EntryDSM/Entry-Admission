@@ -83,7 +83,7 @@ export const Activity = () => {
         <>
           <Section>
             <Text fontSize={24} fontWeight={600}>
-              출석
+              출결
             </Text>
             <GridContainer>
               <AttendanceForm

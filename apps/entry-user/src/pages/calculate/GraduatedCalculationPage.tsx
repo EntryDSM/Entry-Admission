@@ -17,7 +17,7 @@ const STEPS = [
   { key: 'third1', label: '3학년 1학기' },
   { key: 'second2', label: '2학년 2학기' },
   { key: 'second1', label: '2학년 1학기' },
-  { key: 'activity', label: '출석 및 봉사' },
+  { key: 'activity', label: '출결 및 봉사' },
 ];
 
 export const GraduatedCalculationPage = () => {
