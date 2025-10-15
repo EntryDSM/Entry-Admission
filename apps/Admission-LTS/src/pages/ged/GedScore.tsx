@@ -15,7 +15,7 @@ export const GedScore = () => {
   const [datas, setDatas] = usePageData('gedScore');
 
   const handleChange = (key: string) => (value: string) => {
-    setDatas({ ...datas, [key]: value });
+    setDatas({ ...datas, [key]: value === '' ? null : value });
   };
 
   return (

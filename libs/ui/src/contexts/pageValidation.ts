@@ -44,7 +44,7 @@ const pageValidations: Record<string, (data: any) => string[]> = {
   '/second-prospective-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/third-prospective-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/activity-prospective-graduate': d => ['earlyLeave','tardiness','classExit','absence','volunteer', 'dsmAlgorithm', 'certificate'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/ged/score': d => ['kor','soc','his','sci','tech','math','eng'].filter(f => isEmpty(getFieldValue(d,f))),
+  // '/ged/score': d => ['kor','soc','his','sci','tech','math','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/ged/attendance-volunteer': d => ['dsmAlgorithm','certificate'].filter(f => isEmpty(getFieldValue(d,f))),
 };
 
