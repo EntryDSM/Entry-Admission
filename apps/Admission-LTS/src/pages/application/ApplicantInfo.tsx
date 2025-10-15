@@ -8,13 +8,13 @@ import { usePostIdPhoto } from '../../apis';
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
 
-  // 1950~2025년 배열 (오름차순 정렬)
+  // 1950~2025년 배열 (내림차순 정렬)
   const years = eachYearOfInterval({
     start: new Date(1950, 0, 1),
     end: new Date(2025, 11, 31),
   })
     .map((d) => parseInt(format(d, 'yyyy')))
-    .sort((a, b) => a - b);
+    .sort((a, b) => b - a);
 
   // 월은 1~12 고정
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
