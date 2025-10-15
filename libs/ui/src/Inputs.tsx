@@ -15,6 +15,7 @@ interface IAuthInputType {
   errorMessage?: string;
   height?: string;
   value?: string;
+  isDisabled?: boolean;
 }
 
 export const AuthInput = ({
@@ -28,10 +29,15 @@ export const AuthInput = ({
   errorMessage,
   height = '70px',
   value,
+  isDisabled = false,
 }: IAuthInputType) => {
   const [inputValue, setInputValue] = useState<string>(value || '');
   const [isClose, setIsClose] = useState<boolean>(true);
   const [showEye, setShowEye] = useState<boolean>(false);
+
+  useEffect(() => {
+    setInputValue(value || '');
+  }, [value]);
 
   // 입력된 값이 하나 이상일 경우에만 eye아이콘 표시
   useEffect(() => {
@@ -88,11 +94,14 @@ export const AuthInput = ({
       <InputWrapper>
         <Input
           $isError={isError}
-          value={value}
+          $isDisabled={isDisabled}
+          value={isDisabled ? value : inputValue}
           type={changeInputType()}
           placeholder={placeholder}
           maxLength={maxLength}
-          onChange={handleInputChange}
+          onChange={isDisabled ? undefined : handleInputChange}
+          onClick={(e) => isDisabled && e.preventDefault()}
+          disabled={isDisabled}
         />
         {showEye && (
           <EyeWrapper onClick={() => setIsClose(!isClose)}>
@@ -124,13 +133,17 @@ const InputWrapper = styled.div`
   position: relative;
 `;
 
-const Input = styled.input<{ $isError: boolean }>`
+const Input = styled.input<{ $isError: boolean; $isDisabled?: boolean }>`
   width: 100%;
   border: 1px solid
     ${({ $isError }) => ($isError ? colors.extra.error : colors.gray[300])};
   border-radius: 8px;
   padding: 15px 20px;
   transition: all 0.3s ease;
+  cursor: ${({ $isDisabled }) => ($isDisabled ? 'not-allowed' : 'text')};
+  background-color: ${({ $isDisabled }) =>
+    $isDisabled ? colors.gray[100] : 'white'};
+  pointer-events: ${({ $isDisabled }) => ($isDisabled ? 'none' : 'auto')};
 
   ::placeholder {
     color: ${colors.gray[300]};

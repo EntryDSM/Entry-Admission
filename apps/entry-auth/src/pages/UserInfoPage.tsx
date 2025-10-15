@@ -26,11 +26,26 @@ export const UserInfoPage = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
-  // PASS 인증 완료 시 데이터 적용
+  // 페이지 로드 시 localStorage에서 복원
+  useEffect(() => {
+    const savedName = localStorage.getItem('pass_verified_name');
+    const savedPhone = localStorage.getItem('pass_verified_phone');
+
+    if (savedName && savedPhone) {
+      setName(savedName);
+      setPhoneNumber(savedPhone);
+    }
+  }, []); // 빈 배열로 변경 - 한 번만 실행
+
+  // PASS 인증 완료 시 데이터 적용 및 localStorage에 저장
   useEffect(() => {
     if (isVerified && verifyData) {
       setName(verifyData.name);
       setPhoneNumber(verifyData.phoneNumber);
+
+      // localStorage에 저장 추가!
+      localStorage.setItem('pass_verified_name', verifyData.name);
+      localStorage.setItem('pass_verified_phone', verifyData.phoneNumber);
     }
   }, [isVerified, verifyData]);
 
@@ -38,6 +53,7 @@ export const UserInfoPage = () => {
   useEffect(() => {
     if (passError) {
       navigate('/signup');
+      toast.error('pass 인증에 실패하였습니다.');
     }
   }, [passError, navigate]);
 
@@ -73,6 +89,11 @@ export const UserInfoPage = () => {
       onSuccess: (result) => {
         localStorage.setItem('accessToken', result.accessToken);
         localStorage.setItem('refreshToken', result.refreshToken);
+
+        // 회원가입 완료 후 PASS 데이터 삭제
+        localStorage.removeItem('pass_verified_name');
+        localStorage.removeItem('pass_verified_phone');
+
         setIsCompleted(true);
       },
       onError: (error) => {
@@ -89,6 +110,10 @@ export const UserInfoPage = () => {
       navigate('/');
     }
   };
+
+  const hasPassData =
+    localStorage.getItem('pass_verified_name') &&
+    localStorage.getItem('pass_verified_phone');
 
   if (isLoadingPass) {
     return (
@@ -116,33 +141,21 @@ export const UserInfoPage = () => {
           </CompletedContainer>
         ) : (
           <FormContainer>
+            {/* PASS 인증 완료 후 이름/전화번호는 입력 불가 */}
             <AuthInput
               label="이름"
               placeholder="이름을 입력해 주세요."
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              isDisabled={isVerified || !!hasPassData}
             />
             <AuthInput
               label="전화번호"
               placeholder="010-XXXX-XXXX"
               type="phone"
               value={phoneNumber}
-              onChange={(e) => {
-                const onlyNumber = e.target.value.replace(/[^\d]/g, '');
-                let formatted = '';
-                if (onlyNumber.length < 4) formatted = onlyNumber;
-                else if (onlyNumber.length < 8)
-                  formatted = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(
-                    3
-                  )}`;
-                else
-                  formatted = `${onlyNumber.slice(0, 3)}-${onlyNumber.slice(
-                    3,
-                    7
-                  )}-${onlyNumber.slice(7, 11)}`;
-                setPhoneNumber(formatted);
-              }}
+              isDisabled={isVerified || !!hasPassData}
             />
+            {/* 비밀번호 입력 */}
             <AuthInput
               label="비밀번호"
               placeholder="8자 이상, 특수문자 포함"
