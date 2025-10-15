@@ -212,6 +212,11 @@ export const Landing = () => {
               지원자님 계정으로 로그인되어 있습니다.
             </Text>
           </ContentContainer>
+          <ContentContainer>
+            <Text fontSize={18} fontWeight={500}>
+              최종 원서를 출력해, 서명과 직인을 찍은 뒤 반드시 본교로 발송 또는 방문 접수하세요.
+            </Text>
+          </ContentContainer>
         </Flex>
         <Button width="100%" onClick={handleStartClick}>
           원서 접수 시작
