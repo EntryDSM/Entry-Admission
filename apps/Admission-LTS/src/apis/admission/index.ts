@@ -5,6 +5,34 @@ import { toast } from "react-toastify"
 import { AxiosError } from "axios"
 import { useNavigate } from "react-router"
 
+const sendErrorReport = async (error: AxiosError<any>, requestData: any) => {
+  try {
+    const errorReport = {
+      sessionId: crypto.randomUUID(),
+      pageType: "ADMISSION_SUBMIT",
+      endpoint: "/api/v1/applications",
+      httpMethod: "POST",
+      httpStatus: error.response?.status || 0,
+      errorCategory: "CLIENT_ERROR",
+      errorCode: error.code || "UNKNOWN_ERROR",
+      message: error.message || "원서 제출 중 오류가 발생했습니다.",
+      stackTrace: error.stack || "",
+      requestPayload: JSON.stringify(requestData),
+      responseTime: 0
+    };
+
+    await fetch('https://meeeeercat.ncloud.sbs/v1/error/server', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(errorReport)
+    });
+  } catch (reportError) {
+    console.error('Error reporting failed:', reportError);
+  }
+};
+
 export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
   const navigate = useNavigate()
   return useMutation({
@@ -15,8 +43,9 @@ export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
     onSuccess: () => {
       toast.success('원서 제출이 정상적으로 완료되었습니다.')
     },
-    onError: (error) => {
+    onError: async (error, variables) => {
       const err = error as AxiosError<any>;
+
       if (err.response?.status === 409) {
         toast.error('동일한 계정으로 제출된 원서가 존재합니다.')
         setTimeout(() => {
@@ -29,6 +58,9 @@ export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
         }, 3000)
       } else {
         toast.error("원서 제출 중 오류가 발생했습니다.");
+
+        await sendErrorReport(err, variables);
+
         setTimeout(() => {
           window.location.href="https://entrydsm.kr/"
         }, 3000)
