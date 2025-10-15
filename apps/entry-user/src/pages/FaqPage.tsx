@@ -2,7 +2,6 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@entry/design-token';
 import { TabSection, PageNav } from '@entry/ui';
-import { useNavigate } from 'react-router-dom';
 
 interface FaqItem {
   id: number;
@@ -34,7 +33,6 @@ export const FaqPage = () => {
   >('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
-  const navigate = useNavigate();
 
   const handleFaqClick = (id: number) => {
     setExpandedItems((prev) =>
@@ -54,7 +52,7 @@ export const FaqPage = () => {
       id: 1,
       title: '입학 전형 일정은 어떻게 되나요?',
       content:
-        '2025학년도 입학전형 일정은 다음과 같습니다. 원서접수: 10월 20일 오전 9시부터 ~ 23일 오후 5시, 1차 합격자 발표: 10월 27일 오후 3시, 2차 전형 면접: 10월 31일, 최종 합격자 발표: 11월 6일 오전 10시 입니다.',
+        '2026학년도 입학전형 일정은 다음과 같습니다. 원서접수: 10월 20일 오전 9시부터 ~ 23일 오후 5시, 1차 합격자 발표: 10월 27일 오후 3시, 2차 전형 면접: 10월 31일, 최종 합격자 발표: 11월 6일 오전 10시 입니다.',
       category: 'admission',
     },
     {
@@ -68,7 +66,7 @@ export const FaqPage = () => {
       id: 3,
       title: '졸업 후 진로는 어떻게 되나요?',
       content:
-        '저희 학교와 MOU를 맺은 기업수가 480개가 넘습니다. 졸업생들의 주요 진로는 웹, 앱, 보안, 게임, 임베디드 등 다양한 분야의 스타트업 취업, 대기업 계열사, 공무원, 공기업으로 진출하고 있습니다. 2023년 2월 졸업생 취업률 100%, 2024년 2월 졸업생 취업률 97%, 2025년 2월 졸업생 취업률 97% 입니다.',
+        '저희 학교와 MOU를 맺은 기업수가 480개가 넘습니다. 졸업생들의 주요 진로는 웹, 앱, 보안, 게임, 임베디드 등 다양한 분야의 스타트업 취업, 대기업 계열사, 공무원, 공기업으로 진출하고 있습니다. 2023년 2월 졸업생 취업률 100%, 2024년 2월 졸업생 취업률 97%, 2025년 2월 졸업생 취업률 70% 입니다.',
       category: 'career',
     },
     {
@@ -81,8 +79,7 @@ export const FaqPage = () => {
     {
       id: 5,
       title: '기숙사 생활은 어떤가요?',
-      content:
-        '2인 1실 기준으로 운영되며, 헬스장 등이 완비되어 있습니다.',
+      content: '2인 1실 기준으로 운영되며, 헬스장 등이 완비되어 있습니다.',
       category: 'dormitory',
     },
     {
@@ -112,11 +109,12 @@ export const FaqPage = () => {
       category: 'dormitory',
     },
     {
-      id : 10,
+      id: 10,
       title: '대학 진학률은 어떻게 되나요?',
-      content: '저희 학교는 마이스터고등학교로 대학 진학을 위한 커리큘럼이 존재하지 않습니다. 대신 취업 후 3년의 경력을 쌓은 다음 재직자 특별 전형을 이용하여 대학 진학을 준비하기도 합니다. ',
-      category: 'career'
-    }
+      content:
+        '저희 학교는 마이스터고등학교로 대학 진학을 위한 커리큘럼이 존재하지 않습니다. 대신 취업 후 3년의 경력을 쌓은 다음 재직자 특별 전형을 이용하여 대학 진학을 준비하기도 합니다. ',
+      category: 'career',
+    },
   ];
 
   const filteredFaqItems =
@@ -138,7 +136,7 @@ export const FaqPage = () => {
         <TitleSection>
           <Title>자주 묻는 질문</Title>
           <SubTitle>
-            답변 내용은 2025학년도 신입생 전형에 적용되는 내용입니다
+            답변 내용은 2026학년도 신입생 전형에 적용되는 내용입니다
           </SubTitle>
         </TitleSection>
 
