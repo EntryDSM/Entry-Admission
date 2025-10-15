@@ -51,8 +51,8 @@ export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
         setTimeout(() => {
           window.location.href="https://entrydsm.kr/"
         }, 3000)
-      } else if (err.response?.status === 500) {
-        toast.error("서버 오류가 발생했습니다. 다시 시도해주세요.");
+      } else if (err.response?.status === 500 || err.response?.status === 502 || err.response?.status === 503) {
+        toast.error("일시적으로 처리할 수 없습니다. 몇초 후 다시 시도해 주세요.");
         setTimeout(() => {
           window.location.href="https://entrydsm.kr/"
         }, 3000)
