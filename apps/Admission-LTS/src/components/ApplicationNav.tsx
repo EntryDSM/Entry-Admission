@@ -182,6 +182,14 @@ export const ApplicationNav = ({
     return map[status] ?? null;
   };
 
+  const convertToNumber = (value: string | number | null | undefined): number | null => {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+    const num = Number(value);
+    return isNaN(num) ? null : num;
+  };
+
   
   const submitApi = useAdmissionSubmitPost()
   const handleSubmit = async () => {
@@ -347,13 +355,13 @@ export const ApplicationNav = ({
           : state.applicationClassification.graduationType === "졸업"
             ? convertGradeToScore(state.fourthGraduate.eng)
             : null,
-      gedKorean: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.kor) : null,
-      gedSocial: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.soc) : null,
-      gedHistory: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.his) : null,
-      gedMath: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.math) : null,
-      gedScience: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.sci) : null,
-      gedTech: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.tech) : null,
-      gedEnglish: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? Number(state.gedScore.eng) : null,
+      gedKorean: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.kor) : null,
+      gedSocial: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.soc) : null,
+      gedHistory: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.his) : null,
+      gedMath: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.math) : null,
+      gedScience: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.sci) : null,
+      gedTech: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.tech) : null,
+      gedEnglish: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? convertToNumber(state.gedScore.eng) : null,
       //출결
       absence: 
         state.applicationClassification.graduationType === "졸업 예정"
