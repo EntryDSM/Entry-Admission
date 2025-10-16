@@ -54,6 +54,18 @@ export const GuardianInfo = () => {
     setDatas({ addressDetail: e.target.value });
   };
 
+  const formatPhoneNumber = (phoneNumber: string) => {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+  
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+  
+    return phoneNumber;
+  };
+
   useEffect(() => {
       const fetchUserInfo = async () => {
         const userInfo = await getUserInfo();
@@ -65,7 +77,7 @@ export const GuardianInfo = () => {
           setDatas({
             ...datas,
             guardianName: userInfo.name,
-            guardianNumber: userInfo.phoneNumber
+            guardianNumber: formatPhoneNumber(userInfo.phoneNumber)
           })
         }
         

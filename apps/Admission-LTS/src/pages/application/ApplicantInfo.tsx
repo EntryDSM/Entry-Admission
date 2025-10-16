@@ -98,6 +98,18 @@ export const ApplicantInfo = () => {
     setDatas({ ...datas, gender: value });
   };
 
+  const formatPhoneNumber = (phoneNumber: string) => {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+  
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+  
+    return phoneNumber;
+  };
+
   
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -110,7 +122,7 @@ export const ApplicantInfo = () => {
         setDatas({
           ...datas,
           applicantName: userInfo.name,
-          applicantNumber: userInfo.phoneNumber
+          applicantNumber: formatPhoneNumber(userInfo.phoneNumber)
         })
       }  
     };
