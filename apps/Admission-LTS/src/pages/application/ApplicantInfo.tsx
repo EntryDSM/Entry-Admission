@@ -8,9 +8,7 @@ import { getUserInfo } from '@entry/util-config';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
-  const [userInfoDatas, setUserInfoDatas] = useState<{name: string, phoneNumber: string, isParent: boolean}>({
-    name: '',
-    phoneNumber: '',
+  const [userInfoDatas, setUserInfoDatas] = useState<{isParent: boolean}>({
     isParent: false
   })
 
@@ -105,17 +103,16 @@ export const ApplicantInfo = () => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUserInfoDatas({
-        name: userInfo.name,
-        phoneNumber: userInfo.phoneNumber,
         isParent: userInfo.isParent,
       });
 
-      setDatas({
-        ...datas,
-        applicantName: userInfo.name,
-        applicantNumber: userInfo.phoneNumber
-      })
-      
+      if(userInfo.isParent === false) {
+        setDatas({
+          ...datas,
+          applicantName: userInfo.name,
+          applicantNumber: userInfo.phoneNumber
+        })
+      }  
     };
 
     fetchUserInfo();
