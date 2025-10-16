@@ -18,6 +18,7 @@ interface InputProps {
   placeholder?: string;
   inputType?: 'phone' | 'number' | 'text';
   readonly?: boolean;
+  maxLength?: number
 }
 
 interface TextAreaProps {
@@ -143,6 +144,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
             onChange={props.onInputChange}
             type={props.inputType}
             readonly={props.readonly}
+            maxLength={props.maxLength}
           />
         );
 

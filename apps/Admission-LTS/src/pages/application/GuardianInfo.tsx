@@ -1,9 +1,16 @@
 import { Flex } from "@entry/design-token"
 import { FormElement } from '../../components';
 import { usePageData } from "@entry/ui"
+import { useEffect, useState } from "react";
+import { getUserInfo } from "@entry/util-config";
 
 export const GuardianInfo = () => {
   const [datas, setDatas] = usePageData('guardianInfo')
+  const [userInfoDatas, setUserInfoDatas] = useState<{isParent: boolean}>({
+    isParent: false
+  })
+
+
   const formRadioData = [
     {
       name: '성별',
@@ -47,6 +54,38 @@ export const GuardianInfo = () => {
     setDatas({ addressDetail: e.target.value });
   };
 
+  const formatPhoneNumber = (phoneNumber: string) => {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+  
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+  
+    return phoneNumber;
+  };
+
+  useEffect(() => {
+      const fetchUserInfo = async () => {
+        const userInfo = await getUserInfo();
+        setUserInfoDatas({
+          isParent: userInfo.isParent,
+        });
+  
+        if(userInfo.isParent) {
+          setDatas({
+            ...datas,
+            guardianName: userInfo.name,
+            guardianNumber: formatPhoneNumber(userInfo.phoneNumber)
+          })
+        }
+        
+      };
+  
+      fetchUserInfo();
+    }, []);
+
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content">
@@ -58,6 +97,7 @@ export const GuardianInfo = () => {
         placeholder="보호자 성명을 입력해주세요."
         onInputChange={handleInputChange("guardianName")}
         value={datas.guardianName}
+        readonly={userInfoDatas.isParent ? true : false}
       />
       <FormElement
         width="300px"
@@ -67,6 +107,7 @@ export const GuardianInfo = () => {
         placeholder="전화번호를 입력해주세요."
         onInputChange={handleInputChange("guardianNumber")}
         value={datas.guardianNumber}
+        readonly={userInfoDatas.isParent ? true : false}
       />
       <FormElement
         label={formRadioData[0].name}

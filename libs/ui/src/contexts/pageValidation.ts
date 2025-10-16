@@ -28,12 +28,35 @@ const validateApplicationClassificationPage = (data: any) => {
   return missingFields;
 };
 
+// /middle-school-info 페이지 특별 검증 함수
+const validateMiddleSchoolInfoPage = (data: any) => {
+  const missingFields = [];
+  
+  // 기본 필수 필드들
+  ['schoolName', 'studentId', 'schoolPhone', 'teacherName'].forEach(field => {
+    if (isEmpty(getFieldValue(data, field))) {
+      missingFields.push(field);
+    }
+  });
+  
+  // studentId 자릿수 검증 (5자리)
+  const studentId = getFieldValue(data, 'studentId');
+  if (studentId !== null && studentId !== undefined) {
+    const studentIdStr = String(studentId);
+    if (studentIdStr.length !== 5) {
+      missingFields.push('studentId_invalid');
+    }
+  }
+  
+  return missingFields;
+};
+
 // 페이지별 필수 필드 검증
 const pageValidations: Record<string, (data: any) => string[]> = {
   '/application-classification': validateApplicationClassificationPage,
   '/applicant-info': d => ['idPhoto','applicantName', 'applicantNumber','dateOfBirth','gender', 'specialNotes'].filter(f => isEmpty(getFieldValue(d,f))),
   '/guardian-info': d => ['guardianName','guardianNumber','gender','relationship','postalCode','address', 'addressDetail'].filter(f => isEmpty(getFieldValue(d,f))),
-  '/middle-school-info': d => ['schoolName', 'studentId', 'schoolPhone','teacherName'].filter(f => isEmpty(getFieldValue(d,f))),
+  '/middle-school-info': validateMiddleSchoolInfoPage,
   '/personal-statements': d => ['personalStmt','studyPlan'].filter(f => isEmpty(getFieldValue(d,f))),
   '/first-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/second-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
@@ -44,7 +67,6 @@ const pageValidations: Record<string, (data: any) => string[]> = {
   '/second-prospective-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/third-prospective-graduate': d => ['kor','soc','his','math','sci','tech','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/activity-prospective-graduate': d => ['earlyLeave','tardiness','classExit','absence','volunteer', 'dsmAlgorithm', 'certificate'].filter(f => isEmpty(getFieldValue(d,f))),
-  // '/ged/score': d => ['kor','soc','his','sci','tech','math','eng'].filter(f => isEmpty(getFieldValue(d,f))),
   '/ged/attendance-volunteer': d => ['dsmAlgorithm','certificate'].filter(f => isEmpty(getFieldValue(d,f))),
 };
 
@@ -68,6 +90,7 @@ const fieldNameMap: Record<string, string> = {
   addressDetail: '상세 주소',
   schoolName: '중학교 이름',
   studentId: '중학교 학번',
+  studentId_invalid: '중학교 학번 (5자리 필수)',
   schoolPhone: '중학교 전화번호',
   teacherName: '중학교 교사 성명',
   personalStmt: '자기소개서',
@@ -122,6 +145,11 @@ export const validatePageData = (state: ApplicationState, route: string) => {
 export const canProceedToNext = (state: ApplicationState, currentRoute: string) => {
   const { isValid, missingFields } = validatePageData(state, currentRoute);
   if (!isValid) {
+    // studentId 자릿수 오류 체크
+    if (missingFields.includes('studentId_invalid')) {
+      return { canProceed: false, message: '학번은 5자리로 입력해주세요.' };
+    }
+    
     const missingFieldsKR = missingFields.map(f => fieldNameMap[f] || f);
     return { canProceed: false, message: `필수 항목이 누락되었습니다: ${missingFieldsKR.join(', ')}` };
   }

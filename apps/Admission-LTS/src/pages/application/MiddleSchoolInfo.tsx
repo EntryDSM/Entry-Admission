@@ -55,6 +55,8 @@ export const MiddleSchoolInfo = () => {
         placeholder="중학교 학번을 입력해주세요."
         onInputChange={handleStudentIdChange}
         value={datas.studentId}
+        explanation='5자리 숫자 형식으로 입력해주세요. (예: 30112)'
+        maxLength={5}
       />
       <FormElement
         width="300px"
