@@ -141,6 +141,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
             value={props.value ?? ''}
             onChange={props.onInputChange}
             type={props.inputType}
+            readonly={props.readonly}
           />
         );
 

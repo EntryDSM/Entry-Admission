@@ -82,7 +82,7 @@ export const InputContent = ({
   );
 };
 
-const InputContainer = styled.input<{ isBlocked?: boolean; width?: string }>`
+const InputContainer = styled.input<{ readOnly?: boolean; width?: string }>`
   width: ${({ width }) => (width ? width : '100%')};
   height: 40px;
   border-radius: 6px;
@@ -91,8 +91,8 @@ const InputContainer = styled.input<{ isBlocked?: boolean; width?: string }>`
   background-color: ${colors.extra.realWhite};
   color: ${colors.gray[500]};
   font-size: 16px;
-  opacity: ${({ isBlocked }) => (isBlocked ? 0.4 : 1)};
-  pointer-events: ${({ isBlocked }) => (isBlocked ? 'none' : 'auto')};
+  opacity: ${({ readOnly }) => (readOnly ? 0.4 : 1)};
+  pointer-events: ${({ readOnly }) => (readOnly ? 'none' : 'auto')};
 
   &::placeholder {
     color: ${colors.gray[300]};

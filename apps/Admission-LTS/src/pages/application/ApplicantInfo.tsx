@@ -4,9 +4,15 @@ import { FormElement } from '../../components';
 import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 import { usePostIdPhoto } from '../../apis';
+import { getUserInfo } from '@entry/util-config';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
+  const [userInfoDatas, setUserInfoDatas] = useState<{name: string, phoneNumber: string, isParent: boolean}>({
+    name: '',
+    phoneNumber: '',
+    isParent: false
+  })
 
   // 1950~2025년 배열 (내림차순 정렬)
   const years = eachYearOfInterval({
@@ -94,6 +100,27 @@ export const ApplicantInfo = () => {
     setDatas({ ...datas, gender: value });
   };
 
+  
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUserInfoDatas({
+        name: userInfo.name,
+        phoneNumber: userInfo.phoneNumber,
+        isParent: userInfo.isParent,
+      });
+
+      setDatas({
+        ...datas,
+        applicantName: userInfo.name,
+        applicantNumber: userInfo.phoneNumber
+      })
+      
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
     <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
       <FormElement
@@ -111,6 +138,7 @@ export const ApplicantInfo = () => {
         inputType="text"
         onInputChange={handleNameChange}
         value={datas.applicantName}
+        readonly={userInfoDatas.isParent ? false : true}
       />
       <FormElement
         width="300px"
@@ -120,6 +148,7 @@ export const ApplicantInfo = () => {
         placeholder="전화번호를 입력해주세요."
         onInputChange={handleInputChange('applicantNumber')}
         value={datas.applicantNumber}
+        readonly={userInfoDatas.isParent ? false : true}
       />
       <FormElement
         label={formRadioData[1].name}
