@@ -8,6 +8,7 @@ interface IInputType {
   placeholder?: string;
   value?: string | null | number;
   type?: 'phone' | 'number' | 'text';
+  maxLength?: number;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -17,6 +18,7 @@ export const InputContent = ({
   placeholder,
   onChange,
   type,
+  maxLength,
   readonly = false,
 }: IInputType) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,11 +70,14 @@ export const InputContent = ({
     onChange?.(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
   };
 
+  // maxLength 계산: props로 받으면 그것 사용, 아니면 type이 phone이면 13
+  const calculatedMaxLength = maxLength !== undefined ? maxLength : (type === 'phone' ? 13 : undefined);
+
   return (
     <InputContainer
       type="text"
       inputMode={type === 'phone' || type === 'number' ? 'numeric' : 'text'}
-      maxLength={type === 'phone' ? 13 : undefined}
+      maxLength={calculatedMaxLength}
       width={width}
       value={value ?? ''}
       onChange={handleChange}
