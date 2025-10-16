@@ -1,4 +1,4 @@
-export const convertGradeToScore = (grade: string | null): number => {
+export const convertGradeToScore = (grade: string | null) => {
   const upperGrade = grade?.toUpperCase();
   
   switch (upperGrade) {
@@ -13,8 +13,8 @@ export const convertGradeToScore = (grade: string | null): number => {
     case 'E':
       return 1;
     case 'X':
-      return 0;
+      return null;
     default:
-      return 0; // 잘못된 입력의 경우
+      return null; // 잘못된 입력의 경우
   }
 };
