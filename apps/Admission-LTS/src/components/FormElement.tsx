@@ -45,6 +45,7 @@ interface ImageProps {
   type: 'imgSelector';
   imgUrl?: string | File | null;
   onFileChange?: (file: File | null) => void;
+  onImageClick?: () => void;
 }
 
 interface SearchProps {
@@ -188,6 +189,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
           <ImageContent
             initialImgUrl={props.imgUrl}
             onFileChange={props.onFileChange}
+            onClick={props.onImageClick}
           />
         );
 

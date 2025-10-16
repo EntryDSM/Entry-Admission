@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Flex } from '@entry/design-token';
 import { FormElement } from '../../components';
-import { usePageData } from '@entry/ui';
+import { usePageData, PhotoUploadModal } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 import { usePostIdPhoto } from '../../apis';
 import { getUserInfo } from '@entry/util-config';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [userInfoDatas, setUserInfoDatas] = useState<{name: string, phoneNumber: string, isParent: boolean}>({
     name: '',
     phoneNumber: '',
@@ -90,10 +91,15 @@ export const ApplicantInfo = () => {
         {
           onSuccess: () => {
             setDatas({ ...datas, idPhoto: file });
+            setIsPhotoModalOpen(false);
           },
         }
       );
     }
+  };
+
+  const handlePhotoUpload = (file: File | null) => {
+    handleImgChange(file);
   };
 
   const handleGenderSelection = (value: string) => {
@@ -122,14 +128,22 @@ export const ApplicantInfo = () => {
   }, []);
 
   return (
-    <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
-      <FormElement
-        type="imgSelector"
-        label="증명 사진"
-        onFileChange={handleImgChange}
-        imgUrl={datas.idPhoto}
-        explanation="증명사진은 3×4cm 규격이어야 하며, 파일 형식은 HEIC·JPG·JPEG·PNG만 가능합니다. 파일 용량은 5MB 이하로 제한됩니다."
+    <>
+      <PhotoUploadModal
+        isOpen={isPhotoModalOpen}
+        setIsOpen={setIsPhotoModalOpen}
+        onFileUpload={handlePhotoUpload}
+        initialImgUrl={datas.idPhoto}
+        isLoading={postIdPhotoApi.isPending}
       />
+      <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
+        <FormElement
+          type="imgSelector"
+          label="증명 사진"
+          onImageClick={() => setIsPhotoModalOpen(true)}
+          imgUrl={datas.idPhoto}
+          explanation="증명사진은 3×4cm 규격이어야 하며, 파일 형식은 HEIC·JPG·JPEG·PNG만 가능합니다. 파일 용량은 5MB 이하로 제한됩니다."
+        />
       <FormElement
         width="300px"
         type="input"
@@ -173,5 +187,6 @@ export const ApplicantInfo = () => {
         selectedRadio={datas.specialNotes}
       />
     </Flex>
+    </>
   );
 };

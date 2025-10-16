@@ -22,5 +22,6 @@ export * from './utils';
 export * from './CancelModal';
 export * from './PasswordModal';
 export * from './ChangePasswordModal';
+export * from './PhotoUploadModal';
 export * from './modal';
 export * from './AddressContent'

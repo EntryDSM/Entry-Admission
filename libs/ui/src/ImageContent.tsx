@@ -6,9 +6,10 @@ import { useEffect, useRef, useState } from 'react';
 interface IImgType {
   onFileChange?: (file: File | null) => void;
   initialImgUrl?: string | File | null;
+  onClick?: () => void;
 }
 
-export const ImageContent = ({ onFileChange, initialImgUrl = null }: IImgType) => {
+export const ImageContent = ({ onFileChange, initialImgUrl = null, onClick }: IImgType) => {
   const imgRef = useRef<HTMLInputElement>(null);
   const [isHover, setIsHover] = useState(false);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
@@ -65,11 +66,19 @@ export const ImageContent = ({ onFileChange, initialImgUrl = null }: IImgType) =
     onFileChange?.(file);
   };
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      imgRef.current?.click();
+    }
+  };
+
   return (
     <ImgSelector
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
-      onClick={() => imgRef.current?.click()}
+      onClick={handleClick}
       imgUrl={imgUrl}
     >
       {isHover && imgUrl && (
