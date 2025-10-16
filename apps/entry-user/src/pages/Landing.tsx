@@ -103,6 +103,40 @@ export const Landing = () => {
   const isLastStep = step >= maxStep;
   const showText = step < maxStep;
 
+  // 스크롤바 표시/숨김 제어
+  useEffect(() => {
+    if (isLastStep) {
+      // 스크롤 가능, 스크롤바 보이기
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.scrollbarWidth = 'auto';
+      (document.documentElement.style as any).msOverflowStyle = 'auto';
+    } else {
+      // 스크롤 가능하지만 스크롤바 숨기기
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.scrollbarWidth = 'none';
+      (document.documentElement.style as any).msOverflowStyle = 'none';
+
+      // Webkit 브라우저용 스크롤바 숨기기
+      const style = document.createElement('style');
+      style.id = 'hide-scrollbar';
+      style.textContent = `
+        html::-webkit-scrollbar {
+          display: none;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    return () => {
+      document.documentElement.style.overflow = 'auto';
+      document.documentElement.style.scrollbarWidth = 'auto';
+      (document.documentElement.style as any).msOverflowStyle = 'auto';
+      const style = document.getElementById('hide-scrollbar');
+      if (style) style.remove();
+    };
+  }, [isLastStep]);
+
   return (
     <Wrapper>
       <FixedBackground fixed={fixed} step={step} isLastStep={isLastStep}>
@@ -283,6 +317,14 @@ const MentContainer = styled.div`
   margin: 0 100px 10px 100px;
   padding: 80px 0;
 
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   @media (max-width: 1200px) {
     margin: 0 80px 5px 80px;
     padding: 60px 0;
@@ -307,6 +349,7 @@ const Wrapper = styled.div`
   align-items: center;
   text-align: center;
   overflow-x: hidden;
+  overflow-y: visible;
   position: relative;
 `;
 
