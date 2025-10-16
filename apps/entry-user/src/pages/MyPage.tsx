@@ -9,6 +9,7 @@ import {
   ChangePasswordModal,
   useModal,
 } from '@entry/ui';
+import { v4 as uuidv4 } from 'uuid';
 import {
   getUserInfo,
   IUserInfoResponseType,
@@ -151,6 +152,9 @@ export const MyPage = () => {
   };
 
   const handleDownloadApplication = async () => {
+    const sessionId = uuidv4();
+    const startTime = Date.now();
+
     try {
       const blob = await getFinalApplicationPdf();
 
@@ -164,12 +168,38 @@ export const MyPage = () => {
       window.URL.revokeObjectURL(url);
 
       toast.success('원서가 다운로드되었습니다.');
+
+      const generationTime = Date.now() - startTime;
+
+      await fetch('https://meeeeercat.ncloud.sbs/v1/pdf/download-success', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        fileSize: blob.size,
+        generationTime,
+      }),
+    });
+
     } catch (error: any) {
+      const generationTime = Date.now() - startTime;
+      const errorMessage = error?.message || 'PDF 다운로드 중 오류 발생';
+
       if (error.response.status === 404)
         toast.error('원서가 아직 제출되지 않았습니다.');
       else if (error.response.status === 500)
         toast.error('원서 다운로드 중 오류가 발생하였습니다.');
-    }
+      
+      await fetch('https://meeeeercat.ncloud.sbs/v1/pdf/download-failed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        errorMessage,
+        generationTime,
+      }),
+    },
+  )}
   };
 
   const handleCancelApplication = () => {
