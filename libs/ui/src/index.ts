@@ -25,3 +25,4 @@ export * from './ChangePasswordModal';
 export * from './PhotoUploadModal';
 export * from './modal';
 export * from './AddressContent'
+export * from './ErrorPage'

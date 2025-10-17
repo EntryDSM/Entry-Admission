@@ -8,9 +8,7 @@ import { getUserInfo } from '@entry/util-config';
 
 export const ApplicantInfo = () => {
   const [datas, setDatas] = usePageData('applicantInfo');
-  const [userInfoDatas, setUserInfoDatas] = useState<{name: string, phoneNumber: string, isParent: boolean}>({
-    name: '',
-    phoneNumber: '',
+  const [userInfoDatas, setUserInfoDatas] = useState<{isParent: boolean}>({
     isParent: false
   })
 
@@ -100,22 +98,33 @@ export const ApplicantInfo = () => {
     setDatas({ ...datas, gender: value });
   };
 
+  const formatPhoneNumber = (phoneNumber: string) => {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+  
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+  
+    return phoneNumber;
+  };
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUserInfoDatas({
-        name: userInfo.name,
-        phoneNumber: userInfo.phoneNumber,
         isParent: userInfo.isParent,
       });
 
-      setDatas({
-        ...datas,
-        applicantName: userInfo.name,
-        applicantNumber: userInfo.phoneNumber
-      })
-
+      if(userInfo.isParent === false) {
+        setDatas({
+          ...datas,
+          applicantName: userInfo.name,
+          applicantNumber: formatPhoneNumber(userInfo.phoneNumber)
+        })
+      }
     };
 
     fetchUserInfo();
