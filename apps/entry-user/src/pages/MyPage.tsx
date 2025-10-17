@@ -257,16 +257,16 @@ export const MyPage = () => {
     if (!scheduleData?.schedules || applicationStatus) return;
 
     const calculateRemainingTime = () => {
-      const firstAnnouncementSchedule = scheduleData.schedules.find(
-        (s) => s.type === 'FIRST_ANNOUNCEMENT'
+      const endDateSchedule = scheduleData.schedules.find(
+        (s) => s.type === 'END_DATE'
       );
 
-      if (!firstAnnouncementSchedule) {
+      if (!endDateSchedule) {
         setIsApplicationAvailable(false);
         return;
       }
 
-      const endDate = new Date(firstAnnouncementSchedule.date);
+      const endDate = new Date(endDateSchedule.date);
       const now = new Date();
       const diff = endDate.getTime() - now.getTime();
 
