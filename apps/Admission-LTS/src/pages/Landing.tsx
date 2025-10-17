@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllSchedule, useGetApplicationStatus } from '../apis';
 import { getUserInfo } from '@entry/util-config';
-import { ClipLoader } from 'react-spinners';
+import { BeatLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 
 export const Landing = () => {
@@ -225,7 +225,7 @@ export const Landing = () => {
       </Flex>
       {(isLoading || statusLoading || networkLoading) && (
       <LoadingModal>
-        <ClipLoader color={colors.orange[800]} size={100} />
+        <BeatLoader color={colors.orange[800]} />
       </LoadingModal>
       )}
     </Flex>

@@ -194,7 +194,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
           if (props.onFileChange) {
             props.onFileChange(file);
           }
-          setIsModalOpen(false);
+          // 모달은 업로드 완료 후 PhotoUploadModal에서 자동으로 닫힘
         };
 
         return (

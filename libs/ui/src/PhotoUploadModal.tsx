@@ -26,6 +26,7 @@ export const PhotoUploadModal = ({
   const [isHover, setIsHover] = useState(false);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [fileObj, setFileObj] = useState<File | null>(null);
+  const [prevLoading, setPrevLoading] = useState(false);
 
   useEffect(() => {
     // 초기 이미지 URL 혹은 File이 바뀌면 업데이트
@@ -39,6 +40,16 @@ export const PhotoUploadModal = ({
       setFileObj(null);
     }
   }, [initialImgUrl]);
+
+  // 업로드 완료 시 모달 자동 닫기
+  useEffect(() => {
+    if (prevLoading && !isLoading && progressPercentage === 100) {
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 500); // 0.5초 후 모달 닫기 (사용자가 완료를 확인할 수 있도록)
+    }
+    setPrevLoading(isLoading);
+  }, [isLoading, progressPercentage, setIsOpen, prevLoading]);
 
   useEffect(() => {
     if (!fileObj) return;
