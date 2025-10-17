@@ -48,6 +48,7 @@ interface ImageProps {
   onFileChange?: (file: File | null) => void;
   onImageClick?: () => void;
   isLoading?: boolean;
+  progressPercentage?: number;
 }
 
 interface SearchProps {
@@ -204,6 +205,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
               onFileUpload={handleFileChange}
               initialImgUrl={props.imgUrl}
               isLoading={props.isLoading}
+              progressPercentage={props.progressPercentage}
             />
             <ImageContent initialImgUrl={props.imgUrl} onClick={() => setIsModalOpen(true)} />
           </>

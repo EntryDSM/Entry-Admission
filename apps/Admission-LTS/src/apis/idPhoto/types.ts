@@ -1,3 +1,4 @@
 export interface IIdPhotoRequest {
-  file : File | null,
+  file: File | null,
+  onProgress?: (progressPercentage: number) => void;
 }

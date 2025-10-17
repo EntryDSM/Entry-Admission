@@ -7,12 +7,20 @@ const path = "/photo"
 
 export const usePostIdPhoto = () => {
   return useMutation({
-    mutationFn: async(data : IIdPhotoRequest) => {
+    mutationFn: async (data: IIdPhotoRequest) => {
       const formData = new FormData();
       formData.append("image", data.file);
       const response = await AdmissionUserInstance.post(`${path}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          const total = progressEvent.total ?? 0;
+          const loaded = progressEvent.loaded ?? 0;
+          if (total > 0) {
+            const percent = Math.round((loaded * 100) / total);
+            data.onProgress?.(percent);
+          }
         },
       });
       return response;

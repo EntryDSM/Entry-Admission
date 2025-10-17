@@ -10,6 +10,7 @@ interface IPhotoUploadModalProps {
   onFileUpload: (file: File | null) => void;
   initialImgUrl?: string | File | null;
   isLoading?: boolean;
+  progressPercentage?: number; // 0 ~ 100
 }
 
 export const PhotoUploadModal = ({
@@ -18,6 +19,7 @@ export const PhotoUploadModal = ({
   onFileUpload,
   initialImgUrl = null,
   isLoading = false,
+  progressPercentage = 0,
 }: IPhotoUploadModalProps) => {
   const imgRef = useRef<HTMLInputElement>(null);
   const backRef = useRef(null);
@@ -153,6 +155,12 @@ export const PhotoUploadModal = ({
             </Text>
           </Flex>
           <Flex gap={16} width="fit-content" height="fit-content">
+            {isLoading && (
+              <ProgressBarContainer>
+                <ProgressBarFill style={{ width: `${progressPercentage}%` }} />
+                <ProgressLabel>{progressPercentage}%</ProgressLabel>
+              </ProgressBarContainer>
+            )}
             <PreviousButton
               backgroundColor={colors.extra.realWhite}
               color={colors.gray[500]}
@@ -237,4 +245,30 @@ const HoverSelector = styled.div`
 
 const FileInput = styled.input`
   display: none;
+`;
+
+const ProgressBarContainer = styled.div`
+  position: relative;
+  width: 260px;
+  height: 10px;
+  border-radius: 6px;
+  background-color: ${colors.gray[200]};
+  overflow: hidden;
+`;
+
+const ProgressBarFill = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: ${colors.orange[800]};
+  transition: width 0.2s ease;
+`;
+
+const ProgressLabel = styled.div`
+  position: absolute;
+  top: -22px;
+  right: 0;
+  font-size: 12px;
+  color: ${colors.gray[400]};
 `;

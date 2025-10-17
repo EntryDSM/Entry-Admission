@@ -80,14 +80,17 @@ export const ApplicantInfo = () => {
   };
 
   const postIdPhotoApi = usePostIdPhoto();
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const handleImgChange = async (file: File | null) => {
     if (file) {
+      setUploadProgress(0);
       postIdPhotoApi.mutate(
-        { file },
+        { file, onProgress: setUploadProgress },
         {
           onSuccess: () => {
             setDatas({ ...datas, idPhoto: file });
+            setUploadProgress(100);
           },
         }
       );
@@ -138,6 +141,7 @@ export const ApplicantInfo = () => {
         onFileChange={handleImgChange}
         imgUrl={datas.idPhoto}
         isLoading={postIdPhotoApi.isPending}
+        progressPercentage={uploadProgress}
         explanation="증명사진은 3×4cm 규격이어야 하며, 파일 형식은 HEIC·JPG·JPEG·PNG만 가능합니다. 파일 용량은 5MB 이하로 제한됩니다."
       />
       <FormElement
