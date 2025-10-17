@@ -8,7 +8,7 @@ export const useGetRegionStatistics = () => {
   return useQuery({
     queryKey: ['statistics', 'region'],
     queryFn: async () => {
-      const { data } = await AdmissionAdminInstance.get<IRegionStatisticsResponse>(`${path}/region`);
+      const { data } = await AdmissionAdminInstance.get<IRegionStatisticsResponse>(`${path}/api/v1/admin/statistics/region`);
       return data;
     },
   });
