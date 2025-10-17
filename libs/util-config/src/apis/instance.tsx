@@ -18,25 +18,24 @@ import { Cookies } from 'react-cookie';
 
 export const AdmissionUserInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  timeout: 50000,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 export const AdmissionAdminInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  timeout: 50000,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 export const AdmissionPublicInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  timeout: 50000,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 const cookies = new Cookies();
 
-// 세션 ID 가져오기 또는 생성
 const getSessionId = (): string => {
   let sessionId = cookies.get('MIEERCAT_SESSION_ID');
   if (!sessionId) {

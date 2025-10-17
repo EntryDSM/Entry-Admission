@@ -14,6 +14,11 @@ export default defineConfig(() => ({
     host: 'localhost',
   },
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@entry/util-config': new URL('../../libs/util-config/src', import.meta.url).pathname,
+    },
+  },
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],

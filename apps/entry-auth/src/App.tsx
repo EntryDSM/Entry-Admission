@@ -8,7 +8,6 @@ export const App = () => {
   useEffect(() => {
     const isDev = localStorage.getItem('DEV');
     const currentPath = window.location.pathname;
-
     // /dev/enable과 /sorry 경로는 체크 제외
     if (
       isDev !== 'TRUE' &&
