@@ -334,24 +334,10 @@ export const ApplicationPreview = () => {
           </Text>
         </ApplicationLoadingContainer>
       ) : (
-        <Flex width="100%" height="fit-content" isColumn={true} gap={24}>
-          <NoticeBox>
-            <NoticeIconWrapper>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#FF7A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 16V12" stroke="#FF7A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 8H12.01" stroke="#FF7A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </NoticeIconWrapper>
-            <Flex isColumn={true} gap={4}>
-              <Text fontSize={18} fontWeight={600} color={colors.gray[500]}>
-                최종 제출 전 미리보기
-              </Text>
-              <Text fontSize={16} fontWeight={400} color={colors.gray[400]}>
-                PDF를 확인하고 문제가 없는지 검토해주세요
-              </Text>
-            </Flex>
-          </NoticeBox>
+        <Flex width="100%" height="fit-content" isColumn={true}>
+          <NoticeText>
+            최종 제출 전 미리보기 PDF를 확인하고 문제가 없는지 확인하세요
+          </NoticeText>
           <ApplicationContainer>
             {pdfUrl ? (
               <PdfViewport>
@@ -428,25 +414,9 @@ const ApplicationLoadingContainer = styled(Skeleton)`
   align-items: center;
 `;
 
-const NoticeBox = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
-  background: linear-gradient(90deg, ${colors.orange[50]} 0%, ${colors.extra.realWhite} 100%);
-  border-left: 4px solid ${colors.orange[800]};
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-`;
-
-const NoticeIconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background-color: ${colors.extra.realWhite};
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(255, 122, 0, 0.15);
+const NoticeText = styled.div`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${colors.gray[500]};
+  padding: 16px 140px;
 `;
