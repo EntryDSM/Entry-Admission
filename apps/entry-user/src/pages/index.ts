@@ -8,3 +8,4 @@ export * from './Main';
 export * from "./NoticePage"
 export * from './Page404'
 export * from './ErrorFixingPage'
+export * from './ReturnSoon'
