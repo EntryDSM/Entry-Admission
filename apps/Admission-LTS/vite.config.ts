@@ -1,6 +1,7 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -16,7 +17,10 @@ export default defineConfig(() => ({
   plugins: [react()],
   resolve: {
     alias: {
-      '@entry/util-config': new URL('../../libs/util-config/src', import.meta.url).pathname,
+      '@entry/design-token': resolve(__dirname, '../../libs/design-token/src'),
+      '@entry/ui': resolve(__dirname, '../../libs/ui/src'),
+      '@entry/hooks': resolve(__dirname, '../../libs/hooks/src'),
+      '@entry/util-config': resolve(__dirname, '../../libs/util-config/src'),
     },
   },
   // Uncomment this if you are using workers.

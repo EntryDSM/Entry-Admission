@@ -1,3 +1,4 @@
+
 import { colors, Flex, Skeleton, Text } from '@entry/design-token';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
@@ -5,10 +6,13 @@ import { usePdfPreviewPost } from '../../apis';
 import { useApplicationData } from '@entry/ui';
 import { convertGradeToScore } from '../../hooks';
 import { toast } from 'react-toastify';
+import { Document, Page, pdfjs } from 'react-pdf';
+import workerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 export const ApplicationPreview = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [numPages, setNumPages] = useState<number | null>(null);
   const hasFetched = useRef(false);
 
   const formatDate = (arr: (number|string)[], graduationType: string) => {
@@ -322,14 +326,6 @@ export const ApplicationPreview = () => {
 
   return (
     <Container>
-      <Flex width="fit-content" height="fit-content" isColumn={true} gap={12}>
-        <Text fontSize={20} fontWeight={400} color={colors.gray[400]}>
-          대덕소프트웨어마이스터고등학교
-        </Text>
-        <Text fontSize={32} fontWeight={600}>
-          지원서 미리보기
-        </Text>
-      </Flex>
       {isLoading ? (
         <ApplicationLoadingContainer>
           <Text fontSize={20} color={colors.gray[400]}>
@@ -338,27 +334,38 @@ export const ApplicationPreview = () => {
         </ApplicationLoadingContainer>
       ) : (
         <Flex width="100%" height="fit-content" isColumn={true}>
-          <ApplicationTitle>입학원서 미리보기</ApplicationTitle>
           <ApplicationContainer>
-            <ApplicationContent>
-              {pdfUrl ? (
-                <iframe
-                  src={pdfUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 'none' }}
-                  title="지원서 PDF 미리보기"
-                />
-              ) : (
-                <Text color={colors.gray[400]}>PDF를 불러올 수 없습니다.</Text>
-              )}
-            </ApplicationContent>
+            {pdfUrl ? (
+              <PdfViewport>
+                <Document
+                  file={pdfUrl}
+                  loading={<Text color={colors.gray[400]}>PDF 로딩중...</Text>}
+                  error={<Text color={colors.gray[400]}>PDF 로딩 실패</Text>}
+                  onLoadError={() => toast.error('PDF 로딩 실패')}
+                  onLoadSuccess={(info: { numPages: number }) => setNumPages(info.numPages)}
+                >
+                  {Array.from(new Array(numPages || 0), (_el, index) => (
+                    <Page
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      width={794}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  ))}
+                </Document>
+              </PdfViewport>
+            ) : (
+              <Text color={colors.gray[400]}>PDF를 불러올 수 없습니다.</Text>
+            )}
           </ApplicationContainer>
         </Flex>
       )}
     </Container>
   );
 };
+
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 
 const Container = styled.div`
   display: flex;
@@ -367,32 +374,32 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const ApplicationTitle = styled.div`
-  width: 100%;
-  height: 100px;
-  background-color: ${colors.gray[500]};
-  padding-left: 48px;
-  display: flex;
-  align-items: center;
-  font-size: 24px;
-  color: ${colors.extra.realWhite};
-`;
 const ApplicationContainer = styled.div`
   width: 100%;
   background-color: ${colors.gray[400]};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 104px 140px;
+  display: block;
+  padding: 24px 140px;
   box-sizing: border-box;
+  max-height: 80vh;
+  overflow-y: auto;
 `;
 
-const ApplicationContent = styled.div`
+const PdfViewport = styled.div`
   width: 100%;
   max-width: 794px;
-  aspect-ratio: 210 / 297;
   background-color: ${colors.extra.realWhite};
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+  margin: 0 auto;
+  canvas {
+    max-width: 100%;
+    height: auto !important;
+    margin: 0 auto;
+    display: block;
+  }
 `;
 
 const ApplicationLoadingContainer = styled(Skeleton)`
