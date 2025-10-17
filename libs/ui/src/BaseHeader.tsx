@@ -1,4 +1,4 @@
-import { colors, Flex, Text } from '@entry/design-token';
+import { colors, Flex, Text, Skeleton } from '@entry/design-token';
 import { EntryLogo, SideBarBtnIcon } from './assets';
 import { Button } from './Button';
 import styled from '@emotion/styled';
@@ -135,7 +135,7 @@ export const CommonHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const accessToken = getAccessToken();
-  const { data: userInfo, error, isError } = useUserInfo();
+  const { data: userInfo, error, isError, isPending } = useUserInfo();
 
   const navData = [
     { name: '공지사항', path: '/notice' },
@@ -155,6 +155,7 @@ export const CommonHeader = () => {
   };
 
   const isLoggedIn = accessToken && userInfo && !isError;
+  const isLoading = accessToken && isPending;
 
   return (
     <HeaderContainer scrollPosition={scrollPosition}>
@@ -192,7 +193,17 @@ export const CommonHeader = () => {
             </NavContent>
           ))}
         </Flex>
-        {isLoggedIn ? (
+        {isLoading ? (
+          <Flex
+            gap={20}
+            alignItems="center"
+            width="fit-content"
+            height="fit-content"
+          >
+            <SkeletonBox width="90px" height="22px" />
+            <SkeletonBox width="80px" height="22px" />
+          </Flex>
+        ) : isLoggedIn ? (
           <Flex
             gap={20}
             alignItems="center"
@@ -377,4 +388,10 @@ const NavContent = styled.nav<{ isPath?: boolean }>`
   @media (max-width: 1200px) {
     display: none;
   }
+`;
+
+const SkeletonBox = styled(Skeleton)<{ width: string; height: string }>`
+  width: ${({ width }) => width};
+  height: ${({ height }) => height};
+  border-radius: 8px;
 `;

@@ -3,6 +3,7 @@ import { colors, Flex, Skeleton, Text } from '@entry/design-token';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { usePdfPreviewPost } from '../../apis';
+import { usePdfPreviewSuccessPost, usePdfPreviewFailedPost } from '../../apis/pdfLogging';
 import { useApplicationData } from '@entry/ui';
 import { convertGradeToScore } from '../../hooks';
 import { toast } from 'react-toastify';
