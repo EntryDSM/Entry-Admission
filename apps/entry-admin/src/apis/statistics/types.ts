@@ -33,3 +33,18 @@ export interface ICompetitionRateResponse {
     byType: ICompetitionRateByType[];
   };
 }
+
+export interface IGenderStatisticsItem {
+  gender: string;
+  genderName: string;
+  count: number;
+  percentage: number;
+}
+
+export interface IGenderStatisticsResponse {
+  success: boolean;
+  data: {
+    total: number;
+    byGender: IGenderStatisticsItem[];
+  };
+}
