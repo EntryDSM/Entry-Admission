@@ -301,8 +301,16 @@ const adminRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
+// ✅ Public 요청 인터셉터
+const publicRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
+  // @ts-ignore - 요청 시작 시간 기록
+  config.metadata = { startTime: performance.now() };
+  return config;
+};
+
 AdmissionUserInstance.interceptors.request.use(userRequestInterceptor);
 AdmissionAdminInstance.interceptors.request.use(adminRequestInterceptor);
+AdmissionPublicInstance.interceptors.request.use(publicRequestInterceptor);
 
 // ✅ 사용자 응답 인터셉터
 const userResponseInterceptor = async (error: AxiosError) => {
@@ -319,6 +327,24 @@ const userResponseInterceptor = async (error: AxiosError) => {
 
   if (shouldReport && config) {
     await reportServerError(config as InternalAxiosRequestConfig, error);
+  }
+
+  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    return Promise.reject(error);
+  }
+  if (response?.status === 500) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    return Promise.reject(error);
+  }
+  if (response?.status === 502) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    return Promise.reject(error);
+  }
+  if (response?.status === 503) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    return Promise.reject(error);
   }
 
   if (!config || (response?.status !== 401 && response?.status !== 403))
@@ -357,6 +383,24 @@ const adminResponseInterceptor = async (error: AxiosError) => {
 
   if (shouldReport && config) {
     await reportServerError(config as InternalAxiosRequestConfig, error);
+  }
+
+  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    return Promise.reject(error);
+  }
+  if (response?.status === 500) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    return Promise.reject(error);
+  }
+  if (response?.status === 502) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    return Promise.reject(error);
+  }
+  if (response?.status === 503) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    return Promise.reject(error);
   }
 
   if (!config || (response?.status !== 401 && response?.status !== 403))
@@ -401,4 +445,47 @@ AdmissionUserInstance.interceptors.response.use(
 AdmissionAdminInstance.interceptors.response.use(
   successResponseInterceptor,
   adminResponseInterceptor
+);
+
+// ✅ Public 응답 인터셉터
+const publicResponseInterceptor = async (error: AxiosError) => {
+  const { config, response } = error;
+
+  // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
+  const shouldReport =
+    response?.status === 500 ||
+    response?.status && response.status >= 500 ||
+    error.code === 'ECONNABORTED' ||
+    error.message.includes('timeout') ||
+    error.code === 'ERR_NETWORK' ||
+    !response; // 응답 자체가 없는 경우 (네트워크 실패)
+
+  if (shouldReport && config) {
+    await reportServerError(config as InternalAxiosRequestConfig, error);
+  }
+
+  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    return Promise.reject(error);
+  }
+  if (response?.status === 500) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    return Promise.reject(error);
+  }
+  if (response?.status === 502) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    return Promise.reject(error);
+  }
+  if (response?.status === 503) {
+    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    return Promise.reject(error);
+  }
+
+  return Promise.reject(error);
+};
+
+AdmissionPublicInstance.interceptors.response.use(
+  successResponseInterceptor,
+  publicResponseInterceptor
 );
