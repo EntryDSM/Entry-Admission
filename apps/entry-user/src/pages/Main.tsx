@@ -27,11 +27,11 @@ export const Main = () => {
 
   const { data: startDate } = useSchedule({ type: 'START_DATE' });
   const { data: endDate } = useSchedule({ type: 'END_DATE' });
-  const today = new Date();
+  const now = new Date();
 
   const isTrueSchedule =
     startDate && endDate
-      ? today >= new Date(startDate.date) && today <= new Date(endDate.date)
+      ? now >= new Date(startDate.date) && now <= new Date(endDate.date)
       : false;
 
   const handleApplyClick = () => {
