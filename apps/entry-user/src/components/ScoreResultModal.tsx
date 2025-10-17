@@ -44,7 +44,7 @@ export const ScoreResultModal = ({
         const socialRequest = transformCalculationDataToAPI(state, 'SOCIAL');
         const meisterRequest = transformCalculationDataToAPI(state, 'MEISTER');
 
-        const educationalStatus = commonRequest.educanalStatus;
+        const educationalStatus = (commonRequest as any).educationalStatus;
 
         const [commonResponse, socialResponse, meisterResponse] =
           await Promise.all([

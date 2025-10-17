@@ -61,6 +61,19 @@ const convertGradeToNumber = (grade: string | null): number | undefined => {
   return gradeToNumber[grade];
 };
 
+// Preserve 0 as a valid value; return undefined only when not a number
+const safeParseInt = (value: string | null | undefined): number | undefined => {
+  if (value === null || value === undefined || value === '') return undefined;
+  const parsed = parseInt(value as string, 10);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+const safeParseFloat = (value: string | null | undefined): number | undefined => {
+  if (value === null || value === undefined || value === '') return undefined;
+  const parsed = parseFloat(value as string);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
 export const transformCalculationDataToAPI = (
   state: CalculationState,
   applicationType: 'COMMON' | 'MEISTER' | 'SOCIAL'
@@ -87,13 +100,13 @@ export const transformCalculationDataToAPI = (
       educationalStatus,
       scores: {
         // 검정고시는 검정고시 점수만 보냄 (출석 및 봉사 제외)
-        qualificationKorean: parseFloat(state.qeScore.korean) || undefined,
-        qualificationSocial: parseFloat(state.qeScore.social) || undefined,
-        qualificationHistory: parseFloat(state.qeScore.history) || undefined,
-        qualificationMath: parseFloat(state.qeScore.math) || undefined,
-        qualificationScience: parseFloat(state.qeScore.science) || undefined,
-        qualificationEnglish: parseFloat(state.qeScore.english) || undefined,
-        qualificationTech: parseFloat(state.qeScore.technology) || undefined,
+        qualificationKorean: safeParseFloat(state.qeScore.korean),
+        qualificationSocial: safeParseFloat(state.qeScore.social),
+        qualificationHistory: safeParseFloat(state.qeScore.history),
+        qualificationMath: safeParseFloat(state.qeScore.math),
+        qualificationScience: safeParseFloat(state.qeScore.science),
+        qualificationEnglish: safeParseFloat(state.qeScore.english),
+        qualificationTech: safeParseFloat(state.qeScore.technology),
       },
       bonus: {
         dsmAlgorithm: activity.dsmAlgorithm === 'O',
@@ -135,12 +148,12 @@ export const transformCalculationDataToAPI = (
         science_2_1: convertGradeToNumber(state.primaryFirst.sci),
         tech_2_1: convertGradeToNumber(state.primaryFirst.tech),
         english_2_1: convertGradeToNumber(state.primaryFirst.eng),
-        // 출석 및 봉사
-        absence: parseInt(activity.absences) || undefined,
-        tardiness: parseInt(activity.lateArrivals) || undefined,
-        earlyLeave: parseInt(activity.earlyLeaves) || undefined,
-        classExit: parseInt(activity.resultMissing) || undefined,
-        volunteer: parseInt(activity.volunteerHours) || undefined,
+        // 출석 및 봉사 (0도 전송되도록 안전 파싱)
+        absence: safeParseInt(activity.absences),
+        tardiness: safeParseInt(activity.lateArrivals),
+        earlyLeave: safeParseInt(activity.earlyLeaves),
+        classExit: safeParseInt(activity.resultMissing),
+        volunteer: safeParseInt(activity.volunteerHours),
         algorithmAward: activity.dsmAlgorithm === 'O',
         infoProcessingCert: activity.infoProcessing === 'O',
       }
@@ -187,12 +200,12 @@ export const transformCalculationDataToAPI = (
       science_2_1: convertGradeToNumber(state.graduatedSecond1.sci),
       tech_2_1: convertGradeToNumber(state.graduatedSecond1.tech),
       english_2_1: convertGradeToNumber(state.graduatedSecond1.eng),
-      // 출석 및 봉사
-      absence: parseInt(activity.absences) || undefined,
-      tardiness: parseInt(activity.lateArrivals) || undefined,
-      earlyLeave: parseInt(activity.earlyLeaves) || undefined,
-      classExit: parseInt(activity.resultMissing) || undefined,
-      volunteer: parseInt(activity.volunteerHours) || undefined,
+      // 출석 및 봉사 (0도 전송되도록 안전 파싱)
+      absence: safeParseInt(activity.absences),
+      tardiness: safeParseInt(activity.lateArrivals),
+      earlyLeave: safeParseInt(activity.earlyLeaves),
+      classExit: safeParseInt(activity.resultMissing),
+      volunteer: safeParseInt(activity.volunteerHours),
       algorithmAward: activity.dsmAlgorithm === 'O',
       infoProcessingCert: activity.infoProcessing === 'O',
     }
