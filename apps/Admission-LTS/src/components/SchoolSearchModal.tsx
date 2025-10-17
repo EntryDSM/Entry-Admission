@@ -3,6 +3,7 @@ import { colors, Flex, Text } from '@entry/design-token';
 import { useEffect, useRef, useState } from 'react';
 import { Check, Search, PreviousButton } from '@entry/ui';
 import { useGetSchoolSearch } from '../apis';
+import { GlobalLoader } from './';
 
 interface ISchoolSearchModalType {
   setIsShow: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +33,7 @@ export const SchoolSearchModal = ({
   const [tempSelectedCode, setTempSelectedCode] = useState<string | null>(
     selectedCode ?? null
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
@@ -71,11 +73,12 @@ export const SchoolSearchModal = ({
     setSearchValue(''); //검색 내역 초기화
   };
 
-  const { data, refetch } = useGetSchoolSearch(searchValue);
+  const { data, refetch, isFetching } = useGetSchoolSearch(searchValue);
 
-  const handleSearchClick = () => {
+  const handleSearchClick = async () => {
     if (searchValue.trim() === '') return;
-    refetch();
+    setIsLoading(true);
+    await refetch();
   };
 
   useEffect(() => {
@@ -89,7 +92,12 @@ export const SchoolSearchModal = ({
         }))
       );
     }
+    setIsLoading(false);
   }, [data]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   return (
     isShow && (
@@ -184,6 +192,7 @@ export const SchoolSearchModal = ({
             <PreviousButton onClick={handleConfirmClick}>선택</PreviousButton>
           </Flex>
         </Modal>
+        <GlobalLoader isLoading={isLoading} />
       </ModalBack>
     )
   );

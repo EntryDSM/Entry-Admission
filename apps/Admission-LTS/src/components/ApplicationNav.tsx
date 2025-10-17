@@ -1,12 +1,12 @@
-import { colors, Flex } from '@entry/design-token';
+import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApplicationData, useCheckPageData, usePageData, PreviousButton, previousDataRef, performSave, hasChanged, serializeStateWithFiles } from '@entry/ui';
 import { useEffect, useState, useRef } from 'react';
-import { BeatLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 import { useAdmissionSubmitPost } from '../apis';
 import { convertGradeToScore } from '../hooks';
+import { GlobalLoader } from './';
 
 interface IApplicationNavType {
   totalPages: number;
@@ -459,11 +459,7 @@ export const ApplicationNav = ({
           <PreviousButton onClick={handleNextPage}>다음</PreviousButton>
         )}
 
-        {isLoading && (
-          <LoadingModal>
-            <BeatLoader color={colors.orange[800]} />
-          </LoadingModal>
-        )}
+        <GlobalLoader isLoading={isLoading} />
       </Flex>
     </>
   );
@@ -489,19 +485,6 @@ function renderPageIndicators(
     return <PageIndicator key={pageNumber} isActive={currentPage === pageNumber} onClick={() => onPageClick(pageNumber)} />;
   });
 }
-
-const LoadingModal = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.08);
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-`;
 
 const PageIndicator = styled.nav<{ isActive: boolean }>`
   cursor: pointer;

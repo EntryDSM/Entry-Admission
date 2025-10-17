@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllSchedule, useGetApplicationStatus } from '../apis';
 import { getUserInfo } from '@entry/util-config';
-import { BeatLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
+import { GlobalLoader } from '../components';
 
 export const Landing = () => {
 
@@ -223,27 +223,10 @@ export const Landing = () => {
           원서 접수 시작
         </Button>
       </Flex>
-      {(isLoading || statusLoading || networkLoading) && (
-      <LoadingModal>
-        <BeatLoader color={colors.orange[800]} />
-      </LoadingModal>
-      )}
+      <GlobalLoader isLoading={isLoading || statusLoading || networkLoading} />
     </Flex>
   );
 };
-
-const LoadingModal = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.08);
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-`;
 
 
 const ContentContainer = styled.div`

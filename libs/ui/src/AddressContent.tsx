@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { colors, Flex } from "@entry/design-token";
+import { colors, Flex, Text } from "@entry/design-token";
 import { useState } from "react";
 import { Button } from "./Button";
 import DaumPostcode from "react-daum-postcode";
@@ -26,6 +26,10 @@ export const AddressContent = ({postalCodeValue , addressDetailValue, addressVal
     setIsOpen(false);
   };
 
+  const handleSearchClick = () => {
+    setIsOpen(true);
+  };
+
   return (
     <Flex isColumn={true} gap={12} width="100%" height="auto">
       <Flex height="auto" width="100%" gap={20} alignItems="center">
@@ -41,7 +45,7 @@ export const AddressContent = ({postalCodeValue , addressDetailValue, addressVal
           value={addressValue}
           onChange={handleAddressChange}
         />
-        <Button onClick={() => setIsOpen(true)}>검색</Button>
+        <Button onClick={handleSearchClick}>검색</Button>
       </Flex>
       <InputContainer
         placeholder="상세주소"

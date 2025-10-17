@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Button } from '@entry/ui';
 import { useEffect, useState } from 'react';
 import { useGetSchedule } from '../apis';
-import { BeatLoader } from 'react-spinners';
+import { GlobalLoader } from '../components';
 
 export const Submitted = () => {
   const [resultDate, setResultDate] = useState<string>('')
@@ -54,27 +54,10 @@ export const Submitted = () => {
         </Flex>
         <Button width="100%" onClick={() => window.location.href = 'https://entrydsm.kr'}>홈으로 돌아가기</Button>
       </Flex>
-      {isLoading && (
-        <LoadingModal>
-          <BeatLoader color={colors.orange[800]} />
-        </LoadingModal>
-      )}
+      <GlobalLoader isLoading={isLoading} />
     </Flex>
   );
 };
-
-const LoadingModal = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.08);
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-`;
 
 
 const MsgWrapper = styled.div `
