@@ -165,7 +165,7 @@ export const PhotoUploadModal = ({
             </PreviousButton>
             <PreviousButton
               backgroundColor={colors.orange[800]}
-              hoverBackgroundColor={colors.primary[500]}
+              hoverBackgroundColor={colors.orange[850]}
               onClick={handleUpload}
               isBlocked={!fileObj || isLoading}
             >
