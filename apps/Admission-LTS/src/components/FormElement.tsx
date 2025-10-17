@@ -205,12 +205,7 @@ export const FormElement = React.memo<FormElementProps>((props) => {
               initialImgUrl={props.imgUrl}
               isLoading={props.isLoading}
             />
-            <Flex isColumn gap={12}>
-              <ImageContent initialImgUrl={props.imgUrl} />
-              <Button onClick={() => setIsModalOpen(true)} width='150px'>
-                사진 업로드
-              </Button>
-            </Flex>
+            <ImageContent initialImgUrl={props.imgUrl} onClick={() => setIsModalOpen(true)} />
           </>
         );
       }
