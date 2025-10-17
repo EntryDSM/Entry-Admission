@@ -159,15 +159,15 @@ export const PhotoUploadModal = ({
               borderColor={colors.gray[300]}
               hoverBackgroundColor="none"
               onClick={handleCancel}
-              disabled={isLoading}
+              isBlocked={isLoading}
             >
               취소
             </PreviousButton>
             <PreviousButton
-              backgroundColor={colors.primary[400]}
+              backgroundColor={colors.orange[800]}
               hoverBackgroundColor={colors.primary[500]}
               onClick={handleUpload}
-              disabled={!fileObj || isLoading}
+              isBlocked={!fileObj || isLoading}
             >
               {isLoading ? '업로드 중...' : '업로드'}
             </PreviousButton>

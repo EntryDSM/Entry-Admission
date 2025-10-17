@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Flex } from '@entry/design-token';
 import { FormElement } from '../../components';
-import { Button, ImageContent, PhotoUploadModal, usePageData } from '@entry/ui';
+import { usePageData } from '@entry/ui';
 import { eachYearOfInterval, format, lastDayOfMonth, getDate } from 'date-fns';
 import { usePostIdPhoto } from '../../apis';
 import { getUserInfo } from '@entry/util-config';
@@ -11,7 +11,6 @@ export const ApplicantInfo = () => {
   const [userInfoDatas, setUserInfoDatas] = useState<{isParent: boolean}>({
     isParent: false
   })
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 1950~2025년 배열 (내림차순 정렬)
   const years = eachYearOfInterval({
@@ -89,7 +88,6 @@ export const ApplicantInfo = () => {
         {
           onSuccess: () => {
             setDatas({ ...datas, idPhoto: file });
-            setIsModalOpen(false);
           },
         }
       );
@@ -134,17 +132,14 @@ export const ApplicantInfo = () => {
 
   return (
     <Flex isColumn={true} width="100%" height="fit-content" gap={16}>
-      <PhotoUploadModal
-        isOpen={isModalOpen}
-        setIsOpen={setIsModalOpen}
-        onFileUpload={handleImgChange}
-        initialImgUrl={datas.idPhoto}
+      <FormElement
+        type="imgSelector"
+        label="증명 사진"
+        onFileChange={handleImgChange}
+        imgUrl={datas.idPhoto}
         isLoading={postIdPhotoApi.isPending}
+        explanation="증명사진은 3×4cm 규격이어야 하며, 파일 형식은 HEIC·JPG·JPEG·PNG만 가능합니다. 파일 용량은 5MB 이하로 제한됩니다."
       />
-      <Flex isColumn={true} gap={12} width='300px'>
-        <ImageContent imgUrl={datas.idPhoto} />
-        <Button onClick={() => setIsModalOpen(true)} width='300px'>사진 업로드</Button>
-      </Flex>
       <FormElement
         width="300px"
         type="input"

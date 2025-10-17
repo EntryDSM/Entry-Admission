@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { colors, Flex, Text } from '@entry/design-token';
 import styled from '@emotion/styled';
-import { DropDownContent, Caution, Check, ImageContent, InputContent, RadioContent, TextAreaContent, AddressContent } from '@entry/ui';
+import { DropDownContent, Caution, Check, ImageContent, InputContent, RadioContent, TextAreaContent, AddressContent, PhotoUploadModal, Button } from '@entry/ui';
 import { SearchContent } from './SearchContent';
 
 interface BaseFormElementProps {
@@ -47,6 +47,7 @@ interface ImageProps {
   imgUrl?: string | File | null;
   onFileChange?: (file: File | null) => void;
   onImageClick?: () => void;
+  isLoading?: boolean;
 }
 
 interface SearchProps {
@@ -186,14 +187,33 @@ export const FormElement = React.memo<FormElementProps>((props) => {
           />
         );
 
-      case 'imgSelector':
+      case 'imgSelector': {
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const handleFileChange = (file: File | null) => {
+          if (props.onFileChange) {
+            props.onFileChange(file);
+          }
+          setIsModalOpen(false);
+        };
+
         return (
-          <ImageContent
-            initialImgUrl={props.imgUrl}
-            onFileChange={props.onFileChange}
-            onClick={props.onImageClick}
-          />
+          <>
+            <PhotoUploadModal
+              isOpen={isModalOpen}
+              setIsOpen={setIsModalOpen}
+              onFileUpload={handleFileChange}
+              initialImgUrl={props.imgUrl}
+              isLoading={props.isLoading}
+            />
+            <Flex isColumn gap={12}>
+              <ImageContent initialImgUrl={props.imgUrl} />
+              <Button onClick={() => setIsModalOpen(true)} width='150px'>
+                사진 업로드
+              </Button>
+            </Flex>
+          </>
         );
+      }
 
       case 'search':
         // setSelectedValue가 있을 때만 렌더링
