@@ -13,7 +13,7 @@ import {
   ArrowIcon,
 } from '../assets';
 import React from 'react';
-import { useGetAllSchedule, useGetRegionStatistics, useGetCompetitionRate } from '../apis';
+import { useGetAllSchedule, useGetRegionStatistics, useGetCompetitionRate, useGetGenderStatistics } from '../apis';
 
 // 날짜 포맷 변환 함수 (yyyy-MM-ddTHH:mm:ss -> MM/DD)
 const formatDateToMMDD = (dateString: string) => {
@@ -40,17 +40,13 @@ const calculateDday = (dateString: string) => {
   return diffDays;
 };
 
-const mockData = {
-  genderStats: [
-    { gender: '남성', count: '12명', percentage: '12.00%' },
-    { gender: '여성', count: '12명', percentage: '12.00%' },
-  ],
-};
+// 성별 통계는 API와 연동한다
 
 export const StatisticsLandingPage = () => {
   const { data: scheduleData, isLoading } = useGetAllSchedule();
   const { data: regionData, isLoading: isRegionLoading } = useGetRegionStatistics();
   const { data: competitionData, isLoading: isCompetitionLoading } = useGetCompetitionRate();
+  const { data: genderData, isLoading: isGenderLoading } = useGetGenderStatistics();
 
   // 스케줄 데이터에서 날짜 찾기
   const findDate = (type: string) =>
@@ -247,11 +243,13 @@ export const StatisticsLandingPage = () => {
             competitionData?.data?.byType?.map((item, index) => {
               const typeColors: { [key: string]: string } = {
                 'GENERAL': '#1DB954',
+                'COMMON': '#1DB954', // COMMON도 일반 전형 색상 사용
                 'MEISTER': '#FF7A00',
                 'SOCIAL': '#007BFF',
               };
               const typeNames: { [key: string]: string } = {
                 'GENERAL': '일반 전형',
+                'COMMON': '일반 전형',
                 'MEISTER': '마이스터 전형',
                 'SOCIAL': '사회 통합 전형',
               };
@@ -280,21 +278,37 @@ export const StatisticsLandingPage = () => {
       <SectionContainer>
         <SectionTitle>지원자 성비</SectionTitle>
         <GenderGrid>
-          {mockData.genderStats.map((item, index) => (
-            <GenderCard key={index}>
-              <GenderTitle>{item.gender}</GenderTitle>
-              <GenderCount>{item.count}</GenderCount>
-              <ProgressBarContainer>
-                <ProgressBar
-                  progress={18.75}
-                  color={index === 0 ? "#4F46E5" : "#EC4899"}
-                />
-              </ProgressBarContainer>
-              <GenderPercentage>
-                {item.percentage}가 지원했습니다.
-              </GenderPercentage>
-            </GenderCard>
-          ))}
+          {isGenderLoading ? (
+            <>
+              <GenderCard>
+                <SkeletonValue />
+              </GenderCard>
+              <GenderCard>
+                <SkeletonValue />
+              </GenderCard>
+            </>
+          ) : (
+            genderData?.data?.byGender?.slice(0, 2).map((item, index) => {
+              const rawPercentage = typeof item.percentage === 'number' ? item.percentage : 0;
+              // 백엔드가 0~1 또는 0~100 둘 다 반환할 수 있으므로 정규화
+              const normalizedPercentage = rawPercentage <= 1 ? rawPercentage * 100 : rawPercentage;
+              const displayPercentage = `${normalizedPercentage.toFixed(2)}%`;
+              const color = index === 0 ? '#4F46E5' : '#EC4899';
+
+              return (
+                <GenderCard key={`${item.gender}-${index}`}>
+                  <GenderTitle>{item.genderName ?? item.gender}</GenderTitle>
+                  <GenderCount>{item.count}명</GenderCount>
+                  <ProgressBarContainer>
+                    <ProgressBar progress={normalizedPercentage} color={color} />
+                  </ProgressBarContainer>
+                  <GenderPercentage>
+                    {displayPercentage}가 지원했습니다.
+                  </GenderPercentage>
+                </GenderCard>
+              );
+            })
+          )}
         </GenderGrid>
       </SectionContainer>
 
