@@ -57,10 +57,6 @@ export const Router = createBrowserRouter([
         element: <ErrorFixingPage />,
       },
       {
-        path: '/return_soon',
-        element: <ReturnSoon />,
-      },
-      {
         path: '/calculate',
         element: <CalculateLayout />,
         children: [
@@ -121,6 +117,10 @@ export const Router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: '/return_soon',
+    element: <ReturnSoon />,
   },
   {
     path: '*',

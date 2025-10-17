@@ -41,8 +41,8 @@ export const ReturnSoon = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = '/';
-    }, 60000);
+      window.location.href = 'https://entrydsm.kr';
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
