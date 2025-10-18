@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserInfo, IUserInfoResponseType } from '../apis';
 import { getAccessToken } from './cookies';
 import { AxiosError } from 'axios';
@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 
 export const useUserInfo = () => {
   const accessToken = getAccessToken();
+  const queryClient = useQueryClient();
 
   const query = useQuery<IUserInfoResponseType, AxiosError>({
     queryKey: ['userInfo'],
@@ -37,6 +38,13 @@ export const useUserInfo = () => {
       );
     }
   }, [query.error]);
+
+  // 토큰이 없을 때 React Query 캐시 리셋
+  useEffect(() => {
+    if (!accessToken) {
+      queryClient.removeQueries({ queryKey: ['userInfo'] });
+    }
+  }, [accessToken, queryClient]);
 
   return query;
 };

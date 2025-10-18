@@ -61,6 +61,16 @@ const skipAuthUrls = [
 let userRefreshTokenPromise: Promise<string> | null = null;
 let adminRefreshTokenPromise: Promise<string> | null = null;
 
+// entrydsm.kr 메인 페이지인지 확인 (마이페이지 제외)
+const isPublicEntryPage = (): boolean => {
+  const hostname = window.location.hostname;
+  const pathname = window.location.pathname;
+
+  // entrydsm.kr 또는 www.entrydsm.kr이고, /mypage가 아닌 경우
+  return (hostname === 'entrydsm.kr' || hostname === 'www.entrydsm.kr') &&
+         !pathname.startsWith('/mypage');
+};
+
 // 서버 에러 리포트
 const reportServerError = async (
   config: InternalAxiosRequestConfig,
@@ -261,8 +271,11 @@ const userRequestInterceptor = async (config: InternalAxiosRequestConfig) => {
     try {
       token = await handleUserTokenRefresh();
     } catch {
-      window.location.href = 'https://auth.entrydsm.kr';
-      return Promise.reject(new axios.Cancel('No valid token - redirecting to auth'));
+      // entrydsm.kr 메인 페이지에서는 리다이렉트하지 않음
+      if (!isPublicEntryPage()) {
+        window.location.href = 'https://auth.entrydsm.kr';
+      }
+      return Promise.reject(new axios.Cancel('No valid token'));
     }
   }
 
@@ -346,12 +359,17 @@ const userResponseInterceptor = async (error: AxiosError) => {
     return Promise.reject(error);
   }
 
-  if (!config || (response?.status !== 401 && response?.status !== 403))
+  // skipAuthInterceptor가 설정된 요청(refresh 요청)은 401/403 재시도 하지 않음
+  // @ts-ignore
+  if (!config || config.skipAuthInterceptor || (response?.status !== 401 && response?.status !== 403))
     return Promise.reject(error);
 
   const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
   if (retryConfig._retry) {
-    window.location.href = 'https://auth.entrydsm.kr';
+    // entrydsm.kr 메인 페이지에서는 리다이렉트하지 않음
+    if (!isPublicEntryPage()) {
+      window.location.href = 'https://auth.entrydsm.kr';
+    }
     return Promise.reject(error);
   }
 
@@ -362,7 +380,10 @@ const userResponseInterceptor = async (error: AxiosError) => {
     retryConfig.headers['Authorization'] = `Bearer ${newAccessToken}`;
     return await AdmissionUserInstance(retryConfig);
   } catch (err) {
-    window.location.href = 'https://auth.entrydsm.kr';
+    // entrydsm.kr 메인 페이지에서는 리다이렉트하지 않음
+    if (!isPublicEntryPage()) {
+      window.location.href = 'https://auth.entrydsm.kr';
+    }
     return Promise.reject(err);
   }
 };
@@ -402,7 +423,9 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     return Promise.reject(error);
   }
 
-  if (!config || (response?.status !== 401 && response?.status !== 403))
+  // skipAuthInterceptor가 설정된 요청(refresh 요청)은 401/403 재시도 하지 않음
+  // @ts-ignore
+  if (!config || config.skipAuthInterceptor || (response?.status !== 401 && response?.status !== 403))
     return Promise.reject(error);
 
   const retryConfig = config as InternalAxiosRequestConfig & { _retry?: boolean };
