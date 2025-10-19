@@ -71,6 +71,46 @@ export const Landing = () => {
   }, []);
 
   const handleStartClick = () => {
+    if (!scheduleData?.schedules) {
+      toast.error('일정 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    const startDateSchedule = scheduleData.schedules.find(
+      (s) => s.type === 'START_DATE'
+    );
+    const endDateSchedule = scheduleData.schedules.find(
+      (s) => s.type === 'END_DATE'
+    );
+
+    if (!startDateSchedule || !endDateSchedule) {
+      toast.error('일정 정보를 확인할 수 없습니다.');
+      return;
+    }
+
+    const startDate = new Date(startDateSchedule.date);
+    const endDate = new Date(endDateSchedule.date);
+    const now = new Date();
+
+    // 접수 시작 전
+    if (now < startDate) {
+      toast.error('아직 접수 기간이 아닙니다.');
+      setTimeout(() => {
+        window.location.href = 'https://entrydsm.kr/';
+      }, 1500);
+      return;
+    }
+
+    // 접수 마감 후
+    if (now > endDate) {
+      toast.error('접수 기간이 종료되었습니다.');
+      setTimeout(() => {
+        window.location.href = 'https://entrydsm.kr/';
+      }, 1500);
+      return;
+    }
+
+    // 접수 기간 내
     navigate('/application-classification');
   };
 

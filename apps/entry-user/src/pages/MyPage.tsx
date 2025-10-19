@@ -148,6 +148,10 @@ export const MyPage = () => {
   };
 
   const handleApplicationSubmit = () => {
+    if (!isApplicationAvailable) {
+      toast.error('접수 기간이 아닙니다!');
+      return;
+    }
     window.open('https://admission.entrydsm.kr', '_blank');
   };
 
