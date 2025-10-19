@@ -3,7 +3,7 @@ import { colors, Flex, Skeleton, Text } from '@entry/design-token';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { usePdfPreviewPost } from '../../apis';
-import { usePdfPreviewSuccessPost, usePdfPreviewFailedPost } from '../../apis/pdfLogging';
+import { sendPdfPreviewSuccess, sendPdfPreviewFailed } from '../../apis/pdfLogging';
 import { useApplicationData } from '@entry/ui';
 import { convertGradeToScore } from '../../hooks';
 import { toast } from 'react-toastify';
@@ -73,6 +73,7 @@ export const ApplicationPreview = () => {
 
   const pdfPreviewApi = usePdfPreviewPost()
   const { saveToStorage, state } = useApplicationData();
+  const sessionIdRef = useRef<string>(crypto.randomUUID());
 
   useEffect(() => {
     return () => {
@@ -95,9 +96,11 @@ export const ApplicationPreview = () => {
     hasFetched.current = true;
 
     const fetchPdf = async () => {
+      const startTime = Date.now();
+
       try {
         setIsLoading(true);
-        
+
         const data = await pdfPreviewApi.mutateAsync({
           applicantName: state.applicantInfo.applicantName,
           applicantTel: state.applicantInfo.applicantNumber,
@@ -316,9 +319,23 @@ export const ApplicationPreview = () => {
         const url = URL.createObjectURL(blob);
         setPdfUrl(url);
         setIsLoading(false);
-      } catch (error) {
+
+        // PDF 미리보기 성공 로그를 Meerkat으로 전송 (에러 발생 시 메인 애플리케이션에 영향 없음)
+        const generationTime = Date.now() - startTime;
+        sendPdfPreviewSuccess({
+          sessionId: sessionIdRef.current,
+          fileSize: blob.size,
+          generationTime,
+        });
+      } catch (error: any) {
         toast.error('pdf 생성에 실패하였습니다.')
         setIsLoading(false);
+
+        // PDF 미리보기 실패 로그를 Meerkat으로 전송 (에러 발생 시 메인 애플리케이션에 영향 없음)
+        sendPdfPreviewFailed({
+          sessionId: sessionIdRef.current,
+          errorMessage: error?.message || 'PDF 미리보기 생성 중 오류 발생',
+        });
       }
     };
 

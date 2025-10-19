@@ -341,11 +341,28 @@ const userResponseInterceptor = async (error: AxiosError) => {
     await reportServerError(config as InternalAxiosRequestConfig, error);
   }
 
-  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  // TIMEOUT 에러 처리 - 1회 재시도
   if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    const retryConfig = config as InternalAxiosRequestConfig & { _timeoutRetry?: boolean };
+
+    if (!retryConfig._timeoutRetry) {
+      // 첫 번째 timeout - 재시도
+      retryConfig._timeoutRetry = true;
+      try {
+        return await AdmissionUserInstance(retryConfig);
+      } catch (retryError) {
+        // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
+        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        return Promise.reject(retryError);
+      }
+    }
+
+    // 두 번째 timeout - 리다이렉트
     window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
     return Promise.reject(error);
   }
+
+  // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
     window.location.href = 'https://entrydsm.kr/return_soon?code=500';
     return Promise.reject(error);
@@ -405,11 +422,28 @@ const adminResponseInterceptor = async (error: AxiosError) => {
     await reportServerError(config as InternalAxiosRequestConfig, error);
   }
 
-  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  // TIMEOUT 에러 처리 - 1회 재시도
   if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    const retryConfig = config as InternalAxiosRequestConfig & { _timeoutRetry?: boolean };
+
+    if (!retryConfig._timeoutRetry) {
+      // 첫 번째 timeout - 재시도
+      retryConfig._timeoutRetry = true;
+      try {
+        return await AdmissionAdminInstance(retryConfig);
+      } catch (retryError) {
+        // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
+        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        return Promise.reject(retryError);
+      }
+    }
+
+    // 두 번째 timeout - 리다이렉트
     window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
     return Promise.reject(error);
   }
+
+  // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
     window.location.href = 'https://entrydsm.kr/return_soon?code=500';
     return Promise.reject(error);
@@ -486,11 +520,28 @@ const publicResponseInterceptor = async (error: AxiosError) => {
     await reportServerError(config as InternalAxiosRequestConfig, error);
   }
 
-  // 500, 502, 503, TIMEOUT 에러 시 리다이렉트
+  // TIMEOUT 에러 처리 - 1회 재시도
   if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    const retryConfig = config as InternalAxiosRequestConfig & { _timeoutRetry?: boolean };
+
+    if (!retryConfig._timeoutRetry) {
+      // 첫 번째 timeout - 재시도
+      retryConfig._timeoutRetry = true;
+      try {
+        return await AdmissionPublicInstance(retryConfig);
+      } catch (retryError) {
+        // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
+        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        return Promise.reject(retryError);
+      }
+    }
+
+    // 두 번째 timeout - 리다이렉트
     window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
     return Promise.reject(error);
   }
+
+  // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
     window.location.href = 'https://entrydsm.kr/return_soon?code=500';
     return Promise.reject(error);
