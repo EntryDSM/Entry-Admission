@@ -257,26 +257,39 @@ export const MyPage = () => {
     if (!scheduleData?.schedules || applicationStatus) return;
 
     const calculateRemainingTime = () => {
+      const startDateSchedule = scheduleData.schedules.find(
+        (s) => s.type === 'START_DATE'
+      );
       const endDateSchedule = scheduleData.schedules.find(
         (s) => s.type === 'END_DATE'
       );
 
-      if (!endDateSchedule) {
+      if (!startDateSchedule || !endDateSchedule) {
         setIsApplicationAvailable(false);
         return;
       }
 
+      const startDate = new Date(startDateSchedule.date);
       const endDate = new Date(endDateSchedule.date);
       const now = new Date();
+
+      // 접수 시작 전
+      if (now < startDate) {
+        setRemainingTime('접수 시작 전');
+        setIsApplicationAvailable(false);
+        return;
+      }
+
       const diff = endDate.getTime() - now.getTime();
 
+      // 접수 마감
       if (diff <= 0) {
         setRemainingTime('접수 마감');
         setIsApplicationAvailable(false);
         return;
       }
 
-      // 접수 마감 전이면 접수 가능
+      // 접수 기간 내 (시작 ~ 종료)
       setIsApplicationAvailable(true);
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
