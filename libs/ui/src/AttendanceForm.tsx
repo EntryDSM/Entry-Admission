@@ -37,26 +37,29 @@ export const AttendanceForm: React.FC<IAttendanceFormType> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value: rawValue } = e.target;
 
-    if (maxScore !== undefined) {
-      // 숫자만 추출
-      const onlyNums = rawValue.replace(/[^0-9]/g, '');
+    // 숫자만 추출 (마이너스 기호 제거)
+    const onlyNums = rawValue.replace(/[^0-9]/g, '');
 
-      // 빈 값 처리
-      if (onlyNums === '') {
-        onChange('');
-        return;
-      }
-
-      const numValue = Number(onlyNums);
-
-      // 최대값 체크
-      if (numValue <= maxScore && numValue >= minScore) {
-        // 숫자로 변환 후 다시 문자열로 (선행 0 자동 제거)
-        onChange(String(numValue));
-      }
+    // 빈 값 처리
+    if (onlyNums === '') {
+      onChange('');
       return;
     }
-    onChange(rawValue);
+
+    const numValue = Number(onlyNums);
+
+    // 0 이상인지 체크
+    if (numValue < minScore) {
+      return;
+    }
+
+    // 최대값이 설정되어 있으면 최대값 체크
+    if (maxScore !== undefined && numValue > maxScore) {
+      return;
+    }
+
+    // 숫자로 변환 후 다시 문자열로 (선행 0 자동 제거)
+    onChange(String(numValue));
   };
 
   return (

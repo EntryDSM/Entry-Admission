@@ -45,6 +45,63 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
+// 로딩 표시 후 3초 뒤 리다이렉션
+const showLoadingAndRedirect = (url: string) => {
+  // 전체 화면 로딩 오버레이 생성
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  `;
+
+  const spinner = document.createElement('div');
+  spinner.style.cssText = `
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  `;
+
+  const text = document.createElement('div');
+  text.style.cssText = `
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 500;
+  `;
+  text.textContent = '로딩 중...';
+
+  // 스피너 애니메이션 추가
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  `;
+
+  overlay.appendChild(spinner);
+  overlay.appendChild(text);
+  document.head.appendChild(style);
+  document.body.appendChild(overlay);
+
+  // 3초 후 리다이렉트
+  setTimeout(() => {
+    window.location.href = url;
+  }, 3000);
+};
+
 const skipAuthUrls = [
   'POST /admin/auth',
   'POST /user/auth',
@@ -359,27 +416,27 @@ const userResponseInterceptor = async (error: AxiosError) => {
         return await AdmissionUserInstance(retryConfig);
       } catch (retryError) {
         // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
-        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
         return Promise.reject(retryError);
       }
     }
 
     // 두 번째 timeout - 리다이렉트
-    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
     return Promise.reject(error);
   }
 
   // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=500');
     return Promise.reject(error);
   }
   if (response?.status === 502) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=502');
     return Promise.reject(error);
   }
   if (response?.status === 503) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=503');
     return Promise.reject(error);
   }
 
@@ -447,27 +504,27 @@ const adminResponseInterceptor = async (error: AxiosError) => {
         return await AdmissionAdminInstance(retryConfig);
       } catch (retryError) {
         // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
-        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
         return Promise.reject(retryError);
       }
     }
 
     // 두 번째 timeout - 리다이렉트
-    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
     return Promise.reject(error);
   }
 
   // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=500');
     return Promise.reject(error);
   }
   if (response?.status === 502) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=502');
     return Promise.reject(error);
   }
   if (response?.status === 503) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=503');
     return Promise.reject(error);
   }
 
@@ -552,27 +609,27 @@ const publicResponseInterceptor = async (error: AxiosError) => {
         return await AdmissionPublicInstance(retryConfig);
       } catch (retryError) {
         // 재시도 실패 시에도 로깅은 reportServerError에서 자동으로 처리됨
-        window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+        showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
         return Promise.reject(retryError);
       }
     }
 
     // 두 번째 timeout - 리다이렉트
-    window.location.href = 'https://entrydsm.kr/return_soon?code=TIMEOUT';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=TIMEOUT');
     return Promise.reject(error);
   }
 
   // 500, 502, 503 에러 시 리다이렉트
   if (response?.status === 500) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=500';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=500');
     return Promise.reject(error);
   }
   if (response?.status === 502) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=502';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=502');
     return Promise.reject(error);
   }
   if (response?.status === 503) {
-    window.location.href = 'https://entrydsm.kr/return_soon?code=503';
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=503');
     return Promise.reject(error);
   }
 
