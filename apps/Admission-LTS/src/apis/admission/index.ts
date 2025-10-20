@@ -13,7 +13,7 @@ const sendErrorReport = async (error: AxiosError<any>, requestData: any) => {
       endpoint: "/api/v1/applications",
       httpMethod: "POST",
       httpStatus: error.response?.status || 0,
-      errorCategory: "CLIENT_ERROR",
+      errorCategory: "SERVER_ERROR",
       errorCode: error.code || "UNKNOWN_ERROR",
       message: error.message || "원서 제출 중 오류가 발생했습니다.",
       stackTrace: error.stack || "",
