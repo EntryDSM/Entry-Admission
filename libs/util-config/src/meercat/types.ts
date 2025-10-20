@@ -1,4 +1,4 @@
-export type PageType = 'AUTH' | 'USER' | 'ADMISSION';
+export type PageType = 'AUTH' | 'USER' | 'ADMISSION' | 'ADMISSION_SUBMIT';
 
 export interface NetworkTest {
   latency: number;

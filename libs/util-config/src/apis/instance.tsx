@@ -141,8 +141,16 @@ const reportServerError = async (
           ? 'USER'
           : 'ADMISSION';
 
-    const requestPayload =
+    const request =
       typeof config.data === 'string' ? config.data : JSON.stringify(config.data || {});
+
+    const response = error.response?.data
+      ? typeof error.response.data === 'string'
+        ? error.response.data
+        : JSON.stringify(error.response.data)
+      : 'NULL';
+
+    const requestPayload = `REQUEST: ${request} / RESPONSE: ${response}`;
 
     // 에러 타입 분류
     let errorCategory = 'SERVER_ERROR';
