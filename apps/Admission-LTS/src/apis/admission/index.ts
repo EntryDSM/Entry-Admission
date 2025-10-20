@@ -14,7 +14,7 @@ const sendErrorReport = async (
   try {
     const errorReport = {
       sessionId,
-      pageType: "ADMISSION_SUBMIT",
+      pageType: "ADMISSION",
       endpoint: "/api/v1/applications",
       httpMethod: "POST",
       httpStatus: error.response?.status || 0,
