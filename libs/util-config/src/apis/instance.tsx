@@ -328,6 +328,13 @@ AdmissionPublicInstance.interceptors.request.use(publicRequestInterceptor);
 const userResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
 
+  // 400번대 에러도 API 로그에 기록
+  if (response && response.status >= 400 && response.status < 500 && config) {
+    // @ts-ignore
+    const startTime = config.metadata?.startTime || performance.now();
+    logApiCall(config as InternalAxiosRequestConfig, response, startTime);
+  }
+
   // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
   const shouldReport =
     response?.status === 500 ||
@@ -408,6 +415,13 @@ const userResponseInterceptor = async (error: AxiosError) => {
 // ✅ 관리자 응답 인터셉터
 const adminResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
+
+  // 400번대 에러도 API 로그에 기록
+  if (response && response.status >= 400 && response.status < 500 && config) {
+    // @ts-ignore
+    const startTime = config.metadata?.startTime || performance.now();
+    logApiCall(config as InternalAxiosRequestConfig, response, startTime);
+  }
 
   // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
   const shouldReport =
@@ -506,6 +520,13 @@ AdmissionAdminInstance.interceptors.response.use(
 // ✅ Public 응답 인터셉터
 const publicResponseInterceptor = async (error: AxiosError) => {
   const { config, response } = error;
+
+  // 400번대 에러도 API 로그에 기록
+  if (response && response.status >= 400 && response.status < 500 && config) {
+    // @ts-ignore
+    const startTime = config.metadata?.startTime || performance.now();
+    logApiCall(config as InternalAxiosRequestConfig, response, startTime);
+  }
 
   // 모든 에러 타입 리포트 (500, 네트워크 에러, 타임아웃 등)
   const shouldReport =
