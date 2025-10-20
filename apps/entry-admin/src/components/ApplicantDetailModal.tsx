@@ -153,7 +153,14 @@ export const ApplicantDetailModal = ({
             <InfoRow>
               <InfoLabel>성적</InfoLabel>
               <ScoreValue>
-                {application?.scores?.totalScore ?? 0}/170
+                {application?.scores?.totalScore ?? 0}/
+                {application?.applicationType === 'SOCIAL'
+                  ? 110
+                  : application?.applicationType === 'MEISTER'
+                  ? 110
+                  : application?.applicationType === 'COMMON'
+                  ? 170
+                  : '-'}
               </ScoreValue>
             </InfoRow>
 
