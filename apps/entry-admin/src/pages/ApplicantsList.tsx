@@ -75,6 +75,11 @@ export const ApplicantsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { isOpen, open, close } = useModal();
 
+  const handleSearchChange = (keyword: string) => {
+    setSearchKeyword(keyword);
+    setCurrentPage(1);
+  };
+
   const handleCheckBoxChange = <
     G extends FilterGroupType,
     K extends keyof (typeof filters)[G]
@@ -187,7 +192,26 @@ export const ApplicantsList = () => {
     return filtered.sort((a, b) => a.receiptCode - b.receiptCode);
   }, [applicantsList, searchKeyword, filters]);
 
-  const totalPage = data?.data.totalPages ?? 1;
+  // 검색이나 클라이언트 필터가 있으면 클라이언트 사이드 페이지네이션, 아니면 서버 페이지네이션
+  const hasClientFilters =
+    searchKeyword ||
+    Object.values(filters.admission).some(v => v) ||
+    Object.values(filters.education).some(v => v) ||
+    filters.status.received;
+
+  const totalPage = hasClientFilters
+    ? Math.max(1, Math.ceil(filteredApplicants.length / 20))
+    : (data?.data.totalPages ?? 1);
+
+  // 클라이언트 필터가 있으면 페이지별로 데이터 자르기
+  const paginatedApplicants = useMemo(() => {
+    if (hasClientFilters) {
+      const startIndex = (currentPage - 1) * 20;
+      const endIndex = startIndex + 20;
+      return filteredApplicants.slice(startIndex, endIndex);
+    }
+    return filteredApplicants;
+  }, [filteredApplicants, currentPage, hasClientFilters]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -196,7 +220,7 @@ export const ApplicantsList = () => {
   return (
     <Container>
       <HeadContent>
-        <FindApplicantInput onSearch={setSearchKeyword} />
+        <FindApplicantInput onSearch={handleSearchChange} />
         <ButtonContiner>
           <Button
             color={colors.extra.realWhite}
@@ -299,10 +323,10 @@ export const ApplicantsList = () => {
       <ApplicantsAllList>
         {isLoading ? (
           <LoadingContent>지원자 조회 데이터 기다리는 중...</LoadingContent>
-        ) : filteredApplicants.length === 0 ? (
+        ) : paginatedApplicants.length === 0 ? (
           <LoadingContent>지원자 내역이 없습니다.</LoadingContent>
         ) : (
-          filteredApplicants.map((applicant) => (
+          paginatedApplicants.map((applicant) => (
             <Applicant
               key={applicant.applicationId}
               applicationId={applicant.applicationId}
