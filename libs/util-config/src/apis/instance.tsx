@@ -447,6 +447,10 @@ const userResponseInterceptor = async (error: AxiosError) => {
     showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=503');
     return Promise.reject(error);
   }
+  if (response?.status === 530) {
+    showLoadingAndRedirect('https://entrydsm.kr/return_soon?code=503');
+    return Promise.reject(error);
+  }
 
   // skipAuthInterceptor가 설정된 요청(refresh 요청)은 401/403 재시도 하지 않음
   // @ts-ignore
