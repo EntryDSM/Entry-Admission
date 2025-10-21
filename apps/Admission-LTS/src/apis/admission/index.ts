@@ -71,7 +71,7 @@ export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
         setTimeout(() => {
           window.location.href = "https://entrydsm.kr/"
         }, 2000)
-      } else if (err.response?.status === 400 || err.response?.status === 500 || err.response?.status === 502 || err.response?.status === 503) {
+      } else if (err.response?.status === 400 || err.response?.status === 500 || err.response?.status === 502 || err.response?.status === 503 || err.response?.status === 530) {
         toast.error("일시적으로 처리할 수 없습니다. 다시 시도해 주세요.")
         await sendErrorReport(sessionId, err, variables, responseTime)
 
