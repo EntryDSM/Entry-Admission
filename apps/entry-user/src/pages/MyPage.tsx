@@ -376,6 +376,7 @@ export const MyPage = () => {
               원서 다운로드
             </Button>
             {scheduleData?.currentStatus === 'FIRST_ANNOUNCEMENT' ||
+            scheduleData?.currentStatus === 'BEFORE_INTERVIEW' ||
             scheduleData?.currentStatus === 'INTERVIEW' ? (
               <Button
                 backgroundColor={colors.gray[50]}
