@@ -176,15 +176,14 @@ export const MyPage = () => {
       const generationTime = Date.now() - startTime;
 
       await fetch('https://meeeeercat.ncloud.sbs/v1/pdf/download-success', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        fileSize: blob.size,
-        generationTime,
-      }),
-    });
-
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          fileSize: blob.size,
+          generationTime,
+        }),
+      });
     } catch (error: any) {
       const generationTime = Date.now() - startTime;
       const errorMessage = error?.message || 'PDF 다운로드 중 오류 발생';
@@ -193,17 +192,17 @@ export const MyPage = () => {
         toast.error('원서가 아직 제출되지 않았습니다.');
       else if (error.response.status === 500)
         toast.error('원서 다운로드 중 오류가 발생하였습니다.');
-      
+
       await fetch('https://meeeeercat.ncloud.sbs/v1/pdf/download-failed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        errorMessage,
-        generationTime,
-      }),
-    },
-  )}
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          errorMessage,
+          generationTime,
+        }),
+      });
+    }
   };
 
   const handleCancelApplication = () => {
@@ -215,6 +214,15 @@ export const MyPage = () => {
   };
 
   const handleCheckFirstRoundResult = async () => {
+    // 1차 발표 기간이 아닌 경우
+    if (
+      scheduleData?.currentStatus !== 'FIRST_ANNOUNCEMENT' &&
+      scheduleData?.currentStatus !== 'INTERVIEW'
+    ) {
+      toast.error('1차 합격자 발표 기간이 아닙니다.');
+      return;
+    }
+
     try {
       const result = await getFirstRoundPass();
       setIsPass(result.isFirstRoundPass);
@@ -226,6 +234,15 @@ export const MyPage = () => {
   };
 
   const handleCheckSecondRoundResult = async () => {
+    // 2차 발표 기간이 아닌 경우
+    if (
+      scheduleData?.currentStatus !== 'SECOND_ANNOUNCEMENT' &&
+      scheduleData?.currentStatus !== 'END'
+    ) {
+      toast.error('2차 합격자 발표 기간이 아닙니다.');
+      return;
+    }
+
     try {
       const result = await getSecondRoundPass();
       setIsPass(result.finalPass);
@@ -375,29 +392,24 @@ export const MyPage = () => {
             >
               원서 다운로드
             </Button>
-            {scheduleData?.currentStatus === 'FIRST_ANNOUNCEMENT' ||
-            scheduleData?.currentStatus === 'INTERVIEW' ? (
-              <Button
-                backgroundColor={colors.gray[50]}
-                color={colors.orange[800]}
-                borderColor={colors.orange[800]}
-                hoverBackgroundColor="transparent"
-                onClick={handleCheckFirstRoundResult}
-              >
-                1차 결과 확인
-              </Button>
-            ) : scheduleData?.currentStatus === 'SECOND_ANNOUNCEMENT' ||
-              scheduleData?.currentStatus === 'END' ? (
-              <Button
-                backgroundColor={colors.gray[50]}
-                color={colors.orange[800]}
-                borderColor={colors.orange[800]}
-                hoverBackgroundColor="transparent"
-                onClick={handleCheckSecondRoundResult}
-              >
-                2차 결과 확인
-              </Button>
-            ) : null}
+            <Button
+              backgroundColor={colors.gray[50]}
+              color={colors.orange[800]}
+              borderColor={colors.orange[800]}
+              hoverBackgroundColor="transparent"
+              onClick={handleCheckFirstRoundResult}
+            >
+              1차 결과 확인
+            </Button>
+            <Button
+              backgroundColor={colors.gray[50]}
+              color={colors.orange[800]}
+              borderColor={colors.orange[800]}
+              hoverBackgroundColor="transparent"
+              onClick={handleCheckSecondRoundResult}
+            >
+              2차 결과 확인
+            </Button>
           </Flex>
           {applicationStatus ? (
             <Button
