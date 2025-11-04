@@ -19,5 +19,5 @@ export interface IScheduleResponseType {
 
 export interface IAllScheduleResponseType {
   schedules: IScheduleResponseType[];
-  currentStatus: 'BEFORE_START' | 'RECRUITING' | 'FIRST_ANNOUNCEMENT' | 'INTERVIEW' | 'SECOND_ANNOUNCEMENT' | 'END';
+  currentStatus: 'BEFORE_START' | 'RECRUITING' | 'FIRST_ANNOUNCEMENT' | 'BEFORE_INTERVIEW' | 'INTERVIEW' | 'SECOND_ANNOUNCEMENT' | 'END';
 }
