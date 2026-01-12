@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "react-device-detect": "^2.2.3",
-    "react-pdf": "^7.7.1",
-    "pdfjs-dist": "^3.11.174"
+    "react-pdf": "^10.2.0",
+    "pdfjs-dist": "5.4.296"
   }
 }
