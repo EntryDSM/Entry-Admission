@@ -16,16 +16,13 @@ export const loginAdmin = async (
 export const refreshAdminToken = async (
   refreshToken: string
 ): Promise<ITokenResponseType> => {
-  const adminId = getAdminId();
-
+  
   const { data } = await AdmissionAdminInstance.put<ITokenResponseType>(
     '/admin/auth',
     {},
     {
       headers: {
         'X-Refresh-Token': refreshToken,
-        'Request-User-Id': adminId,
-        'Request-User-Role': 'ADMIN',
       },
     }
   );

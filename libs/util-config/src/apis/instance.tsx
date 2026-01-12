@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import {
-  getAdminId,
   getAccessToken,
   getRefreshToken,
   setAccessToken,
@@ -289,8 +288,6 @@ const handleAdminTokenRefresh = () => {
         {
           headers: {
             'X-Refresh-Token': adminRefreshToken,
-            'Request-User-Id': getAdminId(),
-            'Request-User-Role': 'ADMIN',
           },
           // @ts-ignore
           skipAuthInterceptor: true,
