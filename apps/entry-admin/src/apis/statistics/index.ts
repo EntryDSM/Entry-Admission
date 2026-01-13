@@ -9,7 +9,7 @@ export const useGetRegionStatistics = () => {
     queryKey: ['statistics', 'region'],
     queryFn: async () => {
       const { data } = await AdmissionAdminInstance.get<IRegionStatisticsResponse>(
-        '/api/v1/admin/statistics/region'
+        '/admin/application/region-status'
       );
       return data;
     },

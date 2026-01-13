@@ -1,17 +1,9 @@
-export interface IRegionStatistics {
-  region: string;
+export interface IRegionStatisticsItem {
   regionName: string;
   count: number;
-  percentage: number;
 }
 
-export interface IRegionStatisticsResponse {
-  success: boolean;
-  data: {
-    total: number;
-    byRegion: IRegionStatistics[];
-  };
-}
+export type IRegionStatisticsResponse = Record<string, number>;
 
 export interface ICompetitionRateByType {
   applicationType: string;

@@ -47,6 +47,13 @@ export const StatisticsLandingPage = () => {
   const { data: regionData, isLoading: isRegionLoading } = useGetRegionStatistics();
   const { data: competitionData, isLoading: isCompetitionLoading } = useGetCompetitionRate();
   const { data: genderData, isLoading: isGenderLoading } = useGetGenderStatistics();
+  const regionItems = React.useMemo(() => {
+    if (!regionData) return [];
+    return Object.entries(regionData).map(([regionName, count]) => ({
+      regionName,
+      count,
+    }));
+  }, [regionData]);
 
   // 스케줄 데이터에서 날짜 찾기
   const findDate = (type: string) =>
@@ -324,7 +331,7 @@ export const StatisticsLandingPage = () => {
               ))}
             </>
           ) : (
-            regionData?.data?.byRegion?.map((item, index) => (
+            regionItems.map((item, index) => (
               <RegionCard key={index}>
                 <RegionName>{item.regionName}</RegionName>
                 <RegionCount>{item.count}명</RegionCount>
@@ -353,7 +360,7 @@ export const StatisticsLandingPage = () => {
                 ))}
               </>
             ) : (
-              regionData?.data?.byRegion?.slice(0, 4).map((item, index) => (
+              regionItems.slice(0, 4).map((item, index) => (
                 <MapLegendItem key={index}>
                   <MapLegendText>{item.regionName}</MapLegendText>
                   <MapLegendCount>{item.count}명</MapLegendCount>
