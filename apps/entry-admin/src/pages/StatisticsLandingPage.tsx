@@ -55,6 +55,38 @@ export const StatisticsLandingPage = () => {
     }));
   }, [regionData]);
 
+  const genderItems = React.useMemo(() => {
+    if (!genderData) return [];
+    return Object.entries(genderData).map(([genderName, count]) => ({
+      genderName,
+      count,
+    }));
+  }, [genderData]);
+
+  const competitionSummary = React.useMemo(() => {
+    const byTypeMap = new Map<string, number>();
+    let totalApplicants = 0;
+
+    if (!competitionData) {
+      return { totalApplicants: 0, byType: [] as { applicationType: string; applicants: number }[] };
+    }
+
+    competitionData.forEach((item) => {
+      totalApplicants += item.count;
+      byTypeMap.set(
+        item.applicationType,
+        (byTypeMap.get(item.applicationType) ?? 0) + item.count
+      );
+    });
+
+    const byType = Array.from(byTypeMap.entries()).map(([applicationType, applicants]) => ({
+      applicationType,
+      applicants,
+    }));
+
+    return { totalApplicants, byType };
+  }, [competitionData]);
+
   // 스케줄 데이터에서 날짜 찾기
   const findDate = (type: string) =>
     scheduleData?.schedules?.find((s: any) => s.type === type)?.date || '';
@@ -180,7 +212,7 @@ export const StatisticsLandingPage = () => {
               <SkeletonValue />
             ) : (
               <StatValue>
-                {competitionData?.data?.total?.applicants || 0}명 /{competitionData?.data?.total?.capacity || 0}명
+                {competitionSummary.totalApplicants}명 /--명
               </StatValue>
             )}
           </StatContent>
@@ -196,7 +228,7 @@ export const StatisticsLandingPage = () => {
               <SkeletonValue />
             ) : (
               <StatValue>
-                {competitionData?.data?.total?.rate?.toFixed(1) || 0} : 1
+                -- : 1
               </StatValue>
             )}
           </StatContent>
@@ -247,7 +279,7 @@ export const StatisticsLandingPage = () => {
               <ApplicationTypeCard><SkeletonValue /></ApplicationTypeCard>
             </>
           ) : (
-            competitionData?.data?.byType?.map((item, index) => {
+            competitionSummary.byType.map((item, index) => {
               const typeColors: { [key: string]: string } = {
                 'GENERAL': '#1DB954',
                 'COMMON': '#1DB954', // COMMON도 일반 전형 색상 사용
@@ -260,14 +292,17 @@ export const StatisticsLandingPage = () => {
                 'MEISTER': '마이스터 전형',
                 'SOCIAL': '사회 통합 전형',
               };
-              const progressPercentage = item.capacity > 0 ? (item.applicants / item.capacity) * 100 : 0;
-              const percentage = item.capacity > 0 ? ((item.applicants / item.capacity) * 100).toFixed(2) : '0.00';
+              const progressPercentage =
+                competitionSummary.totalApplicants > 0
+                  ? (item.applicants / competitionSummary.totalApplicants) * 100
+                  : 0;
+              const percentage = progressPercentage.toFixed(2);
 
               return (
                 <ApplicationTypeCard key={index}>
                   <ApplicationTypeHeader>
                     <ApplicationTypeTitle>{typeNames[item.applicationType] || item.applicationType}</ApplicationTypeTitle>
-                    <ApplicationTypeCount>{item.applicants}/{item.capacity}</ApplicationTypeCount>
+                    <ApplicationTypeCount>{item.applicants}명</ApplicationTypeCount>
                   </ApplicationTypeHeader>
                   <ProgressBarContainer>
                     <ProgressBar progress={progressPercentage} color={typeColors[item.applicationType] || '#666'} />
@@ -295,16 +330,15 @@ export const StatisticsLandingPage = () => {
               </GenderCard>
             </>
           ) : (
-            genderData?.data?.byGender?.slice(0, 2).map((item, index) => {
-              const rawPercentage = typeof item.percentage === 'number' ? item.percentage : 0;
-              // 백엔드가 0~1 또는 0~100 둘 다 반환할 수 있으므로 정규화
-              const normalizedPercentage = rawPercentage <= 1 ? rawPercentage * 100 : rawPercentage;
+            genderItems.slice(0, 2).map((item, index) => {
+              const total = genderItems.reduce((sum, current) => sum + current.count, 0);
+              const normalizedPercentage = total > 0 ? (item.count / total) * 100 : 0;
               const displayPercentage = `${normalizedPercentage.toFixed(2)}%`;
               const color = index === 0 ? '#4F46E5' : '#EC4899';
 
               return (
-                <GenderCard key={`${item.gender}-${index}`}>
-                  <GenderTitle>{item.genderName ?? item.gender}</GenderTitle>
+                <GenderCard key={`${item.genderName}-${index}`}>
+                  <GenderTitle>{item.genderName}</GenderTitle>
                   <GenderCount>{item.count}명</GenderCount>
                   <ProgressBarContainer>
                     <ProgressBar progress={normalizedPercentage} color={color} />
