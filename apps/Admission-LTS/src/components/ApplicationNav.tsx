@@ -15,6 +15,7 @@ import { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useAdmissionSubmitPost } from '../apis';
 import { convertGradeToScore } from '../hooks';
+import { getApplicationRemark } from '../utils/applicationRemark';
 import { GlobalLoader } from './';
 
 interface IApplicationNavType {
@@ -315,12 +316,9 @@ IApplicationNavType) => {
           ),
           studyPlan: state.personalStatements.studyPlan,
           selfIntroduce: state.personalStatements.personalStmt,
-          nationalMeritChild:
-            state.applicantInfo.specialNotes === '국가 유공자' ? true : false,
-          specialAdmissionTarget:
-            state.applicantInfo.specialNotes === '특례 입학 대상'
-              ? true
-              : false,
+          applicationRemark: getApplicationRemark(
+            state.applicantInfo.specialNotes
+          ),
         },
         schoolInfo: {
           schoolCode:

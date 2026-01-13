@@ -36,8 +36,7 @@ interface IApplicationInfo {
   studyPlan: string // personal-statements, 학업계획서
   selfIntroduce: string // personal-statements, 자기소개
   
-  nationalMeritChild: boolean // applicant-info, 국가 유공자 체크
-  specialAdmissionTarget: boolean // applicant-info, 특례입학 대상
+  applicationRemark: string // applicant-info, 특기사항
 }
 
 interface ISchoolInfo {

@@ -32,52 +32,52 @@ export interface IApplicationDetailRequest {
 }
 
 export interface IApplicationDetailResponse {
-  success: boolean;
-  data: {
-    applicationId: string;
-    userId: string;
-    receiptCode: number;
-    applicantName: string;
-    applicantTel: string;
+  commonInformation: {
+    name: string;
     parentName: string;
     parentTel: string;
-    birthDate: string;
-    applicationType: string;
-    educationalStatus: string;
-    status: string;
-    submittedAt: string;
-    reviewedAt: string;
-    createdAt: string;
-    updatedAt: string;
-    photoUrl: string;
-    studyPlan: string;
-    selfIntroduce: string;
-    isDaejeon: boolean;
-    scores: {
-      totalScore: number;
-      subjectScore: number;
-      attendanceScore: number;
-      volunteerScore: number;
-      bonusScore: number;
-    };
   };
+  moreInformation: {
+    photoUrl: string;
+    birthDay: string;
+    applicationStatus: string;
+    educationalStatus: string;
+    applicationType: string;
+    isDaejeon: boolean;
+  } | null;
+  evaluation: {
+    totalScore: number;
+    totalGradeScore: number;
+    attendanceScore: number;
+    volunteerScore: number;
+    extraScore: number;
+    selfIntroduce?: string | null;
+    studyPlan?: string | null;
+  } | null;
 }
 
 // 상세 정보
 export interface IApplicationDetail {
-  applicationId: string;
-  userId: string;
-  receiptCode: number;
-  applicantName: string;
-  applicantTel: string;
-  parentName: string;
-  parentTel: string;
-  birthDate: string;
-  applicationType: string;
-  educationalStatus: string;
-  status: string;
-  submittedAt: string;
-  reviewedAt: string;
-  createdAt: string;
-  updatedAt: string;
+  commonInformation: {
+    name: string;
+    parentName: string;
+    parentTel: string;
+  };
+  moreInformation: {
+    photoUrl: string;
+    birthDay: string;
+    applicationStatus: string;
+    educationalStatus: string;
+    applicationType: string;
+    isDaejeon: boolean;
+  } | null;
+  evaluation: {
+    totalScore: number;
+    totalGradeScore: number;
+    attendanceScore: number;
+    volunteerScore: number;
+    extraScore: number;
+    selfIntroduce?: string | null;
+    studyPlan?: string | null;
+  } | null;
 }

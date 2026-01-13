@@ -8,6 +8,7 @@ import { useApplicationData } from '@entry/ui';
 import { toast } from 'react-toastify';
 import { Document, Page, pdfjs } from 'react-pdf';
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { getApplicationRemark } from '../../utils/applicationRemark';
 
 export const ApplicationPreview = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -175,8 +176,9 @@ export const ApplicationPreview = () => {
             ),
             studyPlan: state.personalStatements.studyPlan,
             selfIntroduce: state.personalStatements.personalStmt,
-            nationalMeritChild: state.applicantInfo.specialNotes === "국가 유공자" ? true : false,
-            specialAdmissionTarget: state.applicantInfo.specialNotes === "특례 입학 대상" ? true : false,
+            applicationRemark: getApplicationRemark(
+              state.applicantInfo.specialNotes
+            ),
           },
           schoolInfo: {
             schoolCode: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)" ? null : state.middleSchoolInfo.schoolCode,

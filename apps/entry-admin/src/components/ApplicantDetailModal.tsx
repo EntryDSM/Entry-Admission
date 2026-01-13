@@ -92,9 +92,9 @@ export const ApplicantDetailModal = ({
 
         <ModalHeader>
           <ApplicantImage>
-            {application?.photoUrl ? (
+            {application?.moreInformation?.photoUrl ? (
               <img
-                src={application.photoUrl}
+                src={application.moreInformation.photoUrl}
                 alt="지원자 사진"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -106,32 +106,34 @@ export const ApplicantDetailModal = ({
           <ApplicantInfo>
             <ApplicantNumber>
               접수 번호
-              <NumberBadge>{application?.receiptCode ?? '-'}</NumberBadge>
+              <NumberBadge>{receiptCode ?? '-'}</NumberBadge>
             </ApplicantNumber>
 
             <InfoRow>
               <InfoLabel>이름</InfoLabel>
-              <InfoValue>{application?.applicantName ?? '-'}</InfoValue>
+              <InfoValue>{application?.commonInformation.name ?? '-'}</InfoValue>
             </InfoRow>
 
             <InfoRow>
               <InfoLabel>생년월일</InfoLabel>
-              <InfoValue>{application?.birthDate ?? '-'}</InfoValue>
+              <InfoValue>{application?.moreInformation?.birthDay ?? '-'}</InfoValue>
             </InfoRow>
 
             <InfoRow>
               <InfoLabel>지역</InfoLabel>
-              <InfoValue>{application?.isDaejeon ? '대전' : '전국'}</InfoValue>
+              <InfoValue>
+                {application?.moreInformation?.isDaejeon ? '대전' : '전국'}
+              </InfoValue>
             </InfoRow>
 
             <InfoRow>
               <InfoLabel>전형</InfoLabel>
               <InfoValue>
-                {application?.applicationType === 'SOCIAL'
+                {application?.moreInformation?.applicationType === 'SOCIAL'
                   ? '사회통합'
-                  : application?.applicationType === 'MEISTER'
+                  : application?.moreInformation?.applicationType === 'MEISTER'
                   ? '마이스터전형'
-                  : application?.applicationType === 'COMMON'
+                  : application?.moreInformation?.applicationType === 'COMMON'
                   ? '일반'
                   : '-'}
               </InfoValue>
@@ -140,11 +142,11 @@ export const ApplicantDetailModal = ({
             <InfoRow>
               <InfoLabel>학력</InfoLabel>
               <InfoValue>
-                {application?.educationalStatus === 'PROSPECTIVE_GRADUATE'
+                {application?.moreInformation?.educationalStatus === 'PROSPECTIVE_GRADUATE'
                   ? '졸업 예정'
-                  : application?.educationalStatus === 'GRADUATE'
+                  : application?.moreInformation?.educationalStatus === 'GRADUATE'
                   ? '졸업'
-                  : application?.educationalStatus === 'QUALIFICATION_EXAM'
+                  : application?.moreInformation?.educationalStatus === 'QUALIFICATION_EXAM'
                   ? '검정고시'
                   : '-'}
               </InfoValue>
@@ -153,12 +155,12 @@ export const ApplicantDetailModal = ({
             <InfoRow>
               <InfoLabel>성적</InfoLabel>
               <ScoreValue>
-                {application?.scores?.totalScore ?? 0}/
-                {application?.applicationType === 'SOCIAL'
+                {application?.evaluation?.totalScore ?? 0}/
+                {application?.moreInformation?.applicationType === 'SOCIAL'
                   ? 110
-                  : application?.applicationType === 'MEISTER'
+                  : application?.moreInformation?.applicationType === 'MEISTER'
                   ? 110
-                  : application?.applicationType === 'COMMON'
+                  : application?.moreInformation?.applicationType === 'COMMON'
                   ? 170
                   : '-'}
               </ScoreValue>
@@ -167,8 +169,9 @@ export const ApplicantDetailModal = ({
             <InfoRow>
               <InfoLabel>상태</InfoLabel>
               <InfoValue>
-                {application?.status
-                  ? statusMap[application.status] ?? application.status
+                {application?.moreInformation?.applicationStatus
+                  ? statusMap[application.moreInformation.applicationStatus] ??
+                    application.moreInformation.applicationStatus
                   : '-'}
               </InfoValue>
             </InfoRow>
@@ -178,7 +181,7 @@ export const ApplicantDetailModal = ({
         <ModalSection>
           <SectionTitle>자기소개서</SectionTitle>
           <SectionContent>
-            {formatTextWithLineBreaks(application?.selfIntroduce) ??
+            {formatTextWithLineBreaks(application?.evaluation?.selfIntroduce ?? undefined) ??
               '작성된 자기소개서가 없습니다.'}
           </SectionContent>
         </ModalSection>
@@ -186,7 +189,7 @@ export const ApplicantDetailModal = ({
         <ModalSection>
           <SectionTitle>학업 계획서</SectionTitle>
           <SectionContent>
-            {formatTextWithLineBreaks(application?.studyPlan) ??
+            {formatTextWithLineBreaks(application?.evaluation?.studyPlan ?? undefined) ??
               '작성된 학업 계획서가 없습니다.'}
           </SectionContent>
         </ModalSection>
@@ -195,15 +198,15 @@ export const ApplicantDetailModal = ({
           <SectionTitle>점수 상세</SectionTitle>
           <SectionContent>
             <ScoreRow>
-              과목 점수: {application?.scores?.subjectScore ?? 0}
+              과목 점수: {application?.evaluation?.totalGradeScore ?? 0}
             </ScoreRow>
             <ScoreRow>
-              출결 점수: {application?.scores?.attendanceScore ?? 0}
+              출결 점수: {application?.evaluation?.attendanceScore ?? 0}
             </ScoreRow>
             <ScoreRow>
-              봉사 점수: {application?.scores?.volunteerScore ?? 0}
+              봉사 점수: {application?.evaluation?.volunteerScore ?? 0}
             </ScoreRow>
-            <ScoreRow>가산점: {application?.scores?.bonusScore ?? 0}</ScoreRow>
+            <ScoreRow>가산점: {application?.evaluation?.extraScore ?? 0}</ScoreRow>
           </SectionContent>
         </ModalSection>
 
@@ -212,11 +215,11 @@ export const ApplicantDetailModal = ({
           <SectionContent>
             <InfoRow>
               <InfoLabel>부모님 성명</InfoLabel>
-              <InfoValue>{application?.parentName ?? '-'}</InfoValue>
+              <InfoValue>{application?.commonInformation.parentName ?? '-'}</InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoLabel>부모님 연락처</InfoLabel>
-              <InfoValue>{application?.parentTel ?? '-'}</InfoValue>
+              <InfoValue>{application?.commonInformation.parentTel ?? '-'}</InfoValue>
             </InfoRow>
           </SectionContent>
         </ParentSection>
