@@ -5,13 +5,13 @@ import { cancel } from '../assets';
 import { useGetApplicationDetail } from '../apis';
 
 interface IApplicantDetailModalType {
-  applicationId: string;
+  receiptCode: number;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export const ApplicantDetailModal = ({
-  applicationId,
+  receiptCode,
   isOpen,
   onClose,
 }: IApplicantDetailModalType) => {
@@ -20,7 +20,7 @@ export const ApplicantDetailModal = ({
     data: application,
     isLoading,
     isError,
-  } = useGetApplicationDetail(applicationId);
+  } = useGetApplicationDetail(receiptCode);
 
   useEffect(() => {
     if (isOpen) {
@@ -57,7 +57,7 @@ export const ApplicantDetailModal = ({
     RESULT_ANNOUNCED: '합격 여부 확인',
   };
 
-  if (!isOpen || !applicationId) return null;
+  if (!isOpen || !receiptCode) return null;
 
   if (isLoading)
     return (

@@ -17,7 +17,7 @@ export const useGetApplicationAllList = (
     queryFn: async () => {
       const { data } =
         await AdmissionAdminInstance.get<IApplicationAllListResponse>(
-          '/api/v1/applications',
+          '/admin/application/applicants',
           params ? { params } : {}
         );
       return data;

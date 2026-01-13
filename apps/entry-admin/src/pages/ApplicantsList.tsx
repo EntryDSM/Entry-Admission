@@ -98,6 +98,7 @@ export const ApplicantsList = () => {
   };
 
   const handleApplicantClick = (applicant: IApplicationType) => {
+    if (!applicant.receiptCode) return;
     setSelectedApplicant(applicant);
     open();
   };
@@ -127,8 +128,8 @@ export const ApplicantsList = () => {
   const { data, isLoading, refetch } = useGetApplicationAllList(filterParams);
 
   useEffect(() => {
-    if (data?.data.applications) {
-      setApplicantsList(data.data.applications);
+    if (data?.applicants) {
+      setApplicantsList(data.applicants);
     }
   }, [data]);
 
@@ -201,7 +202,7 @@ export const ApplicantsList = () => {
 
   const totalPage = hasClientFilters
     ? Math.max(1, Math.ceil(filteredApplicants.length / 20))
-    : (data?.data.totalPages ?? 1);
+    : (data?.totalPages ?? 1);
 
   // 클라이언트 필터가 있으면 페이지별로 데이터 자르기
   const paginatedApplicants = useMemo(() => {
@@ -328,14 +329,11 @@ export const ApplicantsList = () => {
         ) : (
           paginatedApplicants.map((applicant) => (
             <Applicant
-              key={applicant.applicationId}
-              applicationId={applicant.applicationId}
+              key={applicant.receiptCode}
               receiptCode={applicant.receiptCode}
               applicationType={applicant.applicationType}
               applicantName={applicant.applicantName}
               educationalStatus={applicant.educationalStatus}
-              status={applicant.status}
-              submittedAt={applicant.submittedAt}
               isDaejeon={applicant.isDaejeon}
               isArrived={applicant.isArrived}
               onClick={() => handleApplicantClick(applicant)}
@@ -344,9 +342,9 @@ export const ApplicantsList = () => {
         )}
       </ApplicantsAllList>
 
-      {selectedApplicant && (
+      {selectedApplicant?.receiptCode && (
         <ApplicantDetailModal
-          applicationId={selectedApplicant.applicationId}
+          receiptCode={selectedApplicant.receiptCode}
           isOpen={isOpen}
           onClose={close}
         />

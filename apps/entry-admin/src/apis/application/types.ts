@@ -9,32 +9,26 @@ export interface IApplicationAllListRequest {
 
 // 원서 전체 조회
 export interface IApplicationAllListResponse {
-  success: boolean;
-  data: {
-    applications: IApplicationType[];
-    total: number;
-    page: number;
-    size: number;
-    totalPages: number;
-  };
+  applicants: IApplicationType[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
 }
 
 // 원서 전체 조회 Applicant
 export interface IApplicationType {
-  applicationId: string;
   receiptCode: number;
   applicantName: string;
   applicationType: string;
   educationalStatus: string;
-  status: string;
-  submittedAt: string;
   isDaejeon: boolean;
   isArrived: boolean;
 }
 
 // 원서 상세 조회 타입
 export interface IApplicationDetailRequest {
-  applicationId: string;
+  receiptCode: number;
 }
 
 export interface IApplicationDetailResponse {
