@@ -1,21 +1,38 @@
 export interface CalculatorScoreRequest {
-  admissionType: string;
-  scores: {
-    [key: string]: string;
+  applicationType: string;
+  educationalStatus: string;
+  gradeInfo: {
+    koreanGrade: string;
+    socialGrade: string;
+    historyGrade: string;
+    mathGrade: string;
+    scienceGrade: string;
+    englishGrade: string;
+    techAndHomeGrade: string;
+    gedKorean: number;
+    gedSocial: number;
+    gedMath: number;
+    gedScience: number;
+    gedEnglish: number;
+    gedHistory: number;
   };
-  bonus: {
-    dsmAlgorithm?: boolean;
-    infoProcessing?: boolean;
+  attendanceInfo: {
+    absence: number;
+    tardiness: number;
+    earlyLeave: number;
+    classExit: number;
+    volunteer: number;
+  };
+  awardAndCertificateInfo: {
+    algorithmAward: boolean;
+    infoProcessingCert: boolean;
   };
 }
 
 export interface CalculatorScoreResponse {
-  success: boolean;
-  data: {
-    subjectScore: number;
-    attendanceScore: number;
-    volunteerScore: number;
-    bonusScore: number;
-    totalScore: number;
-  };
+  totalGradeScore: number;
+  attendanceScore: number;
+  extraScore: number;
+  volunteerScore: number;
+  totalScore: number;
 }

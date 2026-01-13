@@ -47,19 +47,14 @@ interface CalculationState {
   qeActivity: IActivityType;
 }
 
-const gradeToNumber: { [key: string]: number } = {
-  'A': 5,
-  'B': 4,
-  'C': 3,
-  'D': 2,
-  'E': 1,
-  '✕': 0
+const normalizeGradeChar = (grade: string | null | undefined): string => {
+  if (!grade) return 'X';
+  if (grade === '✕') return 'X';
+  return grade.toUpperCase();
 };
 
-const convertGradeToNumber = (grade: string | null): number | undefined => {
-  if (!grade) return undefined;
-  return gradeToNumber[grade];
-};
+const buildGradeString = (grades: Array<string | null | undefined>) =>
+  grades.map(normalizeGradeChar).join('');
 
 // Preserve 0 as a valid value; return undefined only when not a number
 const safeParseInt = (value: string | null | undefined): number | undefined => {
@@ -98,20 +93,32 @@ export const transformCalculationDataToAPI = (
     return {
       applicationType,
       educationalStatus,
-      scores: {
-        // 검정고시는 검정고시 점수만 보냄 (출석 및 봉사 제외)
-        qualificationKorean: safeParseFloat(state.qeScore.korean),
-        qualificationSocial: safeParseFloat(state.qeScore.social),
-        qualificationHistory: safeParseFloat(state.qeScore.history),
-        qualificationMath: safeParseFloat(state.qeScore.math),
-        qualificationScience: safeParseFloat(state.qeScore.science),
-        qualificationEnglish: safeParseFloat(state.qeScore.english),
-        qualificationTech: safeParseFloat(state.qeScore.technology),
+      gradeInfo: {
+        koreanGrade: 'XXXX',
+        socialGrade: 'XXXX',
+        historyGrade: 'XXXX',
+        mathGrade: 'XXXX',
+        scienceGrade: 'XXXX',
+        englishGrade: 'XXXX',
+        techAndHomeGrade: 'XXXX',
+        gedKorean: safeParseFloat(state.qeScore.korean) ?? 0,
+        gedSocial: safeParseFloat(state.qeScore.social) ?? 0,
+        gedMath: safeParseFloat(state.qeScore.math) ?? 0,
+        gedScience: safeParseFloat(state.qeScore.science) ?? 0,
+        gedEnglish: safeParseFloat(state.qeScore.english) ?? 0,
+        gedHistory: safeParseFloat(state.qeScore.history) ?? 0,
       },
-      bonus: {
-        dsmAlgorithm: activity.dsmAlgorithm === 'O',
-        infoProcessing: activity.infoProcessing === 'O',
-      }
+      attendanceInfo: {
+        absence: safeParseInt(activity.absences) ?? 0,
+        tardiness: safeParseInt(activity.lateArrivals) ?? 0,
+        earlyLeave: safeParseInt(activity.earlyLeaves) ?? 0,
+        classExit: safeParseInt(activity.resultMissing) ?? 0,
+        volunteer: safeParseInt(activity.volunteerHours) ?? 0,
+      },
+      awardAndCertificateInfo: {
+        algorithmAward: activity.dsmAlgorithm === 'O',
+        infoProcessingCert: activity.infoProcessing === 'O',
+      },
     };
   }
 
@@ -123,40 +130,67 @@ export const transformCalculationDataToAPI = (
     return {
       applicationType,
       educationalStatus,
-      scores: {
-        // 3학년 1학기 (primaryThird)
-        korean_3_1: convertGradeToNumber(state.primaryThird.kor),
-        social_3_1: convertGradeToNumber(state.primaryThird.soc),
-        history_3_1: convertGradeToNumber(state.primaryThird.his),
-        math_3_1: convertGradeToNumber(state.primaryThird.math),
-        science_3_1: convertGradeToNumber(state.primaryThird.sci),
-        tech_3_1: convertGradeToNumber(state.primaryThird.tech),
-        english_3_1: convertGradeToNumber(state.primaryThird.eng),
-        // 직전 학기 (primarySecond)
-        korean_2_2: convertGradeToNumber(state.primarySecond.kor),
-        social_2_2: convertGradeToNumber(state.primarySecond.soc),
-        history_2_2: convertGradeToNumber(state.primarySecond.his),
-        math_2_2: convertGradeToNumber(state.primarySecond.math),
-        science_2_2: convertGradeToNumber(state.primarySecond.sci),
-        tech_2_2: convertGradeToNumber(state.primarySecond.tech),
-        english_2_2: convertGradeToNumber(state.primarySecond.eng),
-        // 직직전 학기 (primaryFirst)
-        korean_2_1: convertGradeToNumber(state.primaryFirst.kor),
-        social_2_1: convertGradeToNumber(state.primaryFirst.soc),
-        history_2_1: convertGradeToNumber(state.primaryFirst.his),
-        math_2_1: convertGradeToNumber(state.primaryFirst.math),
-        science_2_1: convertGradeToNumber(state.primaryFirst.sci),
-        tech_2_1: convertGradeToNumber(state.primaryFirst.tech),
-        english_2_1: convertGradeToNumber(state.primaryFirst.eng),
-        // 출석 및 봉사 (0도 전송되도록 안전 파싱)
-        absence: safeParseInt(activity.absences),
-        tardiness: safeParseInt(activity.lateArrivals),
-        earlyLeave: safeParseInt(activity.earlyLeaves),
-        classExit: safeParseInt(activity.resultMissing),
-        volunteer: safeParseInt(activity.volunteerHours),
+      gradeInfo: {
+        koreanGrade: buildGradeString([
+          'X',
+          state.primaryThird.kor,
+          state.primarySecond.kor,
+          state.primaryFirst.kor,
+        ]),
+        socialGrade: buildGradeString([
+          'X',
+          state.primaryThird.soc,
+          state.primarySecond.soc,
+          state.primaryFirst.soc,
+        ]),
+        historyGrade: buildGradeString([
+          'X',
+          state.primaryThird.his,
+          state.primarySecond.his,
+          state.primaryFirst.his,
+        ]),
+        mathGrade: buildGradeString([
+          'X',
+          state.primaryThird.math,
+          state.primarySecond.math,
+          state.primaryFirst.math,
+        ]),
+        scienceGrade: buildGradeString([
+          'X',
+          state.primaryThird.sci,
+          state.primarySecond.sci,
+          state.primaryFirst.sci,
+        ]),
+        englishGrade: buildGradeString([
+          'X',
+          state.primaryThird.eng,
+          state.primarySecond.eng,
+          state.primaryFirst.eng,
+        ]),
+        techAndHomeGrade: buildGradeString([
+          'X',
+          state.primaryThird.tech,
+          state.primarySecond.tech,
+          state.primaryFirst.tech,
+        ]),
+        gedKorean: 0,
+        gedSocial: 0,
+        gedMath: 0,
+        gedScience: 0,
+        gedEnglish: 0,
+        gedHistory: 0,
+      },
+      attendanceInfo: {
+        absence: safeParseInt(activity.absences) ?? 0,
+        tardiness: safeParseInt(activity.lateArrivals) ?? 0,
+        earlyLeave: safeParseInt(activity.earlyLeaves) ?? 0,
+        classExit: safeParseInt(activity.resultMissing) ?? 0,
+        volunteer: safeParseInt(activity.volunteerHours) ?? 0,
+      },
+      awardAndCertificateInfo: {
         algorithmAward: activity.dsmAlgorithm === 'O',
         infoProcessingCert: activity.infoProcessing === 'O',
-      }
+      },
     };
   }
 
@@ -167,47 +201,66 @@ export const transformCalculationDataToAPI = (
   return {
     applicationType,
     educationalStatus,
-    scores: {
-      // 3학년 2학기
-      korean_3_2: convertGradeToNumber(state.graduatedThird2.kor),
-      social_3_2: convertGradeToNumber(state.graduatedThird2.soc),
-      history_3_2: convertGradeToNumber(state.graduatedThird2.his),
-      math_3_2: convertGradeToNumber(state.graduatedThird2.math),
-      science_3_2: convertGradeToNumber(state.graduatedThird2.sci),
-      tech_3_2: convertGradeToNumber(state.graduatedThird2.tech),
-      english_3_2: convertGradeToNumber(state.graduatedThird2.eng),
-      // 3학년 1학기
-      korean_3_1: convertGradeToNumber(state.graduatedThird1.kor),
-      social_3_1: convertGradeToNumber(state.graduatedThird1.soc),
-      history_3_1: convertGradeToNumber(state.graduatedThird1.his),
-      math_3_1: convertGradeToNumber(state.graduatedThird1.math),
-      science_3_1: convertGradeToNumber(state.graduatedThird1.sci),
-      tech_3_1: convertGradeToNumber(state.graduatedThird1.tech),
-      english_3_1: convertGradeToNumber(state.graduatedThird1.eng),
-      // 2학년 2학기
-      korean_2_2: convertGradeToNumber(state.graduatedSecond2.kor),
-      social_2_2: convertGradeToNumber(state.graduatedSecond2.soc),
-      history_2_2: convertGradeToNumber(state.graduatedSecond2.his),
-      math_2_2: convertGradeToNumber(state.graduatedSecond2.math),
-      science_2_2: convertGradeToNumber(state.graduatedSecond2.sci),
-      tech_2_2: convertGradeToNumber(state.graduatedSecond2.tech),
-      english_2_2: convertGradeToNumber(state.graduatedSecond2.eng),
-      // 2학년 1학기
-      korean_2_1: convertGradeToNumber(state.graduatedSecond1.kor),
-      social_2_1: convertGradeToNumber(state.graduatedSecond1.soc),
-      history_2_1: convertGradeToNumber(state.graduatedSecond1.his),
-      math_2_1: convertGradeToNumber(state.graduatedSecond1.math),
-      science_2_1: convertGradeToNumber(state.graduatedSecond1.sci),
-      tech_2_1: convertGradeToNumber(state.graduatedSecond1.tech),
-      english_2_1: convertGradeToNumber(state.graduatedSecond1.eng),
-      // 출석 및 봉사 (0도 전송되도록 안전 파싱)
-      absence: safeParseInt(activity.absences),
-      tardiness: safeParseInt(activity.lateArrivals),
-      earlyLeave: safeParseInt(activity.earlyLeaves),
-      classExit: safeParseInt(activity.resultMissing),
-      volunteer: safeParseInt(activity.volunteerHours),
+    gradeInfo: {
+      koreanGrade: buildGradeString([
+        state.graduatedThird2.kor,
+        state.graduatedThird1.kor,
+        state.graduatedSecond2.kor,
+        state.graduatedSecond1.kor,
+      ]),
+      socialGrade: buildGradeString([
+        state.graduatedThird2.soc,
+        state.graduatedThird1.soc,
+        state.graduatedSecond2.soc,
+        state.graduatedSecond1.soc,
+      ]),
+      historyGrade: buildGradeString([
+        state.graduatedThird2.his,
+        state.graduatedThird1.his,
+        state.graduatedSecond2.his,
+        state.graduatedSecond1.his,
+      ]),
+      mathGrade: buildGradeString([
+        state.graduatedThird2.math,
+        state.graduatedThird1.math,
+        state.graduatedSecond2.math,
+        state.graduatedSecond1.math,
+      ]),
+      scienceGrade: buildGradeString([
+        state.graduatedThird2.sci,
+        state.graduatedThird1.sci,
+        state.graduatedSecond2.sci,
+        state.graduatedSecond1.sci,
+      ]),
+      englishGrade: buildGradeString([
+        state.graduatedThird2.eng,
+        state.graduatedThird1.eng,
+        state.graduatedSecond2.eng,
+        state.graduatedSecond1.eng,
+      ]),
+      techAndHomeGrade: buildGradeString([
+        state.graduatedThird2.tech,
+        state.graduatedThird1.tech,
+        state.graduatedSecond2.tech,
+        state.graduatedSecond1.tech,
+      ]),
+      gedKorean: 0,
+      gedSocial: 0,
+      gedMath: 0,
+      gedScience: 0,
+      gedEnglish: 0,
+      gedHistory: 0,
+    },
+    attendanceInfo: {
+      absence: safeParseInt(activity.absences) ?? 0,
+      tardiness: safeParseInt(activity.lateArrivals) ?? 0,
+      earlyLeave: safeParseInt(activity.earlyLeaves) ?? 0,
+      classExit: safeParseInt(activity.resultMissing) ?? 0,
+      volunteer: safeParseInt(activity.volunteerHours) ?? 0,
+    },
+    awardAndCertificateInfo: {
       algorithmAward: activity.dsmAlgorithm === 'O',
       infoProcessingCert: activity.infoProcessing === 'O',
-    }
+    },
   };
 };

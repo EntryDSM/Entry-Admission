@@ -61,17 +61,17 @@ export const ScoreResultModal = ({
         const newResults: ScoreResult[] = [
           {
             name: ADMISSION_TYPE_LABEL.COMMON,
-            score: commonResponse.data.totalScore.toFixed(3),
+            score: commonResponse.totalScore.toFixed(3),
             total: maxScore.COMMON.toString(),
           },
           {
             name: ADMISSION_TYPE_LABEL.SOCIAL,
-            score: socialResponse.data.totalScore.toFixed(3),
+            score: socialResponse.totalScore.toFixed(3),
             total: maxScore.SOCIAL.toString(),
           },
           {
             name: ADMISSION_TYPE_LABEL.MEISTER,
-            score: meisterResponse.data.totalScore.toFixed(3),
+            score: meisterResponse.totalScore.toFixed(3),
             total: maxScore.MEISTER.toString(),
           },
         ];
