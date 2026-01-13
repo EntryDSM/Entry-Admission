@@ -125,7 +125,7 @@ export const StatisticsLandingPage = () => {
     currentDeadlineDate = finalAnnouncement;
     currentDeadline = dday === null ? '--일' : dday > 0 ? `${dday}일` : dday === 0 ? '오늘' : '마감';
   } else {
-    currentDeadline = '--일';
+    currentDeadline = '0일';
   }
 
   const displayDeadline = isLoading ? '' : currentDeadline;
