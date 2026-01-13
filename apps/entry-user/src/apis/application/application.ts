@@ -14,11 +14,11 @@ export const getFinalApplicationPdf = async (): Promise<Blob> => {
 
 /**
  * 원서 접수 취소
- * DELETE /api/v1/applications
+ * DELETE /application
  */
 export const deleteApplication = async (): Promise<DeleteApplicationResponse> => {
   const { data } = await AdmissionUserInstance.delete<DeleteApplicationResponse>(
-    '/api/v1/applications'
+    '/application'
   );
   return data;
 };
