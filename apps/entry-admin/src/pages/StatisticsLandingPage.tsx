@@ -43,6 +43,7 @@ const calculateDday = (dateString: string) => {
 // 성별 통계는 API와 연동한다
 
 export const StatisticsLandingPage = () => {
+  const TOTAL_CAPACITY = 128;
   const { data: scheduleData, isLoading } = useGetAllSchedule();
   const { data: regionData, isLoading: isRegionLoading } = useGetRegionStatistics();
   const { data: competitionData, isLoading: isCompetitionLoading } = useGetCompetitionRate();
@@ -212,7 +213,7 @@ export const StatisticsLandingPage = () => {
               <SkeletonValue />
             ) : (
               <StatValue>
-                {competitionSummary.totalApplicants}명 /--명
+                {competitionSummary.totalApplicants}명 /{TOTAL_CAPACITY}명
               </StatValue>
             )}
           </StatContent>
@@ -228,7 +229,9 @@ export const StatisticsLandingPage = () => {
               <SkeletonValue />
             ) : (
               <StatValue>
-                -- : 1
+                {(TOTAL_CAPACITY > 0
+                  ? (competitionSummary.totalApplicants / TOTAL_CAPACITY).toFixed(1)
+                  : '0.0')} : 1
               </StatValue>
             )}
           </StatContent>
