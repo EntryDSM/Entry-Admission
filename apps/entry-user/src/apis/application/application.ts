@@ -6,7 +6,7 @@ import { DeleteApplicationResponse, IApplicationStatusResponse } from './types';
  * GET /api/v1/application/pdf/final
  */
 export const getFinalApplicationPdf = async (): Promise<Blob> => {
-  const { data } = await AdmissionUserInstance.get('/api/v1/application/pdf/final', {
+  const { data } = await AdmissionUserInstance.get('/pdf/final', {
     responseType: 'blob',
   });
   return data;
