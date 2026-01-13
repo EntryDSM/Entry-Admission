@@ -217,6 +217,7 @@ export const MyPage = () => {
     // 1차 발표 기간이 아닌 경우
     if (
       scheduleData?.currentStatus !== 'FIRST_ANNOUNCEMENT' &&
+      scheduleData?.currentStatus !== 'BEFORE_INTERVIEW' &&
       scheduleData?.currentStatus !== 'INTERVIEW'
     ) {
       toast.error('1차 합격자 발표 기간이 아닙니다.');
