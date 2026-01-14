@@ -151,7 +151,7 @@ IApplicationNavType) => {
   const formatDate = (arr: (number | string)[], graduationType: string) => {
     // 검정고시는 null 반환
     if (graduationType === '검정고시 (중학교 졸업 학력)') {
-      return null;
+      return 'XXXX';
     }
 
     // 배열이 비어있거나 값이 없으면 오늘 날짜를 기본값으로 사용
@@ -241,6 +241,10 @@ IApplicationNavType) => {
     return isNaN(num) ? null : num;
   };
 
+  const isQualificationExam =
+    state?.applicationClassification.graduationType === '검정고시 (중학교 졸업 학력)' ||
+    state?.applicationClassification.graduationType?.includes('검정고시');
+
   // 성적 등급을 4글자 문자열로 변환 (2-1, 2-2, 3-1, 3-2 순서)
   const buildGradeString = (
     subject: 'kor' | 'soc' | 'his' | 'math' | 'sci' | 'tech' | 'eng'
@@ -249,8 +253,8 @@ IApplicationNavType) => {
 
     const graduationType = state.applicationClassification.graduationType;
 
-    if (graduationType === '검정고시 (중학교 졸업 학력)') {
-      return null;
+    if (isQualificationExam) {
+      return 'XXXX';
     }
 
     const toGrade = (val: string | null | undefined): string => {
@@ -343,13 +347,13 @@ IApplicationNavType) => {
               : state.middleSchoolInfo.teacherName,
         },
         gradeInfo: {
-          koreanGrade: buildGradeString('kor'),
-          socialGrade: buildGradeString('soc'),
-          historyGrade: buildGradeString('his'),
-          mathGrade: buildGradeString('math'),
-          scienceGrade: buildGradeString('sci'),
-          englishGrade: buildGradeString('eng'),
-          techAndHomeGrade: buildGradeString('tech'),
+          koreanGrade: isQualificationExam ? 'XXXX' : buildGradeString('kor'),
+          socialGrade: isQualificationExam ? 'XXXX' : buildGradeString('soc'),
+          historyGrade: isQualificationExam ? 'XXXX' : buildGradeString('his'),
+          mathGrade: isQualificationExam ? 'XXXX' : buildGradeString('math'),
+          scienceGrade: isQualificationExam ? 'XXXX' : buildGradeString('sci'),
+          englishGrade: isQualificationExam ? 'XXXX' : buildGradeString('eng'),
+          techAndHomeGrade: isQualificationExam ? 'XXXX' : buildGradeString('tech'),
           gedKorean:
             state.applicationClassification.graduationType ===
             '검정고시 (중학교 졸업 학력)'
