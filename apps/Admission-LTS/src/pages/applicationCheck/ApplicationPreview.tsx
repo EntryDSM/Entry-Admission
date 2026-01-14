@@ -76,7 +76,7 @@ export const ApplicationPreview = () => {
 
   const toGraduationDateDto = (arr: (number | string)[], graduationType: string) => {
     if (graduationType === "검정고시 (중학교 졸업 학력)") {
-      return null;
+      return "2026-01";
     }
 
     const today = new Date();
@@ -174,10 +174,12 @@ export const ApplicationPreview = () => {
             studentNumber: state.applicationClassification.graduationType === "검정고시 (중학교 졸업 학력)"
               ? null
               : state.middleSchoolInfo.studentId,
-            graduationDate: toGraduationDateDto(
-              state.applicationClassification.graduationDate,
-              state.applicationClassification.graduationType
-            ),
+            graduationDate: isQualificationExam
+              ? "2026-01"
+              : toGraduationDateDto(
+                state.applicationClassification.graduationDate,
+                state.applicationClassification.graduationType
+              ),
             studyPlan: state.personalStatements.studyPlan,
             selfIntroduce: state.personalStatements.personalStmt,
             applicationRemark: getApplicationRemark(
