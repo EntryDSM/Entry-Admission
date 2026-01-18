@@ -15,7 +15,7 @@ const sendErrorReport = async (
     const errorReport = {
       sessionId,
       pageType: "ADMISSION",
-      endpoint: "/api/v1/applications",
+      endpoint: "/application",
       httpMethod: "POST",
       httpStatus: error.response?.status || 0,
       errorCategory: "SERVER_ERROR",
@@ -44,7 +44,7 @@ export const useAdmissionSubmitPost = <T extends IAdmissionRequest>() => {
     mutationFn: async (data: T) => {
       const startTime = Date.now()
       try {
-        const response = await AdmissionUserInstance.post('/api/v1/applications', data)
+        const response = await AdmissionUserInstance.post('/application', data)
         return response.data
       } catch (error) {
         const responseTime = Date.now() - startTime

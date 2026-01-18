@@ -26,7 +26,7 @@ export const PrimaryCalculationPage = () => {
     {
       name: string;
       type: AdmissionType;
-      data: CalculatorScoreResponse['data'];
+      data: CalculatorScoreResponse;
     }[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,17 +65,17 @@ export const PrimaryCalculationPage = () => {
         {
           name: ADMISSION_TYPE_LABEL.COMMON,
           type: 'COMMON',
-          data: commonResponse.data,
+          data: commonResponse,
         },
         {
           name: ADMISSION_TYPE_LABEL.SOCIAL,
           type: 'SOCIAL',
-          data: socialResponse.data,
+          data: socialResponse,
         },
         {
           name: ADMISSION_TYPE_LABEL.MEISTER,
           type: 'MEISTER',
-          data: meisterResponse.data,
+          data: meisterResponse,
         },
       ]);
       setShowResultModal(true);

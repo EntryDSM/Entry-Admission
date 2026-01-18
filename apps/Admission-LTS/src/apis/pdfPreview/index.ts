@@ -7,7 +7,7 @@ import { AxiosError } from "axios"
 export const usePdfPreviewPost = <T extends IPdfPreviewRequest>() => {
   return useMutation({
     mutationFn: async(data : T) => {
-      const response = await AdmissionUserInstance.post('/api/v1/application/pdf/preview', data, {
+      const response = await AdmissionUserInstance.post('/pdf/preview', data, {
         responseType: 'blob'
       });
       return response.data

@@ -1,50 +1,16 @@
-export interface IRegionStatistics {
-  region: string;
+export interface IRegionStatisticsItem {
   regionName: string;
   count: number;
-  percentage: number;
 }
 
-export interface IRegionStatisticsResponse {
-  success: boolean;
-  data: {
-    total: number;
-    byRegion: IRegionStatistics[];
-  };
-}
+export type IRegionStatisticsResponse = Record<string, number>;
 
-export interface ICompetitionRateByType {
+export interface ICompetitionRateItem {
   applicationType: string;
-  applicants: number;
-  capacity: number;
-  rate: number;
-}
-
-export interface ICompetitionRateTotal {
-  applicants: number;
-  capacity: number;
-  rate: number;
-}
-
-export interface ICompetitionRateResponse {
-  success: boolean;
-  data: {
-    total: ICompetitionRateTotal;
-    byType: ICompetitionRateByType[];
-  };
-}
-
-export interface IGenderStatisticsItem {
-  gender: string;
-  genderName: string;
+  isDaejeon: boolean;
   count: number;
-  percentage: number;
 }
 
-export interface IGenderStatisticsResponse {
-  success: boolean;
-  data: {
-    total: number;
-    byGender: IGenderStatisticsItem[];
-  };
-}
+export type ICompetitionRateResponse = ICompetitionRateItem[];
+
+export type IGenderStatisticsResponse = Record<string, number>;

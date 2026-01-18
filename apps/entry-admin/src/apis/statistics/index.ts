@@ -9,7 +9,7 @@ export const useGetRegionStatistics = () => {
     queryKey: ['statistics', 'region'],
     queryFn: async () => {
       const { data } = await AdmissionAdminInstance.get<IRegionStatisticsResponse>(
-        '/api/v1/admin/statistics/region'
+        '/admin/application/region-status'
       );
       return data;
     },
@@ -21,7 +21,7 @@ export const useGetGenderStatistics = () => {
     queryKey: ['statistics', 'gender'],
     queryFn: async () => {
       const { data } = await AdmissionAdminInstance.get<IGenderStatisticsResponse>(
-        '/api/v1/admin/statistics/gender'
+        '/admin/application/gender-status'
       );
       return data;
     },
@@ -33,7 +33,7 @@ export const useGetCompetitionRate = () => {
     queryKey: ['statistics', 'competition-rate'],
     queryFn: async () => {
       const { data } = await AdmissionAdminInstance.get<ICompetitionRateResponse>(
-        '/api/v1/admin/statistics/competition-rate'
+        '/admin/application/statics/count'
       );
       return data;
     },

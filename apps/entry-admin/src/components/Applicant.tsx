@@ -9,7 +9,6 @@ type IApplicationComponentType = IApplicationType & {
 };
 
 export const Applicant = ({
-  applicationId,
   receiptCode,
   applicantName,
   applicationType,
@@ -41,7 +40,7 @@ export const Applicant = ({
   );
 
   return (
-    <Container key={applicationId} onClick={onClick}>
+    <Container onClick={onClick}>
       <LeftContent>
         <Content>{receiptCode || '-'}</Content>
         <Content>{applicantName}</Content>

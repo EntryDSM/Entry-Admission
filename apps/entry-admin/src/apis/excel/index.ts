@@ -24,7 +24,7 @@ export const useDownloadCheckListExcel = () => {
 
       try {
         const response = await AdmissionAdminInstance.get(
-          '/api/v1/admin/excel/check-list',
+          '/admin/application/excel/applicants/check-list',
           { responseType: 'blob' }
         );
 
@@ -86,7 +86,7 @@ export const useDownloadApplicationInfoExcel = () => {
 
       try {
         const response = await AdmissionAdminInstance.get(
-          '/api/v1/admin/excel/application-info',
+          '/admin/application/excel/applicants',
           { responseType: 'blob' }
         );
 
@@ -151,7 +151,7 @@ export const useDownloadApplicantCodesExcel = () => {
 
       try {
         const response = await AdmissionAdminInstance.get(
-          '/api/v1/admin/excel/applicant-codes',
+          '/admin/application/excel/applicants/code',
           { responseType: 'blob' }
         );
 
@@ -217,7 +217,7 @@ export const useDownloadAdmissionTicketExcel = () => {
 
       try {
         const response = await AdmissionAdminInstance.get(
-          '/api/v1/admin/excel/admission-ticket',
+          '/admin/application/excel/admission-ticket',
           { responseType: 'blob' }
         );
 

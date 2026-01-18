@@ -49,7 +49,6 @@ interface IGedScoreType {
   soc: number | null;
   his: number | null;
   sci: number | null;
-  tech: number | null;
   math: number | null;
   eng: number | null;
 }
@@ -148,7 +147,6 @@ const initialState: ApplicationState = {
     soc: null,
     his: null,
     sci: null,
-    tech: null,
     math: null,
     eng: null,
   },

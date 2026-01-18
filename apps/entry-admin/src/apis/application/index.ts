@@ -17,7 +17,7 @@ export const useGetApplicationAllList = (
     queryFn: async () => {
       const { data } =
         await AdmissionAdminInstance.get<IApplicationAllListResponse>(
-          '/api/v1/applications',
+          '/admin/application/applicants',
           params ? { params } : {}
         );
       return data;
@@ -28,17 +28,17 @@ export const useGetApplicationAllList = (
 };
 
 // 상세 조회
-export const useGetApplicationDetail = (applicationId?: string) => {
+export const useGetApplicationDetail = (receiptCode?: number) => {
   return useQuery({
-    queryKey: ['applicationDetail', applicationId],
+    queryKey: ['applicationDetail', receiptCode],
     queryFn: async () => {
       const { data } =
         await AdmissionAdminInstance.get<IApplicationDetailResponse>(
-          `/api/v1/applications/${applicationId}`
+          `/admin/application/${receiptCode}`
         );
-      return data.data;
+      return data;
     },
-    enabled: !!applicationId, // id 있을 때만 요청
+    enabled: !!receiptCode, // receiptCode 있을 때만 요청
     meta: {
       onError: () => {
         toast.error('원서 상세 조회 중 오류가 발생했습니다.');
@@ -50,7 +50,7 @@ export const useGetApplicationDetail = (applicationId?: string) => {
 // 수험번호 일괄 부여
 export const usePostExamNumber = () => {
   return useMutation({
-    mutationFn: () => AdmissionAdminInstance.post('/exam-code'),
+    mutationFn: () => AdmissionAdminInstance.patch('/admin/application/exam-code'),
     onSuccess: () => toast.success('수험번호가 일괄 부여되었습니다.'),
     onError: () => toast.error('수험번호 부여 중 오류가 발생했습니다.'),
   });
