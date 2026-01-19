@@ -21,8 +21,6 @@ const TAB_OPTIONS = [
 const formatDate = (dateString: string) => dateString.split('T')[0];
 
 export const NoticePage = () => {
-  console.count('NoticePage render');
-
   const [activeTab, setActiveTab] = useState<'NOTICE' | 'GUIDE'>('NOTICE');
   const navigate = useNavigate();
   const { data, isLoading } = useGetAllNotice(activeTab);
