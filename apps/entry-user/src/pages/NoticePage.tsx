@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import { NoticePinIcon, TabSection } from '@entry/ui';
@@ -10,7 +10,7 @@ interface NoticeItem {
   title: string;
   createdAt: string;
   isPinned: boolean;
-  type: 'GUIDE' | 'NOTICE'
+  type: 'GUIDE' | 'NOTICE';
 }
 
 const TAB_OPTIONS = [
@@ -18,37 +18,25 @@ const TAB_OPTIONS = [
   { key: 'GUIDE', label: '예비 신입생 안내' },
 ];
 
+const formatDate = (dateString: string) => dateString.split('T')[0];
+
 export const NoticePage = () => {
-  const [activeTab, setActiveTab] = useState<'NOTICE' | 'GUIDE'>(
-    'NOTICE'
-  );
+  const [activeTab, setActiveTab] = useState<'NOTICE' | 'GUIDE'>('NOTICE');
   const navigate = useNavigate();
+  const { data, isLoading } = useGetAllNotice(activeTab);
 
-  const handleNoticeClick = (id: number) => {
-    navigate(`/notice/${id}`);
-  };
-
-  const handleTabChange = (tab: string) => {
+  const handleNoticeClick = (id: number) => navigate(`/notice/${id}`);
+  const handleTabChange = (tab: string) =>
     setActiveTab(tab as 'NOTICE' | 'GUIDE');
-  };
 
-  const {data, isLoading} = useGetAllNotice(activeTab);
-  const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
-
-  const formatDate = (dateString: string) => {
-    return dateString.split('T')[0]; 
-  };
-
-  useEffect(() => {
-    if (data && Array.isArray(data?.notices)) {
-    const formattedNotices = data.notices.map(notice => ({
-      ...notice,
-      createdAt: formatDate(notice.createdAt)
-    }));
-    setNoticeItems(formattedNotices);
-  }
+  const noticeItems = useMemo(() => {
+    return (
+      data?.notices?.map((notice: NoticeItem) => ({
+        ...notice,
+        createdAt: formatDate(notice.createdAt),
+      })) ?? []
+    );
   }, [data]);
-
 
   return (
     <PageContainer>
@@ -76,12 +64,11 @@ export const NoticePage = () => {
               {isLoading ? (
                 <LoadingRow>로딩 중...</LoadingRow>
               ) : noticeItems.length > 0 ? (
-                noticeItems.map((item) => (
+                noticeItems.map((item: NoticeItem) => (
                   <TableRow
                     key={item.id}
                     onClick={() => handleNoticeClick(item.id)}
                   >
-                    {/* <ColumnNum>{item.id}</ColumnNum> */}
                     <ColumnNum>공지</ColumnNum>
                     <ColumnTitle>
                       {item.isPinned && (
