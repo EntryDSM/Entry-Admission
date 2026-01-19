@@ -2,7 +2,9 @@
   "name": "@entry/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build:apps": "nx run-many -t build -p admission-lts,entry-admin,entry-auth,entry-user"
+  },
   "private": true,
   "dependencies": {
     "@channel.io/channel-web-sdk-loader": "^2.0.0",
