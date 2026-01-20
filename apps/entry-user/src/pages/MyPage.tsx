@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { colors, Flex } from '@entry/design-token';
 import {
@@ -21,6 +21,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { usePassVerification } from '../hooks/usePassVerification';
+import { useRemainingTime } from '../hooks/useRemainingTime';
 import {
   getFinalApplicationPdf,
   deleteApplication,
@@ -32,26 +33,26 @@ import { useGetAllSchedule } from '../apis/schedule/schedule';
 import { ADMISSION_TYPE_LABEL } from '../constants/admissionType';
 
 export const MyPage = () => {
-  const [delOpen, setDelOpen] = useState<boolean>(false);
-  const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
-  const [changePasswordModalOpen, setChangePasswordModalOpen] =
-    useState<boolean>(false);
-  const [cancelApplicationOpen, setCancelApplicationOpen] =
-    useState<boolean>(false);
+  const [openModal, setOpenModal] = useState({
+    delete: false,
+    password: false,
+    changePassword: false,
+    cancelApplication: false,
+  });
   const [isPass, setIsPass] = useState<boolean>(false);
   const [announcementStep, setAnnouncementStep] = useState<1 | 2>(1);
-  const [remainingTime, setRemainingTime] = useState<string>('');
-  const [displayName, setDisplayName] = useState<string>('');
+
+  const openModalHandler = useCallback((modalName: keyof typeof openModal) => {
+    setOpenModal((prev) => ({ ...prev, [modalName]: true }));
+  }, []);
+
+  const closeModalHandler = useCallback((modalName: keyof typeof openModal) => {
+    setOpenModal((prev) => ({ ...prev, [modalName]: false }));
+  }, []);
 
   const queryClient = useQueryClient();
   const resultModal = useModal();
-  const {
-    startVerification,
-    isLoading: isPassLoading,
-    isVerified,
-    verifyData,
-    reset,
-  } = usePassVerification();
+  const { startVerification, isVerified, verifyData } = usePassVerification();
 
   const { data: userInfo, isLoading: isUserLoading } =
     useQuery<IUserInfoResponseType>({
@@ -78,11 +79,14 @@ export const MyPage = () => {
 
   const { data: scheduleData } = useGetAllSchedule();
 
+  const { remainingTime, isAvailable: isApplicationAvailable } =
+    useRemainingTime(scheduleData?.schedules, !!applicationStatus);
+
   // 30초마다 일정을 자동으로 조회하여 상태 업데이트
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ['schedule'] });
-    }, 30000); // 30초마다 갱신
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [queryClient]);
@@ -93,8 +97,8 @@ export const MyPage = () => {
       toast.success('회원 탈퇴가 완료되었습니다.');
       removeAccessToken();
       removeRefreshToken();
-      setPasswordModalOpen(false);
-      setDelOpen(false);
+      closeModalHandler('password');
+      closeModalHandler('delete');
       window.location.href = 'https://auth.entrydsm.kr';
     },
     onError: (error: any) => {
@@ -108,7 +112,7 @@ export const MyPage = () => {
     mutationFn: changePassword,
     onSuccess: () => {
       toast.success('비밀번호가 성공적으로 변경되었습니다.');
-      setChangePasswordModalOpen(false);
+      closeModalHandler('changePassword');
     },
     onError: (error: any) => {
       toast.error(
@@ -121,7 +125,7 @@ export const MyPage = () => {
     mutationFn: deleteApplication,
     onSuccess: () => {
       toast.success('원서 접수가 취소되었습니다.');
-      setCancelApplicationOpen(false);
+      closeModalHandler('cancelApplication');
       // 원서 상태를 다시 조회하여 UI 업데이트
       queryClient.invalidateQueries({ queryKey: ['applicationStatus'] });
     },
@@ -131,10 +135,6 @@ export const MyPage = () => {
       );
     },
   });
-
-  const handleDelClick = () => {
-    setDelOpen(true);
-  };
 
   const handlePasswordConfirm = (password: string) => {
     deleteUserMutation.mutate({ password });
@@ -256,83 +256,15 @@ export const MyPage = () => {
 
   useEffect(() => {
     if (isVerified && verifyData) {
-      setChangePasswordModalOpen(true);
+      openModalHandler('changePassword');
     }
-  }, [isVerified, verifyData]);
-
-  useEffect(() => {
-    setDisplayName(userInfo?.name || '사용자');
-  }, [userInfo]);
+  }, [isVerified, verifyData, openModalHandler]);
 
   const handleLogout = () => {
     removeAccessToken();
     removeRefreshToken();
     window.location.href = 'https://entrydsm.kr/';
   };
-
-  // 접수 가능 여부를 시간 기반으로 확인
-  const [isApplicationAvailable, setIsApplicationAvailable] =
-    useState<boolean>(false);
-
-  // 접수 종료 시간까지 남은 시간 계산 (1초마다 업데이트)
-  useEffect(() => {
-    if (!scheduleData?.schedules || applicationStatus) return;
-
-    const calculateRemainingTime = () => {
-      const startDateSchedule = scheduleData.schedules.find(
-        (s) => s.type === 'START_DATE'
-      );
-      const endDateSchedule = scheduleData.schedules.find(
-        (s) => s.type === 'END_DATE'
-      );
-
-      if (!startDateSchedule || !endDateSchedule) {
-        setIsApplicationAvailable(false);
-        return;
-      }
-
-      const startDate = new Date(startDateSchedule.date);
-      const endDate = new Date(endDateSchedule.date);
-      const now = new Date();
-
-      // 접수 시작 전
-      if (now < startDate) {
-        setRemainingTime('접수 시작 전');
-        setIsApplicationAvailable(false);
-        return;
-      }
-
-      const diff = endDate.getTime() - now.getTime();
-
-      // 접수 마감
-      if (diff <= 0) {
-        setRemainingTime('접수 마감');
-        setIsApplicationAvailable(false);
-        return;
-      }
-
-      // 접수 기간 내 (시작 ~ 종료)
-      setIsApplicationAvailable(true);
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      if (days > 0) {
-        setRemainingTime(`${days}일 ${hours}시간 ${minutes}분 ${seconds}초`);
-      } else {
-        setRemainingTime(`${hours}시간 ${minutes}분 ${seconds}초`);
-      }
-    };
-
-    calculateRemainingTime();
-    const interval = setInterval(calculateRemainingTime, 1000);
-
-    return () => clearInterval(interval);
-  }, [scheduleData, applicationStatus]);
 
   if (isUserLoading || isApplicationLoading) {
     return (
@@ -347,7 +279,7 @@ export const MyPage = () => {
   return (
     <PageContainer>
       <ContentWrapper>
-        <UserName>{displayName}님</UserName>
+        <UserName>{userInfo?.name || 'user'}님</UserName>
         <PhoneNumber>{userInfo?.phoneNumber || '전화번호 없음'}</PhoneNumber>
 
         <ApplicationStatusSection>
@@ -418,7 +350,7 @@ export const MyPage = () => {
               color={colors.extra.error}
               borderColor={colors.extra.error}
               hoverBackgroundColor="transparent"
-              onClick={() => setCancelApplicationOpen(true)}
+              onClick={() => openModalHandler('cancelApplication')}
             >
               원서 최종 제출 취소
             </Button>
@@ -477,7 +409,7 @@ export const MyPage = () => {
                 color={colors.extra.error}
                 borderColor={colors.extra.error}
                 hoverBackgroundColor="transparent"
-                onClick={() => setDelOpen(true)}
+                onClick={() => openModalHandler('delete')}
               >
                 회원 탈퇴
               </Button>
@@ -486,20 +418,20 @@ export const MyPage = () => {
         </SettingsSection>
       </ContentWrapper>
       <CancelModal
-        setIsOpen={setDelOpen}
-        isOpen={delOpen}
+        setIsOpen={() => closeModalHandler('delete')}
+        isOpen={openModal.delete}
         title="탈퇴하시겠습니까?"
         content="탈퇴 시 모든 정보가 삭제되며, 다시 복구하실 수 없습니다."
         btnText="탈퇴하기"
         onClick={() => {
-          setDelOpen(false);
-          setPasswordModalOpen(true);
+          closeModalHandler('delete');
+          openModalHandler('password');
         }}
       />
 
       <PasswordModal
-        setIsOpen={setPasswordModalOpen}
-        isOpen={passwordModalOpen}
+        setIsOpen={() => closeModalHandler('password')}
+        isOpen={openModal.password}
         title="비밀번호 확인"
         content="회원 탈퇴를 위해 비밀번호를 입력해주세요."
         btnText="탈퇴하기"
@@ -508,8 +440,8 @@ export const MyPage = () => {
       />
 
       <ChangePasswordModal
-        setIsOpen={setChangePasswordModalOpen}
-        isOpen={changePasswordModalOpen}
+        setIsOpen={() => closeModalHandler('changePassword')}
+        isOpen={openModal.changePassword}
         onConfirm={handleChangePasswordConfirm}
         isLoading={changePasswordMutation.isPending}
         userPhoneNumber={userInfo?.phoneNumber || ''}
@@ -517,8 +449,8 @@ export const MyPage = () => {
       />
 
       <CancelModal
-        setIsOpen={setCancelApplicationOpen}
-        isOpen={cancelApplicationOpen}
+        setIsOpen={() => closeModalHandler('cancelApplication')}
+        isOpen={openModal.cancelApplication}
         title="원서 접수를 취소하시겠습니까?"
         content="취소 시 제출된 원서가 삭제되며, 다시 복구하실 수 없습니다."
         btnText="접수 취소"
