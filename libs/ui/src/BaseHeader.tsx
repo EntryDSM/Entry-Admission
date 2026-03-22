@@ -159,24 +159,11 @@ export const CommonHeader = () => {
 
   return (
     <HeaderContainer scrollPosition={scrollPosition}>
-      <Flex
-        gap={12}
-        alignItems="center"
-        height="fit-content"
-        width="fit-content"
-        onClick={() => navigate('/')}
-      >
+      <CommonHeaderLogoSection onClick={() => navigate('/')}>
         <EntryLogo />
-        <Text fontSize={24} fontWeight={600} color={colors.gray[500]}>
-          EntryDSM
-        </Text>
-      </Flex>
-      <Flex
-        gap={52}
-        alignItems="center"
-        height="fit-content"
-        width="fit-content"
-      >
+        <CommonHeaderLogoText>EntryDSM</CommonHeaderLogoText>
+      </CommonHeaderLogoSection>
+      <CommonHeaderActionSection>
         <Flex
           width="fit-content"
           height="fit-content"
@@ -244,7 +231,7 @@ export const CommonHeader = () => {
           </Button>
         )}
         <SideBarBtnIcon onClick={() => setIsSideClick(!isSideClick)} />
-      </Flex>
+      </CommonHeaderActionSection>
       {isSideClick && (
         <SideNavContainer>
           {navData.map((data) => (
@@ -307,6 +294,45 @@ const LogoContainer = styled.div`
   cursor: pointer;
 `;
 
+const CommonHeaderLogoSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  height: fit-content;
+  cursor: pointer;
+
+  @media (max-width: 1200px) {
+    flex: 1;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+`;
+
+const CommonHeaderLogoText = styled.div`
+  width: fit-content;
+  font-size: 24px;
+  font-weight: 600;
+  color: ${colors.gray[500]};
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+`;
+
+const CommonHeaderActionSection = styled.div`
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
+  gap: 52px;
+
+  @media (max-width: 1200px) {
+    gap: 12px;
+    flex-shrink: 0;
+  }
+`;
+
 const AuthHeaderContainer = styled.div`
   display: flex;
   align-items: center;
@@ -322,7 +348,7 @@ const AuthHeaderContainer = styled.div`
 `;
 
 const SideNavContainer = styled.nav`
-  width: 100vw;
+  width: 100%;
   height: auto;
   position: absolute;
   top: 70px;
@@ -349,7 +375,7 @@ const HeaderContainer = styled.header<{ scrollPosition?: number }>`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 70px;
   display: flex;
   justify-content: space-between;
@@ -362,6 +388,14 @@ const HeaderContainer = styled.header<{ scrollPosition?: number }>`
       scrollPosition ? colors.gray[200] : 'transparent'};
   transition: 0.4s ease-in-out;
   z-index: 100;
+
+  @media (max-width: 1200px) {
+    padding: 0 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0 12px;
+  }
 `;
 
 const NoPathHeaderContainer = styled(HeaderContainer)`
